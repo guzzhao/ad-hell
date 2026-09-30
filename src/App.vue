@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useEventListener } from '@vueuse/core'
 import { useStormStore } from '@/stores/storm'
 import { useReducedMotion } from '@/composables/useReducedMotion'
 import { useStormLoop } from '@/composables/useStormLoop'
@@ -17,13 +17,13 @@ useStormLoop()
 /**
  * Esc 等效于"结束体验"。
  * 一个故意骚扰用户的页面如果把人困住，它本身就成了它要批判的东西。
+ *
+ * 用 `useEventListener` 而不是手写 add/removeEventListener：清理跟着 effect scope 走，
+ * 不会因为漏写 onBeforeUnmount 而在热更新后累积监听器。
  */
-function onKeydown(event: KeyboardEvent): void {
+useEventListener(window, 'keydown', (event) => {
   if (event.key === 'Escape') storm.enterTruth()
-}
-
-onMounted(() => window.addEventListener('keydown', onKeydown))
-onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
+})
 </script>
 
 <template>

@@ -52,6 +52,32 @@ describe('App 冒烟测试', () => {
     wrapper.unmount()
   })
 
+  it('主循环真的在推进风暴，并且夹紧了单帧步长', async () => {
+    const wrapper = mount(App)
+    const storm = useStormStore()
+
+    // store 的单测是直接调 advance(100) 的，绕过了主循环；这一条专门补上那段集成，
+    // 保证 rAF 真的接上了 store，而且 MAX_FRAME_MS 的夹紧在换实现之后仍然生效。
+    const advance = vi.spyOn(storm, 'advance')
+
+    await new Promise((resolve) => setTimeout(resolve, 120))
+
+    expect(advance).toHaveBeenCalled()
+
+    const deltas = advance.mock.calls.map(([dt]) => dt)
+    expect(deltas.length).toBeGreaterThan(0)
+    // 每一帧都必须落在 [0, 100]：切后台回来的那种巨大 delta 会被夹掉
+    for (const dt of deltas) {
+      expect(dt).toBeGreaterThanOrEqual(0)
+      expect(dt).toBeLessThanOrEqual(100)
+    }
+    // 至少有一帧确实推进了时间，否则循环只是在空转
+    expect(deltas.some((dt) => dt > 0)).toBe(true)
+
+    advance.mockRestore()
+    wrapper.unmount()
+  })
+
   it('主屏同时呈现 A 类与 B 类两个分区，且点明反差', () => {
     const wrapper = mount(App)
     const text = wrapper.text()
