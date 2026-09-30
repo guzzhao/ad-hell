@@ -88,6 +88,18 @@ describe('覆盖面积估算', () => {
       expect(c).toBeLessThanOrEqual(1)
     }
   })
+
+  it('接管实例完全不参与覆盖率', () => {
+    const takeover = makeAd(0, 0, 100, 100, 1, 'takeover')
+    expect(coverageEstimate([takeover])).toBe(0)
+  })
+
+  it('弹窗与接管混在一起时，只算弹窗那部分', () => {
+    const popups = [makeAd(0, 0, 50, 50, 1), makeAd(50, 50, 50, 50, 2)]
+    const takeover = makeAd(0, 0, 100, 100, 3, 'takeover')
+
+    expect(coverageEstimate([...popups, takeover])).toBeCloseTo(coverageEstimate(popups), 5)
+  })
 })
 
 describe('崩塌判定', () => {
@@ -107,6 +119,17 @@ describe('崩塌判定', () => {
   it('覆盖够且数量够时崩塌', () => {
     const ads = Array.from({ length: STORM.collapseMinAds }, (_, i) => makeAd(0, 0, 100, 100, i))
     expect(isCollapsed(ads)).toBe(true)
+  })
+
+  // 这条是 B1 改动的护栏：在 coverageEstimate 排除 takeover 之前，它会失败。
+  // 一个全屏接管实例贡献 100% 覆盖率，足以让"弹窗数够了"的瞬间被误判为崩塌。
+  it('全屏接管实例不能代替洪水把屏幕判定为崩塌', () => {
+    const popups = Array.from({ length: STORM.collapseMinAds + 10 }, (_, i) =>
+      makeAd(0, 0, 4, 4, i),
+    )
+    const takeover = makeAd(0, 0, 100, 100, 999, 'takeover')
+
+    expect(isCollapsed([...popups, takeover])).toBe(false)
   })
 })
 

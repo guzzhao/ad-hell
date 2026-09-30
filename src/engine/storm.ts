@@ -79,6 +79,14 @@ export function coverageEstimate(ads: readonly AdInstance[]): number {
   const cells: number[] = Array.from({ length: cols * rows }, () => 0)
 
   for (const ad of ads) {
+    // 只有弹窗参与覆盖率统计。
+    //
+    // 接管广告是一次**剧本演出**，不是洪水的一部分：它占满整屏会贡献 100% 覆盖率，
+    // 若此时屏上已有 collapseMinAds 个弹窗，崩塌就会被这一个剧本实例提前触发，
+    // 崩塌时机于是取决于节拍表而不是风暴本身。
+    // 理由详见 .trellis/tasks/09-30-ad-v2-extension/design.md §5.3
+    if (ad.surface !== 'popup') continue
+
     const c0 = clamp(Math.floor((ad.x / 100) * cols), 0, cols - 1)
     const c1 = clamp(Math.ceil(((ad.x + ad.w) / 100) * cols) - 1, 0, cols - 1)
     const r0 = clamp(Math.floor((ad.y / 100) * rows), 0, rows - 1)
