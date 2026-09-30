@@ -47,7 +47,7 @@ npm run build           # run-p type-check + vite build
 |------|------|------|
 | 纯逻辑（`engine/`） | Vitest 单测，断言**性质**而不只是例子 | 28 条 |
 | 状态机（`stores/`） | Vitest 单测，直接推进 `advance()` | 18 条 |
-| 渲染（`App` 级） | `@vue/test-utils` + jsdom 冒烟测试 | 7 条 |
+| 渲染（`App` 级） | `@vue/test-utils` + jsdom 冒烟测试（含主循环集成） | 8 条 |
 | 数据合规（`data/`） | 黑名单与结构断言 | 9 条 |
 | 视觉 / 体感 | **不做自动化**，照人工核对清单走 | — |
 | E2E / 视觉回归 | **不做**（刻意的取舍） | — |

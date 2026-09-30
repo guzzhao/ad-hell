@@ -54,6 +54,11 @@ Pinia setup store 负责：阶段机、计时、计数、弹窗实例列表。
 凡是需要 `onMounted` / `onBeforeUnmount` / `requestAnimationFrame` / `matchMedia` /
 `ResizeObserver` 的，都放这里，不要塞进组件。
 
+**实现时先查 `@vueuse/core`**：目前三个组合式函数全部建立在 VueUse 之上
+（`useRafFn` / `usePreferredReducedMotion` / `useElementSize` + `useMediaQuery`），
+清理逻辑跟着 effect scope 走，不需要手写 `onBeforeUnmount`。
+详见 [hook-guidelines.md](./hook-guidelines.md)。
+
 ### `components/` —— 只负责渲染
 
 组件里不做判定逻辑。要判断"这个点击算不算关掉"，调用 store 或 engine。

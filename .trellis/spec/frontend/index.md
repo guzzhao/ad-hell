@@ -35,6 +35,7 @@
 动手写代码前逐条确认：
 
 - [ ] 这一段逻辑属于哪一层？**纯逻辑进 `src/engine/`，不要写进组件**（见 directory-structure.md）
+- [ ] 要接浏览器 API 吗？**先查 `@vueuse/core` 有没有现成的**，别手写（见 hook-guidelines.md）
 - [ ] 要不要碰布局常量？`src/constants.ts` 与 `src/styles/*.css` 里有一份**必须手工同步**的镜像（见 component-guidelines.md）
 - [ ] 会不会同时用到 CSS `transform` 和 GSAP？**必须落在不同元素上**（见 component-guidelines.md 的"动画分工"）
 - [ ] 新加的是不是数组下标访问？`noUncheckedIndexedAccess` 已开启，返回值是 `T | undefined`（见 type-safety.md）

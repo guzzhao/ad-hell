@@ -79,12 +79,15 @@ npm run dev        # http://localhost:5173
 
 ## 技术栈
 
-Vite · Vue 3（`<script setup>`）· TypeScript · Pinia · GSAP
+Vite · Vue 3（`<script setup>`）· TypeScript · Pinia · GSAP · VueUse
 
 - **无路由**：手机内部的视图切换由 Pinia 状态驱动，不需要 vue-router。
 - **无 UI 组件库**：假广告的视觉风格必须手写 CSS 才像。
 - **工具链只有 oxc**：lint 用 `oxlint`，格式化用 `oxfmt`，不依赖 eslint / prettier
   —— 依赖树因此少掉 110 个包。
+- **浏览器 API 交给 VueUse**：`useRafFn` / `useElementSize` / `useMediaQuery` /
+  `usePreferredReducedMotion` / `useEventListener` 替掉了手写的 rAF 记账、
+  ResizeObserver 与 matchMedia 监听（净省 60~80 行，产物 +4 kB / gzip +1.5 kB）。
 - **GSAP 只用于编排**：风暴升级的屏幕抖动与崩塌吞没序列用 GSAP 时间轴；单个弹窗的进出场交给 Vue `<TransitionGroup>` + CSS。集成方式为 `gsap.context()` + `ctx.revert()`（npm 上没有 `@gsap/vue` 这个包）。
 
 ## 代码结构
