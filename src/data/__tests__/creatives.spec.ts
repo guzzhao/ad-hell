@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { CREATIVES, findCreative } from '../creatives'
 import { APPS, appsByCategory } from '../apps'
+import { FULL_SHAKE_ENERGY } from '@/engine/shake'
 
 /**
  * 真实企业名 / 商标黑名单。
@@ -82,6 +83,32 @@ describe('广告素材合规', () => {
 
   it('findCreative 对未知 id 返回 undefined 而不是抛错', () => {
     expect(findCreative('does-not-exist')).toBeUndefined()
+  })
+})
+
+describe('摇一摇素材', () => {
+  it('至少有一条素材带摇一摇，否则这个功能在演示里永远不会出现', () => {
+    const withTrigger = CREATIVES.filter((c) => c.trigger !== undefined)
+
+    expect(withTrigger.length).toBeGreaterThan(0)
+  })
+
+  it('每条摇一摇素材的阈值都不超过兜底按钮的能量', () => {
+    // 桌面没有传感器、iOS 拒绝授权时，兜底按钮按一次必须**一定**能触发；
+    // 阈值一旦高过 FULL_SHAKE_ENERGY，AC14 的"等价操作路径"就成了空话。
+    const tooHigh = CREATIVES.filter((c) => (c.trigger?.threshold ?? 0) > FULL_SHAKE_ENERGY).map(
+      (c) => c.id,
+    )
+
+    expect(tooHigh).toEqual([])
+  })
+
+  it('摇一摇素材的冷却为正，否则一次摇动会连跳好几次', () => {
+    const noCooldown = CREATIVES.filter(
+      (c) => c.trigger !== undefined && c.trigger.cooldownMs <= 0,
+    ).map((c) => c.id)
+
+    expect(noCooldown).toEqual([])
   })
 })
 

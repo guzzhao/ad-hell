@@ -1,10 +1,11 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { AdInstance, CloseOutcome, StormPhase } from '@/types/ad'
+import type { AdInstance, AdTrigger, CloseOutcome, StormPhase } from '@/types/ad'
 import { CREATIVES, findCreative } from '@/data/creatives'
 import { BEATS } from '@/data/beats'
 import { misclickPenalty, resolveClose } from '@/engine/close'
 import { mulberry32 } from '@/engine/rng'
+import { pushShakeSample, resolveShake, triggerCooldownMs, type ShakeSample } from '@/engine/shake'
 import {
   STORM,
   coverageEstimate,
@@ -24,6 +25,16 @@ import {
  * 点"重新体验"时会换成时间种子，避免每次看到一模一样的弹窗序列。
  */
 export const DEFAULT_SEED = 20260928
+
+/**
+ * 按素材 id 取摇一摇配置。
+ *
+ * 摇一摇是**素材的能力位**而不是全局开关，所以这个查找就是那条分界线：
+ * 找不到 `trigger` 的素材完全不参与摇一摇。
+ */
+function triggerOf(creativeId: string): AdTrigger | undefined {
+  return findCreative(creativeId)?.trigger
+}
 
 export const useStormStore = defineStore('storm', () => {
   // ── 状态 ────────────────────────────────────────────────
@@ -51,11 +62,24 @@ export const useStormStore = defineStore('storm', () => {
   let collapseElapsed = 0
   /** 已经上演过的节拍条数。用条数而不是时刻，跨帧的节拍才一条都不会漏。 */
   let firedBeats = 0
+  /**
+   * 摇一摇的能量窗口。
+   *
+   * 非响应式：它每次采样都会变，但界面不关心窗口里有多少能量；
+   * 放进响应式只会白白触发重渲染。与 `zCounter` 属于同一类记账。
+   */
+  let shakeSamples: ShakeSample[] = []
+  /** 每个实例的下次允许触发时刻。同样是非响应式记账。 */
+  const shakeCooldowns = new Map<number, number>()
 
   // ── 派生状态 ────────────────────────────────────────────
   const coverage = computed(() => coverageEstimate(ads.value))
   /** 弹窗数量。接管广告不在洪水里，不该占用"同时存在多少个弹窗"这个名额。 */
   const popupCount = computed(() => ads.value.filter((ad) => ad.surface === 'popup').length)
+  /** 屏上是否存在响应摇一摇的广告。控制层据此决定要不要提示用户。 */
+  const shakeArmed = computed(() =>
+    ads.value.some((ad) => findCreative(ad.creativeId)?.trigger !== undefined),
+  )
   const progress = computed(() => stormProgress(elapsedMs.value))
   const target = computed(() => targetConcurrent(elapsedMs.value))
   const interval = computed(() => spawnInterval(elapsedMs.value))
@@ -70,6 +94,8 @@ export const useStormStore = defineStore('storm', () => {
     spawnAccumulator = 0
     collapseElapsed = 0
     firedBeats = 0
+    shakeSamples = []
+    shakeCooldowns.clear()
     phase.value = 'boot'
     elapsedMs.value = 0
     ads.value = []
@@ -237,6 +263,36 @@ export const useStormStore = defineStore('storm', () => {
     landingOpen.value = false
   }
 
+  /**
+   * 收到一次摇动的能量。
+   *
+   * 由 `useShakeSource` 调用，与 `advance(dt)` 是**平行**的两个入口：
+   * `advance` 只依赖时间，`handleShake` 只依赖外部事件，两者互不感知。
+   * 这正是"摇一摇是外部事件"这一事实在架构上的落点——它没有被塞进时间推进里，
+   * 所以 `advance` 的"相同输入必得相同输出"（风暴全部单测的前提）依然成立。
+   */
+  function handleShake(energy: number): void {
+    if (phase.value !== 'storm') return
+
+    shakeSamples = pushShakeSample(shakeSamples, { atMs: elapsedMs.value, energy })
+
+    const id = resolveShake(ads.value, triggerOf, shakeSamples, shakeCooldowns, elapsedMs.value)
+    if (id === null) return
+
+    const ad = ads.value.find((a) => a.id === id)
+    const trigger = ad ? triggerOf(ad.creativeId) : undefined
+    if (!ad || !trigger) return
+
+    shakeCooldowns.set(id, elapsedMs.value + triggerCooldownMs(trigger))
+    // 窗口清零：一次摇动只算一次。残余能量不该在冷却刚过时又补一次跳转。
+    shakeSamples = []
+
+    // 与点假关闭键、点广告主体同罪：屏幕上多出 2~4 个弹窗
+    misclickCount.value += 1
+    landingOpen.value = true
+    applyPenalty(misclickPenalty(rng()))
+  }
+
   /** 主动结束体验，直接进入真相环节。 */
   function enterTruth(): void {
     phase.value = 'truth'
@@ -269,6 +325,7 @@ export const useStormStore = defineStore('storm', () => {
     // 派生
     coverage,
     popupCount,
+    shakeArmed,
     progress,
     target,
     interval,
@@ -280,6 +337,7 @@ export const useStormStore = defineStore('storm', () => {
     advance,
     attemptClose,
     tapAdBody,
+    handleShake,
     closeLanding,
     enterTruth,
     setReducedMotion,

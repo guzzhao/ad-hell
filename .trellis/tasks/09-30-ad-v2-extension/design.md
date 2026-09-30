@@ -27,7 +27,7 @@ v1 的设计见 `../09-30-phone-ad-chaos/design.md`，本文件是它的演进�
 |---|---|---|---|
 | **形态** | `AdLayout` → 渲染组件 | `src/components/ads/layouts.ts` | `Record<AdLayout, Component>`，漏注册 → `type-check` 报错 |
 | **呈现面** | `AdSurface` → 层组件 | `src/components/ads/surfaces.ts` | 同上 |
-| **触发** | `AdTrigger['kind']` → 判定实现 | `src/engine/shake.ts` + store 里的穷尽 `switch` | `never` 穷尽检查，漏分支 → `type-check` 报错 |
+| **触发** | `AdTrigger['kind']` → 每种触发的差异化处理 | `src/engine/shake.ts` 的 `TriggerCooldown` 映射类型 | 漏一个键 → `type-check` 报错（**注意：这不是单点注册**，见 §4.3） |
 | **媒体** | `mediaId` → 媒体描述符 | `src/data/media.ts` | 运行期由 `registry.spec.ts` 校验（string 键无法编译期穷尽） |
 | **能力层** | 浏览器能力探测 | `src/capabilities.ts` | 注入假 env 直接单测各分支 |
 
@@ -173,18 +173,35 @@ export function isShakeTriggered(samples: readonly ShakeSample[], threshold: num
 
 /**
  * 从屏上的广告里挑出该响应这次摇动的那一个。
- * 只在带 shake 触发器的广告之间选择；冷却未过则返回 null。
+ * 只在带 shake 触发器的广告之间选择；冷却未过则返回 null；能量不够也返回 null。
  */
-export function pickShakeResponder(
+export function resolveShake(
   ads: readonly AdInstance[],
   resolveTrigger: (creativeId: string) => AdTrigger | undefined,
+  samples: readonly ShakeSample[],
   nextAllowedAt: ReadonlyMap<number, number>,
   nowMs: number,
 ): number | null
 ```
 
-`pickShakeResponder` 用**穷尽 `switch (trigger.kind)`** 实现，新增触发类型时
-漏掉分支会被 `never` 检查挡下。
+#### 4.3.1 关于"触发缝的编译期保证"——实测修正
+
+设计初稿写的是"用穷尽 `switch (trigger.kind)` + `assertNever`，漏分支编译报错"。
+**实现时发现这条不成立**：`assertNever` 的穷尽性依赖被判断的值是一个**多成员联合**，
+而 `AdTrigger` 当前只有一个成员（`ShakeTrigger`），在 `default` 分支里它不会被收窄成
+`never`，于是编译器报的是"`ShakeTrigger` 不能赋给 `never`"——一个假阳性错误。
+
+改用映射类型 `TriggerCooldown`（`{[K in AdTrigger['kind']]: (t: Extract<AdTrigger,{kind:K}>) => number}`），
+并用"往 `AdTrigger` 加一个 `tilt` 分支"实测验证过：`type-check` 报
+`Property 'tilt' is missing in type ... but required in type 'TriggerCooldown'`。
+
+但要如实说明一条与另外三条缝不同的性质：**触发缝不是单点注册。**
+那次实测同时暴露了 `resolveShake` 里直接访问 `trigger.threshold` 的地方也会报错。
+也就是说，加一种触发方式需要补**若干处**，编译器会把它们全部指出来——
+这比"静默出错"好得多，但确实不是"加一行"。
+
+形态缝与呈现面缝是真正的单点注册（数据只引用 `layout` / `surface` 两个字符串），
+这一点没有变。
 
 ### 4.4 防抖与冷却（两层，缺一不可）
 

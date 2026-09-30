@@ -4,6 +4,7 @@ import { DEFAULT_SEED, useStormStore } from '../storm'
 import { STORM } from '@/engine/storm'
 import { findCreative } from '@/data/creatives'
 import { BEATS } from '@/data/beats'
+import { FULL_SHAKE_ENERGY, SHAKE } from '@/engine/shake'
 import type { AdInstance, CloseVariant } from '@/types/ad'
 
 type Store = ReturnType<typeof useStormStore>
@@ -338,5 +339,105 @@ describe('全屏接管广告（剧本节拍）', () => {
     seedAd(store, 'call-loan-service')
 
     expect(store.coverage).toBe(0)
+  })
+})
+
+describe('摇一摇', () => {
+  // splash-mall 是素材库里唯一带 trigger 的那条（开屏广告 + 摇一摇）
+  const SHAKY = 'splash-mall'
+
+  it('屏上没有带摇一摇的广告时，摇动毫无后果', () => {
+    const store = useStormStore()
+    store.start()
+    expect(store.shakeArmed).toBe(false)
+
+    for (let i = 0; i < 10; i++) store.handleShake(SHAKE.beatEnergy)
+
+    expect(store.misclickCount).toBe(0)
+    expect(store.landingOpen).toBe(false)
+  })
+
+  it('屏上有带摇一摇的广告时，攒够能量就跳转一次并追加弹窗', () => {
+    const store = useStormStore()
+    store.start()
+    seedAd(store, SHAKY)
+    expect(store.shakeArmed).toBe(true)
+
+    const before = store.ads.length
+    // 阈值 1、单拍 0.5，所以要两拍
+    store.handleShake(SHAKE.beatEnergy)
+    expect(store.misclickCount).toBe(0)
+
+    store.handleShake(SHAKE.beatEnergy)
+    expect(store.misclickCount).toBe(1)
+    expect(store.landingOpen).toBe(true)
+    expect(store.ads.length).toBeGreaterThan(before)
+  })
+
+  it('一次摇动只算一次：冷却期内的后续能量不再叠加', () => {
+    const store = useStormStore()
+    store.start()
+    seedAd(store, SHAKY)
+
+    store.handleShake(FULL_SHAKE_ENERGY)
+    expect(store.misclickCount).toBe(1)
+
+    store.handleShake(FULL_SHAKE_ENERGY)
+    store.handleShake(FULL_SHAKE_ENERGY)
+    expect(store.misclickCount).toBe(1)
+  })
+
+  it('冷却过后可以再摇一次', () => {
+    const store = useStormStore()
+    store.start()
+    seedAd(store, SHAKY)
+
+    store.handleShake(FULL_SHAKE_ENERGY)
+    expect(store.misclickCount).toBe(1)
+
+    advanceFor(store, 1600)
+    store.handleShake(FULL_SHAKE_ENERGY)
+
+    expect(store.misclickCount).toBe(2)
+  })
+
+  it('窗口外的旧能量会过期，攒不起来就永远不触发', () => {
+    const store = useStormStore()
+    store.start()
+    seedAd(store, SHAKY)
+
+    // 每一拍单独都不够阈值，而两次之间隔了比窗口更久的时间
+    for (let i = 0; i < 5; i++) {
+      store.handleShake(SHAKE.beatEnergy)
+      advanceFor(store, 1100)
+    }
+
+    expect(store.misclickCount).toBe(0)
+  })
+
+  it('真相环节里摇动不触发——那时的屏幕上已经没有广告了', () => {
+    const store = useStormStore()
+    store.start()
+    seedAd(store, SHAKY)
+    store.enterTruth()
+
+    store.handleShake(FULL_SHAKE_ENERGY)
+
+    expect(store.misclickCount).toBe(0)
+  })
+
+  it('重新体验会清掉摇一摇的能量与冷却', () => {
+    const store = useStormStore()
+    store.start()
+    seedAd(store, SHAKY)
+    store.handleShake(FULL_SHAKE_ENERGY)
+    expect(store.misclickCount).toBe(1)
+
+    store.restart()
+    seedAd(store, SHAKY)
+    store.handleShake(FULL_SHAKE_ENERGY)
+
+    // 新一局里第一次摇动就该生效，不该被上一局的冷却挡住
+    expect(store.misclickCount).toBe(1)
   })
 })

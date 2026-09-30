@@ -154,7 +154,7 @@ export const CREATIVES: readonly AdCreative[] = [
   },
   {
     id: 'splash-mall',
-    badge: '满 199 减 100',
+    badge: '限时 3 小时',
     category: '开屏广告',
     brand: '闪购商城',
     headline: '双十一提前购',
@@ -162,6 +162,12 @@ export const CREATIVES: readonly AdCreative[] = [
     cta: '立即进入',
     layout: 'splash',
     surface: 'popup',
+    /*
+     * 开屏广告 + 摇一摇跳转，是现实中这套滥用的经典组合：用户只是想拿稳手机，
+     * 页面就跳走了。触发能力挂在**素材**上，与版式正交——所以这里不必新造一种版式，
+     * 正好证明那条缝是独立的。
+     */
+    trigger: { kind: 'shake', threshold: 1, cooldownMs: 1500 },
     closeVariant: 'corner',
     palette: { bg: '#e23b2e', fg: '#ffffff', accent: '#ffd54a' },
     size: { w: 100, h: 100 },
