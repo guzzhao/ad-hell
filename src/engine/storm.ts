@@ -105,11 +105,15 @@ export function coverageEstimate(ads: readonly AdInstance[]): number {
  * 是否达到崩塌条件。
  *
  * 两个条件都要满足：覆盖面积够大，且弹窗数量够多。
- * 只判覆盖会被单个全屏广告直接击穿。
+ * 只判覆盖会被单个全屏广告直接击穿——`collapseMinAds` 就是为这件事存在的。
+ *
+ * 因此**两个条件都必须只看弹窗**：接管广告正是一个"单个全屏广告"，
+ * 若把它算进数量，就等于把这个守卫又绕开了。
  */
 export function isCollapsed(ads: readonly AdInstance[]): boolean {
-  if (ads.length < STORM.collapseMinAds) return false
-  return coverageEstimate(ads) >= STORM.collapseCoverage
+  const popups = ads.filter((ad) => ad.surface === 'popup')
+  if (popups.length < STORM.collapseMinAds) return false
+  return coverageEstimate(popups) >= STORM.collapseCoverage
 }
 
 /**

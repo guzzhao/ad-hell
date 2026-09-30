@@ -131,6 +131,21 @@ describe('崩塌判定', () => {
 
     expect(isCollapsed([...popups, takeover])).toBe(false)
   })
+
+  // 上一条测试里弹窗本来就够多，所以漏掉这一条就漏掉了一半的 bug：
+  // collapseMinAds 的**数量**条件同样必须排除接管实例，否则守卫照样被绕开。
+  //
+  // 这里必须让弹窗本身就够覆盖：否则 coverageEstimate 自己的过滤会把测试救回来，
+  // 这条测试就变成了空跑（第一次写的时候正是踩了这个坑）。
+  it('接管实例也不算进崩塌所需的弹窗数量', () => {
+    const popups = Array.from({ length: STORM.collapseMinAds - 1 }, (_, i) =>
+      makeAd(0, 0, 100, 100, i),
+    )
+    const takeover = makeAd(0, 0, 100, 100, 999, 'takeover')
+
+    expect(coverageEstimate(popups)).toBeGreaterThanOrEqual(STORM.collapseCoverage)
+    expect(isCollapsed([...popups, takeover])).toBe(false)
+  })
 })
 
 describe('位置采样', () => {
