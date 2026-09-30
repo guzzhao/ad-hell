@@ -3,8 +3,10 @@ import {
   HUMAN_CLOSE_CLICKS_PER_SEC,
   STORM,
   coverageEstimate,
+  dueBeats,
   eligibleCreatives,
   isCollapsed,
+  isTakeoverExpired,
   pickCreative,
   samplePosition,
   spawnInterval,
@@ -13,7 +15,7 @@ import {
   targetConcurrent,
 } from '../storm'
 import { mulberry32 } from '../rng'
-import type { AdInstance, AdSurface } from '@/types/ad'
+import type { AdInstance, AdSurface, StormBeat } from '@/types/ad'
 import { CREATIVES } from '@/data/creatives'
 
 function makeAd(
@@ -196,6 +198,15 @@ describe('素材抽取', () => {
     expect(pickCreative([], 0.5, mulberry32(1))).toBeUndefined()
   })
 
+  // 接管广告只走剧本节拍，不参与随机抽签。混进池子里的后果很隐蔽：
+  // 它会被当成普通弹窗撒在屏幕上，还会顶掉真正的节拍（spawnTakeover 会让位）。
+  it('抽签池里不会出现接管素材', () => {
+    const pool = eligibleCreatives(CREATIVES, 1)
+
+    expect(pool.length).toBeGreaterThan(0)
+    expect(pool.some((c) => c.surface === 'takeover')).toBe(false)
+  })
+
   it('五种关闭变体在素材库里都至少出现两次', () => {
     const counts = new Map<string, number>()
     for (const c of CREATIVES) {
@@ -204,5 +215,55 @@ describe('素材抽取', () => {
     for (const variant of ['honest', 'tiny', 'corner', 'deceptive', 'none']) {
       expect(counts.get(variant) ?? 0).toBeGreaterThanOrEqual(2)
     }
+  })
+})
+
+describe('剧本节拍调度', () => {
+  const beats: StormBeat[] = [
+    { atMs: 1000, creativeId: 'a' },
+    { atMs: 2000, creativeId: 'b' },
+  ]
+
+  it('未到点不返回任何节拍', () => {
+    expect(dueBeats(beats, 0, 999)).toEqual([])
+  })
+
+  it('刚好到点即返回', () => {
+    expect(dueBeats(beats, 0, 1000)).toHaveLength(1)
+  })
+
+  it('已经上演过的不会重演', () => {
+    expect(dueBeats(beats, 1, 1000)).toEqual([])
+  })
+
+  // 这条是"用条数当游标"而不是"用上次时刻"的理由：
+  // 一帧跨过多个节拍时（切标签页回来、卡顿），中间那些必须一条都不漏。
+  it('一帧跨过多个节拍时全部返回，不漏掉中间那些', () => {
+    expect(dueBeats(beats, 0, 5000)).toHaveLength(2)
+  })
+
+  it('全部上演过后不再返回', () => {
+    expect(dueBeats(beats, beats.length, 999_999)).toEqual([])
+  })
+})
+
+describe('接管实例超龄', () => {
+  it('弹窗永远不会超龄——它本来就该待在屏幕上等人来关', () => {
+    const popup = makeAd(0, 0, 50, 50, 1, 'popup')
+    expect(isTakeoverExpired(popup, STORM.takeoverMaxMs)).toBe(false)
+    expect(isTakeoverExpired(popup, 999_999)).toBe(false)
+  })
+
+  it('接管实例到点超龄，差 1ms 都不算', () => {
+    const takeover = makeAd(0, 0, 100, 100, 1, 'takeover')
+    expect(isTakeoverExpired(takeover, STORM.takeoverMaxMs - 1)).toBe(false)
+    expect(isTakeoverExpired(takeover, STORM.takeoverMaxMs)).toBe(true)
+  })
+
+  it('超龄是相对出生时刻算的，不是相对风暴开始时刻', () => {
+    const late: AdInstance = { ...makeAd(0, 0, 100, 100, 1, 'takeover'), bornAt: 9000 }
+    // 风暴走到 15s 时，这个 9s 才出生的接管只活了 6s，不该超龄
+    expect(isTakeoverExpired(late, 15_000)).toBe(false)
+    expect(isTakeoverExpired(late, 9000 + STORM.takeoverMaxMs)).toBe(true)
   })
 })

@@ -22,7 +22,7 @@ export type CloseVariant =
   | 'none'
 
 /** 广告素材的版式。 */
-export type AdLayout = 'banner' | 'interstitial' | 'splash' | 'floating' | 'fakeCall'
+export type AdLayout = 'banner' | 'interstitial' | 'splash' | 'floating' | 'fakeCall' | 'callPage'
 
 /**
  * 广告的呈现面：它由哪一层渲染。
@@ -56,8 +56,8 @@ export interface ShakeTrigger {
 /** 广告的触发方式。加新触发类型就是往这个联合里加一个分支。 */
 export type AdTrigger = ShakeTrigger
 
-/** 程序合成音的预设名。 */
-export type SynthPreset = 'ringtone' | 'callVoice'
+/** 程序合成音的预设名。加一种声音就是往这个联合里加一个分支。 */
+export type SynthPreset = 'callSession'
 
 /**
  * 媒体描述符。
@@ -90,6 +90,11 @@ export interface AdCreative {
   headline: string
   subline: string
   cta: string
+  /**
+   * 催单角标，如「限时免息」「仅剩 37 个名额」。
+   * 真实广告几乎都挂着这么一枚，是"真实感"里最廉价也最有效的一笔。
+   */
+  badge?: string
   layout: AdLayout
   /**
    * 呈现面。**必填**：它参与崩塌判定，不能有一个沉默的默认值——
@@ -136,6 +141,19 @@ export type CloseOutcome =
   | { kind: 'misclick'; extraAds: number }
 
 export type StormPhase = 'boot' | 'storm' | 'collapsed' | 'truth'
+
+/**
+ * 风暴剧本的一条节拍：在第 `atMs` 毫秒上演 `creativeId` 这条素材。
+ *
+ * 用来安排那些**不能交给随机生成**的演出（例如全屏来电广告）：
+ * 随机上演意味着"这一遍可能看不到"，验收就无从谈起。
+ *
+ * ⚠️ 表必须按 `atMs` 升序。`dueBeats()` 用"已上演条数"作游标，乱序会让后面的节拍永不上演。
+ */
+export interface StormBeat {
+  atMs: number
+  creativeId: string
+}
 
 export interface AppMeta {
   id: string

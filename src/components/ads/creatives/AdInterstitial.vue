@@ -6,6 +6,7 @@ defineProps<{ creative: AdCreative }>()
 
 <template>
   <div class="ad-inter">
+    <span class="creative-sheen" aria-hidden="true" />
     <div class="ad-inter__hero" aria-hidden="true">
       <span class="ad-inter__mark">{{ creative.brand.slice(0, 1) }}</span>
     </div>
@@ -13,6 +14,9 @@ defineProps<{ creative: AdCreative }>()
       <span class="ad-inter__tag">广告 · {{ creative.category }}</span>
       <strong>{{ creative.headline }}</strong>
       <small>{{ creative.subline }}</small>
+      <span v-if="creative.badge" class="creative-badge ad-inter__badge">
+        {{ creative.badge }}
+      </span>
       <span class="ad-inter__cta">{{ creative.cta }}</span>
     </div>
   </div>
@@ -20,10 +24,16 @@ defineProps<{ creative: AdCreative }>()
 
 <style scoped>
 .ad-inter {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--ad-bg);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ad-bg) 88%, #ffffff) 0%,
+    var(--ad-bg) 46%,
+    color-mix(in srgb, var(--ad-bg) 80%, #000000) 100%
+  );
   color: var(--ad-fg);
   border-radius: 16px;
   overflow: hidden;
@@ -78,14 +88,25 @@ defineProps<{ creative: AdCreative }>()
   line-height: 1.5;
 }
 
+.ad-inter__badge {
+  align-self: flex-start;
+  margin-top: 7px;
+}
+
 .ad-inter__cta {
   margin-top: auto;
   padding: 9px 0;
   text-align: center;
   border-radius: 999px;
-  background: var(--ad-accent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ad-accent) 78%, #ffffff) 0%,
+    var(--ad-accent) 52%,
+    color-mix(in srgb, var(--ad-accent) 84%, #000000) 100%
+  );
   color: #14161a;
   font-size: 13px;
   font-weight: 800;
+  box-shadow: 0 6px 14px -6px rgba(0, 0, 0, 0.6);
 }
 </style>

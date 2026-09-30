@@ -6,6 +6,7 @@ defineProps<{ creative: AdCreative }>()
 
 <template>
   <div class="ad-splash">
+    <span class="creative-sheen" aria-hidden="true" />
     <!-- 视觉上的"跳过"倒计时。它是装饰，不是可点控件：真正的关闭键由 CloseButton 决定 -->
     <span class="ad-splash__skip" aria-hidden="true">跳过 5s ›</span>
 
@@ -14,6 +15,9 @@ defineProps<{ creative: AdCreative }>()
       <span class="ad-splash__brand">{{ creative.brand }}</span>
       <strong>{{ creative.headline }}</strong>
       <small>{{ creative.subline }}</small>
+      <span v-if="creative.badge" class="creative-badge ad-splash__badge">
+        {{ creative.badge }}
+      </span>
       <span class="ad-splash__cta">{{ creative.cta }}</span>
     </div>
 
@@ -29,7 +33,12 @@ defineProps<{ creative: AdCreative }>()
   justify-content: center;
   height: 100%;
   padding: 40px 26px 30px;
-  background: var(--ad-bg);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ad-bg) 86%, #ffffff) 0%,
+    var(--ad-bg) 48%,
+    color-mix(in srgb, var(--ad-bg) 78%, #000000) 100%
+  );
   color: var(--ad-fg);
   overflow: hidden;
 }
@@ -98,14 +107,24 @@ defineProps<{ creative: AdCreative }>()
   opacity: 0.85;
 }
 
+.ad-splash__badge {
+  margin-top: 12px;
+}
+
 .ad-splash__cta {
-  margin-top: 22px;
+  margin-top: 14px;
   padding: 12px 34px;
   border-radius: 999px;
-  background: var(--ad-accent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ad-accent) 76%, #ffffff) 0%,
+    var(--ad-accent) 52%,
+    color-mix(in srgb, var(--ad-accent) 84%, #000000) 100%
+  );
   color: #14161a;
   font-size: 15px;
   font-weight: 800;
+  box-shadow: 0 10px 22px -10px rgba(0, 0, 0, 0.75);
 }
 
 .ad-splash__foot {

@@ -11,6 +11,9 @@ defineProps<{ creative: AdCreative }>()
     <div class="ad-banner__text">
       <strong>{{ creative.headline }}</strong>
       <small>{{ creative.subline }}</small>
+      <span v-if="creative.badge" class="creative-badge ad-banner__badge">
+        {{ creative.badge }}
+      </span>
     </div>
     <span class="ad-banner__cta">{{ creative.cta }}</span>
   </div>
@@ -23,7 +26,13 @@ defineProps<{ creative: AdCreative }>()
   gap: 9px;
   height: 100%;
   padding: 0 13px;
-  background: var(--ad-bg);
+  /* 不再是纯色块：上提亮、下压暗，色块才有"材质"而不是一块色板 */
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ad-bg) 88%, #ffffff) 0%,
+    var(--ad-bg) 44%,
+    color-mix(in srgb, var(--ad-bg) 80%, #000000) 100%
+  );
   color: var(--ad-fg);
 }
 
@@ -75,15 +84,26 @@ defineProps<{ creative: AdCreative }>()
   text-overflow: ellipsis;
 }
 
+.ad-banner__badge {
+  align-self: flex-start;
+  margin-top: 3px;
+}
+
 .ad-banner__cta {
   flex: none;
   margin-left: auto;
   padding: 6px 11px;
   border-radius: 999px;
-  background: var(--ad-accent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ad-accent) 78%, #ffffff) 0%,
+    var(--ad-accent) 52%,
+    color-mix(in srgb, var(--ad-accent) 84%, #000000) 100%
+  );
   color: #14161a;
   font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
+  box-shadow: 0 4px 10px -4px rgba(0, 0, 0, 0.55);
 }
 </style>

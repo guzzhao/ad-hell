@@ -1,4 +1,4 @@
-import type { AdCreative, AdInstance } from '@/types/ad'
+import type { AdCreative, AdInstance, StormBeat } from '@/types/ad'
 
 /**
  * 广告风暴的全部可调参数。调参只改这里，不要把数字散落到组件中。
@@ -27,6 +27,15 @@ export const STORM = {
   collapseMinAds: 14,
   /** 进入 collapsed 后停留多久再切到 truth（ms），留给崩塌演出。 */
   collapseSettleMs: 2600,
+
+  /**
+   * 全屏接管广告的硬性时长上限（ms）。
+   *
+   * 这是**用户保护**，不是演出参数：`closeVariant: 'none'` 的来电广告没有任何关闭键，
+   * 没有这一条，用户就会被一个挂不掉的电话永久困住——那这页面本身就成了它要批判的东西。
+   * 到点自动"对方挂断"。
+   */
+  takeoverMaxMs: 12_000,
 
   /** 覆盖面积估算的网格分辨率。 */
   gridCols: 12,
@@ -158,12 +167,21 @@ export function samplePosition(
   return { x: clamp(x, 0, maxX), y: clamp(y, 0, maxY) }
 }
 
-/** 在当前进度下允许出现的素材。全屏素材被 `minProgress` 压到风暴后段。 */
+/**
+ * 在当前进度下**允许被随机生成**的素材。
+ *
+ * 只返回弹窗素材。接管广告由 `data/beats.ts` 的剧本节拍上演，绝不能混进抽签池：
+ * 随机生成器会把它当成普通弹窗撒在屏幕上（位置还是采样出来的，
+ * 但它本该铺满整屏），而且会顶掉真正的节拍——`spawnTakeover` 见到已有接管就会让位。
+ * 这个 bug 真的发生过一次，是 `开场不会抽到全屏素材` 那条单测把它抓出来的。
+ *
+ * 全屏的弹窗素材则被 `minProgress` 压到风暴后段，避免开场就遮死整个屏幕。
+ */
 export function eligibleCreatives(
   creatives: readonly AdCreative[],
   progress: number,
 ): AdCreative[] {
-  return creatives.filter((c) => progress >= (c.minProgress ?? 0))
+  return creatives.filter((c) => c.surface === 'popup' && progress >= (c.minProgress ?? 0))
 }
 
 /** 从可用素材中抽一条。池子为空时返回 undefined，由调用方决定是否跳过本次生成。 */
@@ -176,4 +194,40 @@ export function pickCreative(
   if (pool.length === 0) return undefined
   const index = Math.min(pool.length - 1, Math.floor(rng() * pool.length))
   return pool[index]
+}
+
+/**
+ * 本次推进中应当上演的节拍。
+ *
+ * @param firedCount 已经上演过的**条数**（不是时间）。调用方把它当游标持久化。
+ *
+ * 用"已上演条数"而不是"上次的时刻"，是因为落下的节拍必须**一条都不漏**：
+ * 用时刻比较会在帧跨过多个节拍时丢掉中间那些。
+ *
+ * 前提：`beats` 按 `atMs` 升序（`beats.spec.ts` 守着这条不变量），
+ * 因此遇到第一条未到点的节拍就可以停。
+ */
+export function dueBeats(
+  beats: readonly StormBeat[],
+  firedCount: number,
+  elapsedMs: number,
+): StormBeat[] {
+  const due: StormBeat[] = []
+  for (let i = firedCount; i < beats.length; i++) {
+    const beat = beats[i]
+    if (!beat || elapsedMs < beat.atMs) break
+    due.push(beat)
+  }
+  return due
+}
+
+/**
+ * 接管实例是否已经超龄（到点自动挂断）。
+ *
+ * 只对接管实例有意义：弹窗本来就该一直待在屏幕上等人来关，
+ * 而全屏接管必须有硬性终点，否则无关闭键的那种会把人永久困住。
+ */
+export function isTakeoverExpired(ad: AdInstance, elapsedMs: number): boolean {
+  if (ad.surface !== 'takeover') return false
+  return elapsedMs - ad.bornAt >= STORM.takeoverMaxMs
 }

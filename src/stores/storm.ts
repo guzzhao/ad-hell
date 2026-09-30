@@ -2,12 +2,15 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { AdInstance, CloseOutcome, StormPhase } from '@/types/ad'
 import { CREATIVES, findCreative } from '@/data/creatives'
+import { BEATS } from '@/data/beats'
 import { misclickPenalty, resolveClose } from '@/engine/close'
 import { mulberry32 } from '@/engine/rng'
 import {
   STORM,
   coverageEstimate,
+  dueBeats,
   isCollapsed,
+  isTakeoverExpired,
   pickCreative,
   samplePosition,
   spawnInterval,
@@ -39,9 +42,13 @@ export const useStormStore = defineStore('storm', () => {
   let zCounter = 10
   let spawnAccumulator = 0
   let collapseElapsed = 0
+  /** 已经上演过的节拍条数。用条数而不是时刻，跨帧的节拍才一条都不会漏。 */
+  let firedBeats = 0
 
   // ── 派生状态 ────────────────────────────────────────────
   const coverage = computed(() => coverageEstimate(ads.value))
+  /** 弹窗数量。接管广告不在洪水里，不该占用"同时存在多少个弹窗"这个名额。 */
+  const popupCount = computed(() => ads.value.filter((ad) => ad.surface === 'popup').length)
   const progress = computed(() => stormProgress(elapsedMs.value))
   const target = computed(() => targetConcurrent(elapsedMs.value))
   const interval = computed(() => spawnInterval(elapsedMs.value))
@@ -55,6 +62,7 @@ export const useStormStore = defineStore('storm', () => {
     zCounter = 10
     spawnAccumulator = 0
     collapseElapsed = 0
+    firedBeats = 0
     phase.value = 'boot'
     elapsedMs.value = 0
     ads.value = []
@@ -98,6 +106,56 @@ export const useStormStore = defineStore('storm', () => {
   }
 
   /**
+   * 上演一条剧本节拍——目前只有全屏接管广告走这条路。
+   *
+   * 与 `spawnOne` 分开而不是复用，是因为两者的"位置"语义完全不同：
+   * 弹窗要采样百分比坐标，接管永远是从 (0,0) 铺满整屏。
+   */
+  function spawnTakeover(creativeId: string): void {
+    // 同一时刻只允许一个全屏接管：两块来电页互相盖住毫无意义。
+    // 当前节拍表不会产生重叠（间隔 18s > 上限 12s），这条守卫是为了将来改表时不静默出错。
+    if (ads.value.some((ad) => ad.surface === 'takeover')) return
+
+    const creative = findCreative(creativeId)
+    if (!creative) return
+
+    ads.value.push({
+      id: nextId++,
+      creativeId: creative.id,
+      surface: creative.surface,
+      x: 0,
+      y: 0,
+      w: creative.size.w,
+      h: creative.size.h,
+      z: zCounter++,
+      bornAt: elapsedMs.value,
+    })
+    spawnedCount.value += 1
+  }
+
+  /** 上演所有到点的节拍。 */
+  function runBeats(): void {
+    const due = dueBeats(BEATS, firedBeats, elapsedMs.value)
+    if (due.length === 0) return
+    // 先推进游标再上演：spawnTakeover 若因为已有接管而跳过，这一拍也不该重来。
+    firedBeats += due.length
+    for (const beat of due) spawnTakeover(beat.creativeId)
+  }
+
+  /**
+   * 让超龄的接管广告自动"挂断"。
+   *
+   * 这是**用户保护**：`closeVariant: 'none'` 的来电广告没有任何关闭键，
+   * 没有这一步，用户会被一个挂不掉的电话永久困住——那这页面本身就成了它要批判的东西。
+   *
+   * 不计入 `closedCount`：那个数字是"用户亲手关掉了多少"，自动挂断不算。
+   */
+  function expireTakeovers(): void {
+    const survivors = ads.value.filter((ad) => !isTakeoverExpired(ad, elapsedMs.value))
+    if (survivors.length !== ads.value.length) ads.value = survivors
+  }
+
+  /**
    * 推进一帧。由 `useStormLoop` 调用，dt 已由调用方夹紧。
    */
   function advance(dt: number): void {
@@ -111,12 +169,16 @@ export const useStormStore = defineStore('storm', () => {
     elapsedMs.value += dt
     spawnAccumulator += dt
 
+    runBeats()
+    expireTakeovers()
+
     if (spawnAccumulator >= interval.value) {
       // 只补一个，并且不累积"欠账"：否则从后台切回来会瞬间爆发几十个弹窗。
       spawnAccumulator = 0
       // 数量未达当前目标才补，这就是"打地鼠"机制——关掉一个，过一会儿又补回来。
       // 目标值本身只随时间增长，不受用户操作影响，这是"关不完"的结构性保证。
-      if (ads.value.length < target.value) spawnOne()
+      // 只数弹窗：接管广告不在洪水里，让它占掉一个名额会稀释洪水的密度。
+      if (popupCount.value < target.value) spawnOne()
     }
 
     // 兜底：到点必然收场。即使有人手速超神，风暴也不会无限拖延。
@@ -188,6 +250,7 @@ export const useStormStore = defineStore('storm', () => {
     landingOpen,
     // 派生
     coverage,
+    popupCount,
     progress,
     target,
     interval,

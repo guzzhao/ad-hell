@@ -3,6 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { DEFAULT_SEED, useStormStore } from '../storm'
 import { STORM } from '@/engine/storm'
 import { findCreative } from '@/data/creatives'
+import { BEATS } from '@/data/beats'
 import type { AdInstance, CloseVariant } from '@/types/ad'
 
 type Store = ReturnType<typeof useStormStore>
@@ -279,5 +280,63 @@ describe('风暴 store', () => {
     }
 
     expect(sequenceA).toEqual(sequenceB)
+  })
+})
+
+describe('全屏接管广告（剧本节拍）', () => {
+  const firstBeat = BEATS[0]
+
+  it('到点上演，且素材正是节拍表指定的那一条', () => {
+    const store = useStormStore()
+    store.start()
+    expect(store.ads.some((a) => a.surface === 'takeover')).toBe(false)
+
+    advanceFor(store, firstBeat?.atMs ?? 0)
+
+    const takeovers = store.ads.filter((a) => a.surface === 'takeover')
+    expect(takeovers).toHaveLength(1)
+    expect(takeovers[0]?.creativeId).toBe(firstBeat?.creativeId)
+  })
+
+  it('到点自动挂断，不会把用户永久困住', () => {
+    const store = useStormStore()
+    store.start()
+    advanceFor(store, (firstBeat?.atMs ?? 0) + STORM.takeoverMaxMs - 100)
+    // 差 100ms 还没到点，应该还在
+    expect(store.ads.some((a) => a.surface === 'takeover')).toBe(true)
+
+    advanceFor(store, 100)
+    expect(store.ads.some((a) => a.surface === 'takeover')).toBe(false)
+  })
+
+  it('自动挂断不算作用户关闭', () => {
+    const store = useStormStore()
+    store.start()
+    advanceFor(store, (firstBeat?.atMs ?? 0) + STORM.takeoverMaxMs)
+
+    expect(store.closedCount).toBe(0)
+  })
+
+  // 这条测的是"接管广告不占弹窗名额"。改动前 advance 用的是 ads.length，
+  // 那个长度里包含接管实例，于是它会顶掉一个弹窗名额——洪水被稀释。
+  it('接管实例不占用弹窗的数量目标', () => {
+    const store = useStormStore()
+    store.start()
+    // 塞一个接管实例进去，让它从头就在场（bornAt 为 0，不会中途超龄）
+    seedAd(store, 'call-loan-service')
+    expect(store.ads.some((a) => a.surface === 'takeover')).toBe(true)
+
+    advanceFor(store, 6000)
+
+    // 6 秒时 targetConcurrent 仍是 2；弹窗应当被补满 2 个，接管实例不算在内
+    expect(store.popupCount).toBe(store.target)
+  })
+
+  it('接管广告不计入覆盖率，也不会顶起崩塌判定', () => {
+    const store = useStormStore()
+    store.start()
+    seedAd(store, 'call-loan-service')
+
+    expect(store.coverage).toBe(0)
   })
 })

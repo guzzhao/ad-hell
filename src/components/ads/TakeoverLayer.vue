@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, type Component } from 'vue'
+import { computed, type Component, type CSSProperties } from 'vue'
 import { storeToRefs } from 'pinia'
-import type { AdCreative, AdInstance } from '@/types/ad'
+import type { AdCreative } from '@/types/ad'
 import { useStormStore } from '@/stores/storm'
 import { findCreative } from '@/data/creatives'
 import CloseButton from './CloseButton.vue'
@@ -24,9 +24,10 @@ const { ads } = storeToRefs(storm)
 
 /** 渲染所需的全部信息都在这里算好，模板里不做查找，也就不需要非空断言。 */
 interface TakeoverView {
-  ad: AdInstance
-  creative: AdCreative
+  id: number
   layout: Component
+  creative: AdCreative
+  style: CSSProperties
 }
 
 const views = computed<TakeoverView[]>(() => {
@@ -35,7 +36,18 @@ const views = computed<TakeoverView[]>(() => {
     if (ad.surface !== 'takeover') continue
     const creative = findCreative(ad.creativeId)
     if (!creative) continue
-    result.push({ ad, creative, layout: LAYOUTS[creative.layout] })
+    result.push({
+      id: ad.id,
+      layout: LAYOUTS[creative.layout],
+      creative,
+      // 调色板通过 CSS 自定义属性下传，版式组件不必各自接一套 props（与 AdPopup 一致）
+      style: {
+        zIndex: ad.z,
+        '--ad-bg': creative.palette.bg,
+        '--ad-fg': creative.palette.fg,
+        '--ad-accent': creative.palette.accent,
+      },
+    })
   }
   return result
 })
@@ -52,13 +64,13 @@ function onClose(id: number): void {
       <!-- 点主体同样是误触跳转，真实广告就是这样 -->
       <div
         v-for="view in views"
-        :key="view.ad.id"
+        :key="view.id"
         class="takeover-layer__item"
-        :style="{ zIndex: view.ad.z }"
+        :style="view.style"
         @click="storm.tapAdBody()"
       >
         <component :is="view.layout" :creative="view.creative" />
-        <CloseButton :variant="view.creative.closeVariant" @hit="onClose(view.ad.id)" />
+        <CloseButton :variant="view.creative.closeVariant" @hit="onClose(view.id)" />
       </div>
     </TransitionGroup>
   </div>

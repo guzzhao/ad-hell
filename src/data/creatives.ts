@@ -13,6 +13,7 @@ import type { AdCreative } from '@/types/ad'
 export const CREATIVES: readonly AdCreative[] = [
   {
     id: 'loan-fast',
+    badge: '限时免息',
     category: '网贷',
     brand: '速银花',
     headline: '最高可借 20 万',
@@ -26,6 +27,7 @@ export const CREATIVES: readonly AdCreative[] = [
   },
   {
     id: 'loan-quota',
+    badge: '仅限本机',
     category: '网贷',
     brand: '钱多多',
     headline: '您有一笔额度待领取',
@@ -39,6 +41,7 @@ export const CREATIVES: readonly AdCreative[] = [
   },
   {
     id: 'game-legend',
+    badge: '刚开新服',
     category: '传奇游戏',
     brand: '龙渊传奇',
     headline: '一刀 9999 级',
@@ -52,6 +55,7 @@ export const CREATIVES: readonly AdCreative[] = [
   },
   {
     id: 'game-retro',
+    badge: '老玩家回归',
     category: '传奇游戏',
     brand: '霸业复古',
     headline: '开服 3 分钟就爆装备',
@@ -65,6 +69,7 @@ export const CREATIVES: readonly AdCreative[] = [
   },
   {
     id: 'slim-seven',
+    badge: '第 3 天见效',
     category: '减肥',
     brand: '轻盈日记',
     headline: '7 天瘦 10 斤',
@@ -78,6 +83,7 @@ export const CREATIVES: readonly AdCreative[] = [
   },
   {
     id: 'health-bp',
+    badge: '限 60 岁以上',
     category: '老人健康',
     brand: '康寿堂',
     headline: '免费领取血压仪',
@@ -91,6 +97,7 @@ export const CREATIVES: readonly AdCreative[] = [
   },
   {
     id: 'dating-nearby',
+    badge: '附近 3 人',
     category: '同城交友',
     brand: '近邻缘',
     headline: '附近 3 位新用户想认识你',
@@ -104,6 +111,7 @@ export const CREATIVES: readonly AdCreative[] = [
   },
   {
     id: 'shop-99',
+    badge: '今日 23:59 截止',
     category: '9.9 包邮',
     brand: '拼一拼优选',
     headline: '9.9 元包邮到家',
@@ -117,6 +125,7 @@ export const CREATIVES: readonly AdCreative[] = [
   },
   {
     id: 'fake-system',
+    badge: '建议立即处理',
     category: '伪装系统提示',
     brand: '系统提示',
     headline: '检测到内存不足',
@@ -130,6 +139,7 @@ export const CREATIVES: readonly AdCreative[] = [
   },
   {
     id: 'fake-call',
+    badge: '第 2 次来电',
     category: '伪装来电',
     brand: '女儿',
     headline: '女儿 来电中…',
@@ -144,6 +154,7 @@ export const CREATIVES: readonly AdCreative[] = [
   },
   {
     id: 'splash-mall',
+    badge: '满 199 减 100',
     category: '开屏广告',
     brand: '闪购商城',
     headline: '双十一提前购',
@@ -158,6 +169,7 @@ export const CREATIVES: readonly AdCreative[] = [
   },
   {
     id: 'splash-video',
+    badge: '3.2 亿人在看',
     category: '短视频引流',
     brand: '趣看',
     headline: '刷一下，根本停不下来',
@@ -172,6 +184,7 @@ export const CREATIVES: readonly AdCreative[] = [
   },
   {
     id: 'insurance-one',
+    badge: '0 免赔',
     category: '保险',
     brand: '安康保',
     headline: '每月 1 元，最高赔 600 万',
@@ -185,6 +198,7 @@ export const CREATIVES: readonly AdCreative[] = [
   },
   {
     id: 'course-free',
+    badge: '仅剩 37 个名额',
     category: '学习课程',
     brand: '学霸营',
     headline: '0 元领取名师课',
@@ -195,6 +209,37 @@ export const CREATIVES: readonly AdCreative[] = [
     closeVariant: 'honest',
     palette: { bg: '#7a3fd4', fg: '#ffffff', accent: '#ffd54a' },
     size: { w: 100, h: 11 },
+  },
+  // ── 以下两条是全屏接管形态（surface: 'takeover'），由 data/beats.ts 的剧本节拍上演 ──
+  {
+    id: 'call-loan-service',
+    category: '伪装客服来电',
+    brand: '速银花客服',
+    headline: '您的额度已通过审批',
+    subline: '需与您本人确认放款信息',
+    cta: '接听',
+    layout: 'callPage',
+    surface: 'takeover',
+    mediaId: 'call-default',
+    // 有拒绝键，但放在左上角不易点击处——对应报道里"关闭键置于不易点击处"
+    closeVariant: 'corner',
+    palette: { bg: '#1f6fe0', fg: '#ffffff', accent: '#7fd4ff' },
+    size: { w: 100, h: 100 },
+  },
+  {
+    id: 'call-health-agent',
+    category: '伪装健康顾问来电',
+    brand: '康寿堂顾问',
+    headline: '您预约的免费体检已排上号',
+    subline: '需与您本人确认到店时间',
+    cta: '接听',
+    layout: 'callPage',
+    surface: 'takeover',
+    mediaId: 'call-default',
+    // 完全没有拒绝键，只能等 STORM.takeoverMaxMs 到点自动挂断——对应"无法关闭"
+    closeVariant: 'none',
+    palette: { bg: '#2fa84f', fg: '#ffffff', accent: '#7fd4ff' },
+    size: { w: 100, h: 100 },
   },
 ]
 
