@@ -9,8 +9,12 @@
 ```
 src/
 ├── types/ad.ts           # 跨层共享的类型。只有类型，没有运行时逻辑。
-├── data/                 # 静态数据：广告素材、App 元数据
+├── constants.ts          # 布局常量（手机逻辑尺寸、断点、缩放）
+├── capabilities.ts       # 浏览器能力探测：纯函数 + 注入 env，可单测
+├── data/                 # 静态数据：广告素材、媒体清单、风暴剧本、App 元数据
 ├── engine/               # 纯函数：不 import vue，不 import pinia
+│   └── __tests__/
+├── audio/                # 程序合成音频：synth.ts 纯函数，AudioBus.ts 碰 Web Audio
 │   └── __tests__/
 ├── stores/               # Pinia：把 engine 的纯函数组合成有状态的过程
 │   └── __tests__/
@@ -18,11 +22,12 @@ src/
 ├── components/
 │   ├── shell/            # 设备外壳与手机视口（布局层）
 │   ├── phone/            # 手机内部 UI；apps/ 下是各 App 视图
-│   ├── ads/              # 弹窗系统；creatives/ 下是按版式分的素材渲染
-│   ├── chrome/           # 页面级控件：逃生出口、战况 HUD
+│   ├── ads/              # 广告系统。layouts.ts / surfaces.ts 是**扩展缝**
+│   │   └── creatives/    # 按版式分的素材渲染
+│   ├── chrome/           # 页面级控件：逃生出口、音频、摇一摇提示、战况 HUD
 │   └── truth/            # 崩塌后的真相长页
-├── styles/               # base.css（全局变量与重置）、phone.css（视口与样机）
-└── constants.ts          # 布局常量（手机逻辑尺寸、断点、缩放）
+├── styles/               # base.css、phone.css、creative.css（素材质感层）
+└── __tests__/            # 只放根级纯函数（capabilities）的测试
 ```
 
 ---
@@ -62,6 +67,25 @@ Pinia setup store 负责：阶段机、计时、计数、弹窗实例列表。
 ### `components/` —— 只负责渲染
 
 组件里不做判定逻辑。要判断"这个点击算不算关掉"，调用 store 或 engine。
+
+### `audio/` —— 参数与发声分开
+
+**判据**：`synth.ts` 是纯函数，不 import 任何 Web Audio 运行时，只算频率 / 包络 / 滤波参数；
+`AudioBus.ts` 是命令式对象，碰 Web Audio 但**不 import vue**，生命周期由 `useCallAudio` 驱动。
+
+**为什么**：真正建节点、开声卡的那一层在 jsdom 里根本跑不起来。把"要发什么声"抽成纯数据，
+声音的形状才可能被单测钉死——否则音频这块只能靠人耳，回归时无从防守。
+
+### `components/ads/layouts.ts` 与 `surfaces.ts` —— 扩展缝，不是普通模块
+
+它们是**注册表**：`Record<AdLayout, Component>` 与 `Record<AdSurface, Component>` 的穷尽性
+由编译器保证。加一种版式 / 呈现面而忘了注册，`type-check` 会直接报错。
+
+所以这两个文件**允许**被频繁修改。判断一处改动是否违反扩展缝的约定，标准是
+"有没有动既有的形态 / 呈现面**实现**"，而不是"有没有动这个文件"。
+
+⚠️ 触发缝（`src/engine/shake.ts`）不一样：加一种 `AdTrigger` 会牵动**若干处**，
+因为各处要访问不同触发方式自己的字段。编译器会把它们全指出来，但那不是单点注册。
 
 ---
 
