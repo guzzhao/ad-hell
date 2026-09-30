@@ -4,8 +4,10 @@ import { useEventListener } from '@vueuse/core'
 import { useStormStore } from '@/stores/storm'
 import { useReducedMotion } from '@/composables/useReducedMotion'
 import { useStormLoop } from '@/composables/useStormLoop'
+import { useCallAudio } from '@/composables/useCallAudio'
 import DeviceShell from '@/components/shell/DeviceShell.vue'
 import EscapeHatch from '@/components/chrome/EscapeHatch.vue'
+import AudioControls from '@/components/chrome/AudioControls.vue'
 import TruthPanel from '@/components/truth/TruthPanel.vue'
 
 const storm = useStormStore()
@@ -13,6 +15,7 @@ const { phase } = storeToRefs(storm)
 
 useReducedMotion()
 useStormLoop()
+useCallAudio()
 
 /**
  * Esc 等效于"结束体验"。
@@ -31,6 +34,7 @@ useEventListener(window, 'keydown', (event) => {
     <DeviceShell v-if="phase !== 'truth'" />
     <TruthPanel v-else />
     <EscapeHatch v-if="phase === 'storm' || phase === 'collapsed'" />
+    <AudioControls v-if="phase === 'storm' || phase === 'collapsed'" />
   </div>
 </template>
 

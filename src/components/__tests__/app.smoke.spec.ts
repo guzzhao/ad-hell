@@ -170,3 +170,70 @@ describe('App 冒烟测试', () => {
     wrapper.unmount()
   })
 })
+
+describe('音频控件', () => {
+  it('静音键在位，状态如实反映在 aria-pressed 上', async () => {
+    const wrapper = mount(App)
+    const storm = useStormStore()
+    await nextTick()
+
+    const button = wrapper.find('.audio-controls__btn')
+    expect(button.exists()).toBe(true)
+    expect(button.attributes('aria-pressed')).toBe('false')
+
+    await button.trigger('click')
+    await nextTick()
+
+    expect(storm.muted).toBe(true)
+    expect(button.attributes('aria-pressed')).toBe('true')
+    expect(wrapper.text()).toContain('已静音')
+
+    wrapper.unmount()
+  })
+
+  it('声音偏好与动效偏好互不推导', async () => {
+    const wrapper = mount(App)
+    const storm = useStormStore()
+    await nextTick()
+
+    // matchMedia 在测试里一律返回 matches:false，所以 reducedMotion 是 false
+    expect(storm.reducedMotion).toBe(false)
+
+    await wrapper.find('.audio-controls__btn').trigger('click')
+    await nextTick()
+
+    // 静音不该顺手把动效也关了——这是两件事
+    expect(storm.muted).toBe(true)
+    expect(storm.reducedMotion).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('没有 AudioContext 的环境里静默降级，并如实提示需要点击解锁', async () => {
+    const wrapper = mount(App)
+    const storm = useStormStore()
+
+    // jsdom 不实现 AudioContext，于是这条测试走的正是"环境不支持音频"的降级路径
+    expect('AudioContext' in globalThis).toBe(false)
+
+    storm.ads.push({
+      id: 1,
+      creativeId: 'call-loan-service',
+      surface: 'takeover',
+      x: 0,
+      y: 0,
+      w: 100,
+      h: 100,
+      z: 10,
+      bornAt: 0,
+    })
+    await nextTick()
+
+    // 这是关键的一条：有声音要放却放不出来时，界面必须说实话，
+    // 而不是静悄悄地不出声让人以为页面坏了；而且全程不能抛错（AC17）。
+    expect(storm.audioBlocked).toBe(true)
+    expect(wrapper.find('.audio-controls__hint').exists()).toBe(true)
+
+    wrapper.unmount()
+  })
+})

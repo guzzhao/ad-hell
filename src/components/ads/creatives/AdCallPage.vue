@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useIntervalFn } from '@vueuse/core'
 import type { AdCreative } from '@/types/ad'
+import { RING_MS } from '@/audio/synth'
 
 /**
  * 全屏来电接听页。
@@ -10,31 +11,38 @@ import type { AdCreative } from '@/types/ad'
  * 与前作 `AdFakeCall.vue` 的区别是它是**全屏接管**（`surface: 'takeover'`）：
  * 它盖住手机上的一切，包括正在弹出的那些弹窗。
  *
- * 接通计时器不是装饰：一个停在 00:00 的来电页一眼就是假的，
+ * 计时器不是装饰：一个停在 00:00 的来电页一眼就是假的，
  * 而"它真的在计时"正是这类广告最让人心里发毛的地方。
+ *
+ * 前 `RING_MS` 是振铃，之后转成通话并开始计时——与 `synth.ts` 里声音从振铃切到
+ * 人声用的是**同一个常量**。画面和声音必须同时切换，否则一眼就露馅。
  */
 defineProps<{ creative: AdCreative }>()
 
-const seconds = ref(0)
+const elapsedMs = ref(0)
 
 // useIntervalFn 跟着 effect scope 清理，不需要手写 onBeforeUnmount。
 useIntervalFn(() => {
-  seconds.value += 1
+  elapsedMs.value += 1000
 }, 1000)
 
-/** 通话计时，形如 00:07。 */
-function formatDuration(total: number): string {
+/** 还在响铃，还是已经接通。 */
+const ringing = computed(() => elapsedMs.value < RING_MS)
+
+/** 通话计时，形如 00:07。振铃阶段不计时。 */
+const duration = computed(() => {
+  const total = Math.max(0, Math.floor((elapsedMs.value - RING_MS) / 1000))
   const mm = String(Math.floor(total / 60)).padStart(2, '0')
   const ss = String(total % 60).padStart(2, '0')
   return `${mm}:${ss}`
-}
+})
 </script>
 
 <template>
   <div class="call-page">
     <header class="call-page__top">
-      <span class="call-page__state">来电中…</span>
-      <span class="call-page__timer" aria-hidden="true">{{ formatDuration(seconds) }}</span>
+      <span class="call-page__state">{{ ringing ? '来电中…' : '通话中' }}</span>
+      <span v-if="!ringing" class="call-page__timer" aria-hidden="true">{{ duration }}</span>
     </header>
 
     <div class="call-page__center">

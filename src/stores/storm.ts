@@ -35,6 +35,13 @@ export const useStormStore = defineStore('storm', () => {
   const misclickCount = ref(0)
   const reducedMotion = ref(false)
   const landingOpen = ref(false)
+  /** 静音偏好。与"减少动态效果"无关——动效偏好不蕴含声音偏好。 */
+  const muted = ref(false)
+  /**
+   * 有音频要放、但浏览器还没拿到用户手势因而放不出来。
+   * 界面据此显示「点击任意处开启声音」，而不是让用户以为页面坏了。
+   */
+  const audioBlocked = ref(false)
 
   // ── 非响应式的内部记账 ───────────────────────────────────
   let rng: () => number = mulberry32(DEFAULT_SEED)
@@ -70,6 +77,7 @@ export const useStormStore = defineStore('storm', () => {
     spawnedCount.value = 0
     misclickCount.value = 0
     landingOpen.value = false
+    audioBlocked.value = false
   }
 
   function start(seed: number = DEFAULT_SEED): void {
@@ -238,6 +246,14 @@ export const useStormStore = defineStore('storm', () => {
     reducedMotion.value = value
   }
 
+  function toggleMuted(): void {
+    muted.value = !muted.value
+  }
+
+  function setAudioBlocked(value: boolean): void {
+    audioBlocked.value = value
+  }
+
   return {
     // 状态
     phase,
@@ -248,6 +264,8 @@ export const useStormStore = defineStore('storm', () => {
     misclickCount,
     reducedMotion,
     landingOpen,
+    muted,
+    audioBlocked,
     // 派生
     coverage,
     popupCount,
@@ -265,5 +283,7 @@ export const useStormStore = defineStore('storm', () => {
     closeLanding,
     enterTruth,
     setReducedMotion,
+    toggleMuted,
+    setAudioBlocked,
   }
 })
