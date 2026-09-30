@@ -11,6 +11,10 @@
 
 ### 1. 脚手架落地
 
+> ⚠️ 本步骤记录的是**当时实际执行**的命令。此后工具链已改为只依赖 oxc
+> （去掉 eslint 与 prettier，改用 oxfmt）。**重新落地时不要把 `--eslint --prettier`
+> 加回来** —— 详见 `research/tech-stack-and-scaffold.md` 末尾的「变更记录」。
+
 1. 在仓库**外**的临时目录生成模板（见 `research/tech-stack-and-scaffold.md`，不用 `--force`）：
    ```powershell
    $tmp = Join-Path $env:TEMP 'ad-all-scaffold'

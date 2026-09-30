@@ -22,7 +22,8 @@ D:\code\ad-all\
 ├── package.json
 ├── vite.config.ts
 ├── tsconfig*.json
-├── eslint.config.ts / .prettierrc.json
+├── .oxlintrc.json / .oxfmtrc.json   # lint 与格式化（原为 eslint.config.ts / .prettierrc.json，
+│                                     # 见 research/tech-stack-and-scaffold.md 的变更记录）
 ├── src/
 │   ├── main.ts
 │   ├── App.vue                     # 顶层阶段切换（simulation ⇄ truth）

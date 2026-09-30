@@ -99,3 +99,33 @@ GSAP 自 3.13 起**完全免费，含商业用途**（含此前收费的插件�
 3. 不引入 vue-router。
 4. 脚手架版本组合以 create-vue 3.24.0 生成的 `package.json` 为准；若 `typescript`
    被固定为 5.x/6.x 而非最新 7.x，**以脚手架结果为准**，不手动升级到 7.x。
+
+---
+
+## 变更记录（后续修订，阅读上面的内容时请以此为准）
+
+### 2026-09-30 · 移除 eslint 与 prettier，工具链统一到 oxc
+
+上面记录的脚手架命令用了 `--eslint --prettier`，指的是**当时的**决策。此后已改为只依赖 oxc：
+
+| 项 | 变更前 | 变更后 |
+|---|---|---|
+| Lint | `oxlint` + `eslint`（`run-s lint:*` 两段） | 只有 `oxlint . --fix` |
+| 格式化 | `prettier` 3.9.6 | `oxfmt` 0.71.0 |
+| 配置 | `eslint.config.ts` + `.prettierrc.json` | 已删除；改用 `.oxfmtrc.json` |
+| 包数 | 356 | **250**（少 110 个，其中 3 个是新增的 oxfmt） |
+
+伴随的改动：
+
+- `.oxlintrc.json` 的 `categories` 从只开 `correctness` 改为 `correctness` + `suspicious`
+  （144 → 177 条规则）。**`pedantic` 不要开**，实测会多出 109 条规则、大量风格噪音。
+- `.oxfmtrc.json` 由 `oxfmt --migrate=prettier` 生成，保住了 `semi: false` /
+  `singleQuote: true` / `printWidth: 100`。
+- `.vscode/extensions.json` 去掉了 ESLint 与 Prettier 扩展推荐；
+  `.vscode/settings.json`（gitignored）的 `editor.defaultFormatter` 改为 `oxc.oxc-vscode`。
+- **oxfmt 与 Prettier 的输出不完全一致**：oxfmt 没有数组 "fill" 行为，装不下的数组会
+  排成一行一项。全仓库因此重排了 16 个文件。
+
+**如果将来有人想重新加回 eslint**：先确认它到底能多抓到什么。本次移除前，
+eslint 在本项目里**从未产出过任何一条发现**（三次真问题全部由 oxlint 报出），
+且类型安全实际由 `vue-tsc` 保证，与 eslint 无关。

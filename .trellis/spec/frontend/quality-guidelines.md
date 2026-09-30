@@ -1,6 +1,6 @@
 # Quality Guidelines
 
-> 四道门必须全绿才算完成。测试预算花在纯逻辑上，不追求视觉自动化。
+> 五项检查必须全绿才算完成。测试预算花在纯逻辑上，不追求视觉自动化。
 
 ---
 
@@ -9,7 +9,8 @@
 命令（注意 `test:unit` 与 `test:unit:run` 的区别）：
 
 ```bash
-npm run lint            # oxlint . --fix  →  eslint . --fix
+npm run lint            # oxlint . --fix
+npm run format:check    # oxfmt --check src/
 npm run type-check      # vue-tsc --build
 npm run test:unit:run   # vitest run（跑一遍就退出）
 npm run build           # run-p type-check + vite build
@@ -17,6 +18,26 @@ npm run build           # run-p type-check + vite build
 
 > **Warning**：`npm run test:unit` 是 **watch 模式**，在脚本、CI 或 agent 里会永久挂住。
 > 需要"跑一遍就退出"时一律用 `test:unit:run`。
+
+### 工具链现状：只有 oxc
+
+本项目**不依赖 eslint，也不依赖 prettier**。lint 与格式化都由 oxc 工具链承担：
+
+| 职责 | 工具 | 配置 |
+|------|------|------|
+| Lint | `oxlint` | `.oxlintrc.json` |
+| 格式化 | `oxfmt` | `.oxfmtrc.json` |
+
+- `.oxlintrc.json` 启用了 6 个插件（`eslint` / `typescript` / `unicorn` / `oxc` / `vue` / `vitest`），
+  类别开了 `correctness` + `suspicious`，共 177 条规则。
+  **不要退回只开 `correctness`** —— `suspicious` 只多 33 条规则却抓到过真问题（`unicorn/no-array-sort`）。
+- `pedantic` **不要开**：会多出 109 条规则，其中 `max-lines-per-function`、`no-conditional-in-test`
+  这类风格观点会跟现有代码结构打架，噪音大于价值。
+- `.oxfmtrc.json` 是从旧的 Prettier 配置迁移来的（`--migrate=prettier`），保留了
+  `semi: false` / `singleQuote: true` / `printWidth: 100` 三项。
+- **格式化器的行为与 Prettier 不完全一致**：oxfmt 没有 Prettier 的数组 "fill" 行为，
+  装不下的数组会排成一行一项（见 `src/data/__tests__/creatives.spec.ts` 的 `REAL_BRANDS`）。
+  这是已知代价，不要去跟格式化器较劲，也不要用技巧绕开它。
 
 ---
 
@@ -166,10 +187,10 @@ expect(hits).toEqual([])
 
 ## Code Review Checklist
 
-- [ ] 四道门（lint / type-check / test:unit:run / build）全绿？
+- [ ] 五项检查（lint / format:check / type-check / test:unit:run / build）全绿？
 - [ ] 新纯函数有单测？断言的是性质还是脆弱的例子？
 - [ ] 测试里有没有条件式 `expect`？
-- [ ] 有没有引入 `as any` / `@ts-ignore` / `!` / `eslint-disable` / `console.*`？
+- [ ] 有没有引入 `as any` / `@ts-ignore` / `!` / `oxlint-disable` / `console.*`？
 - [ ] `engine/` 有没有偷偷 import `vue` 或 `pinia`？
 - [ ] 布局常量（手机尺寸、断点）改动时，CSS 里的镜像同步了吗？
 - [ ] 有没有在同一个元素上既写 CSS `transform` 又用 GSAP？

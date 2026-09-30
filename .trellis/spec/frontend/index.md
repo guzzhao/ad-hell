@@ -25,7 +25,7 @@
 | [Component Guidelines](./component-guidelines.md) | 组件职责、布局约束、动画分工、可访问性红线 | Filled |
 | [Composable Guidelines](./hook-guidelines.md) | 组合式函数的生命周期与清理约定 | Filled |
 | [State Management](./state-management.md) | Pinia setup store、纯函数引擎、确定性随机 | Filled |
-| [Quality Guidelines](./quality-guidelines.md) | 四道质量门、测试约定、lint 陷阱 | Filled |
+| [Quality Guidelines](./quality-guidelines.md) | 五项检查、测试约定、lint 陷阱 | Filled |
 | [Type Safety](./type-safety.md) | 严格模式下的类型约定（含 noUncheckedIndexedAccess） | Filled |
 
 ---
@@ -46,10 +46,11 @@
 
 ## Quality Check
 
-提交前必须四道门全绿：
+提交前必须五项全绿：
 
 ```bash
-npm run lint          # oxlint + eslint（带 --fix）
+npm run lint          # oxlint . --fix（correctness + suspicious，177 条规则）
+npm run format:check  # oxfmt --check src/
 npm run type-check    # vue-tsc --build
 npm run test:unit:run # vitest run（注意不是 test:unit，那个是 watch 模式会挂住）
 npm run build         # 类型检查 + 生产构建

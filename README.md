@@ -19,8 +19,9 @@ npm run dev        # http://localhost:5173
 | `npm run test:unit` | 单元测试（watch 模式） |
 | `npm run test:unit:run` | 单元测试跑一遍就退出（CI / 自动化用这个） |
 | `npm run type-check` | `vue-tsc` 类型检查 |
-| `npm run lint` | oxlint + eslint（带自动修复） |
-| `npm run format` | Prettier 格式化 `src/` |
+| `npm run lint` | `oxlint` 检查并自动修复（177 条规则） |
+| `npm run format` | `oxfmt` 格式化 `src/` |
+| `npm run format:check` | 只检查格式，不改文件 |
 
 要求 Node `^22.18.0 || >=24.12.0`（见 `package.json` 的 `engines`）。
 
@@ -82,6 +83,8 @@ Vite · Vue 3（`<script setup>`）· TypeScript · Pinia · GSAP
 
 - **无路由**：手机内部的视图切换由 Pinia 状态驱动，不需要 vue-router。
 - **无 UI 组件库**：假广告的视觉风格必须手写 CSS 才像。
+- **工具链只有 oxc**：lint 用 `oxlint`，格式化用 `oxfmt`，不依赖 eslint / prettier
+  —— 依赖树因此少掉 110 个包。
 - **GSAP 只用于编排**：风暴升级的屏幕抖动与崩塌吞没序列用 GSAP 时间轴；单个弹窗的进出场交给 Vue `<TransitionGroup>` + CSS。集成方式为 `gsap.context()` + `ctx.revert()`（npm 上没有 `@gsap/vue` 这个包）。
 
 ## 代码结构

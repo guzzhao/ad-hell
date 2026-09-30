@@ -122,13 +122,13 @@ export function misclickPenalty(roll: number): number {
 | `as any` | 关掉类型检查，等于没写类型。全项目零使用 |
 | `@ts-ignore` / `@ts-expect-error` | 同上。真有问题就修类型 |
 | `!` 非空断言 | 掩盖 `noUncheckedIndexedAccess` 想提醒你的真实分支。用 `if (!x) return` 或 `??` |
-| `eslint-disable` / `oxlint-disable` | 全项目零使用。规则不合理就改规则，不要就地静音 |
+| `oxlint-disable` | 全项目零使用。规则不合理就改规则，不要就地静音 |
 | `console.log` | 全项目零使用。调试完必须删掉 |
 
-这四条都有 grep 级别的自查方式：
+这几条都有 grep 级别的自查方式：
 
 ```bash
-grep -rn "as any\|@ts-ignore\|@ts-expect-error\|eslint-disable\|oxlint-disable\|console\." src/
+grep -rn "as any\|@ts-ignore\|@ts-expect-error\|oxlint-disable\|console\." src/
 ```
 
 ---
