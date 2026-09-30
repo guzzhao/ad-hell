@@ -81,6 +81,7 @@ export const useStormStore = defineStore('storm', () => {
     ads.value.push({
       id: nextId++,
       creativeId: creative.id,
+      surface: creative.surface,
       x,
       y,
       w: creative.size.w,

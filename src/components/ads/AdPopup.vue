@@ -1,31 +1,24 @@
 <script setup lang="ts">
 import { computed, type Component, type CSSProperties } from 'vue'
-import type { AdCreative, AdInstance } from '@/types/ad'
+import type { AdInstance } from '@/types/ad'
 import { findCreative } from '@/data/creatives'
 import CloseButton from './CloseButton.vue'
-import AdBanner from './creatives/AdBanner.vue'
-import AdFloating from './creatives/AdFloating.vue'
-import AdInterstitial from './creatives/AdInterstitial.vue'
-import AdSplash from './creatives/AdSplash.vue'
-import AdFakeCall from './creatives/AdFakeCall.vue'
+import { LAYOUTS } from './layouts'
 
 const props = defineProps<{ ad: AdInstance }>()
 const emit = defineEmits<{ close: [id: number]; tap: [] }>()
 
-const LAYOUTS: Record<AdCreative['layout'], Component> = {
-  banner: AdBanner,
-  floating: AdFloating,
-  interstitial: AdInterstitial,
-  splash: AdSplash,
-  fakeCall: AdFakeCall,
-}
-
 const creative = computed(() => findCreative(props.ad.creativeId))
 
+/**
+ * 版式到组件的分派交给 `layouts.ts` 的注册表。
+ * 这里不再需要"找不到就回退"的分支——`Record<AdLayout, Component>` 是穷尽的，
+ * `LAYOUTS[current.layout]` 不可能为 undefined。
+ */
 const layout = computed<Component | null>(() => {
   const current = creative.value
   if (!current) return null
-  return LAYOUTS[current.layout] ?? null
+  return LAYOUTS[current.layout]
 })
 
 /**

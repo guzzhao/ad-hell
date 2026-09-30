@@ -25,6 +25,50 @@ export type CloseVariant =
 export type AdLayout = 'banner' | 'interstitial' | 'splash' | 'floating' | 'fakeCall'
 
 /**
+ * 广告的呈现面：它由哪一层渲染。
+ *
+ * 这不只是样式问题——`coverageEstimate` 要靠它把"洪水"和"剧本演出"分开：
+ * 只有 `popup` 参与覆盖率统计，否则一个全屏接管实例会让崩塌时机取决于剧本而非风暴。
+ */
+export type AdSurface =
+  /** 漂浮弹窗，按百分比坐标定位。 */
+  | 'popup'
+  /** 全屏接管，独占手机视口并盖住所有弹窗。 */
+  | 'takeover'
+
+// 注：`InAppAdSlot` 是**由 App 视图以 props 静态渲染**的广告位，不是 AdInstance，
+// 所以不进这个联合类型——给它注册一个永不使用的 surface 组件是死代码。
+// 将来若要让风暴把广告注入 App 内容流，再加 'inline' 并在 SURFACES 里注册即可，
+// 漏注册会被编译器挡下。
+
+/**
+ * 摇一摇触发。这是**素材的能力位**，不是全局开关：
+ * 只有屏幕上正存在带该能力的广告时，摇动才会被响应。
+ */
+export interface ShakeTrigger {
+  kind: 'shake'
+  /** 触发所需的归一化能量阈值。 */
+  threshold: number
+  /** 触发后的冷却时长（ms），保证一次摇动只算一次。 */
+  cooldownMs: number
+}
+
+/** 广告的触发方式。加新触发类型就是往这个联合里加一个分支。 */
+export type AdTrigger = ShakeTrigger
+
+/** 程序合成音的预设名。 */
+export type SynthPreset = 'ringtone' | 'callVoice'
+
+/**
+ * 媒体描述符。
+ *
+ * v2 只有程序合成一种。真实素材（图片 / 视频）将来作为**新的联合分支**加进来，
+ * 届时渲染层必须补上对应分支——这是刻意的：渲染真实图片是真正的新行为，
+ * 不该用一个"预留但从未执行"的分支假装已经支持。
+ */
+export type AdMedia = { kind: 'synth'; preset: SynthPreset }
+
+/**
  * App 分类。
  * - `system`：现实中本不该有广告，演示里被广告攻陷。
  * - `commercial`：现实中广告泛滥，演示里反而干净。
@@ -47,6 +91,15 @@ export interface AdCreative {
   subline: string
   cta: string
   layout: AdLayout
+  /**
+   * 呈现面。**必填**：它参与崩塌判定，不能有一个沉默的默认值——
+   * 漏填必须是编译错误，而不是让某个实例悄悄进了覆盖率统计。
+   */
+  surface: AdSurface
+  /** 带此字段的素材才会响应摇一摇。 */
+  trigger?: AdTrigger
+  /** 指向 `data/media.ts` 里媒体清单的键。 */
+  mediaId?: string
   closeVariant: CloseVariant
   palette: Palette
   /** 相对手机视口的百分比尺寸。 */
@@ -61,6 +114,8 @@ export interface AdCreative {
 export interface AdInstance {
   id: number
   creativeId: string
+  /** 生成时从素材复制。引擎据此判断它是否参与覆盖率统计。 */
+  surface: AdSurface
   /** 百分比坐标与尺寸，原点为手机视口左上角。 */
   x: number
   y: number

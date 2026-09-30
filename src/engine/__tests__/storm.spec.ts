@@ -13,11 +13,18 @@ import {
   targetConcurrent,
 } from '../storm'
 import { mulberry32 } from '../rng'
-import type { AdInstance } from '@/types/ad'
+import type { AdInstance, AdSurface } from '@/types/ad'
 import { CREATIVES } from '@/data/creatives'
 
-function makeAd(x: number, y: number, w: number, h: number, id = 1): AdInstance {
-  return { id, creativeId: 'test', x, y, w, h, z: id, bornAt: 0 }
+function makeAd(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  id = 1,
+  surface: AdSurface = 'popup',
+): AdInstance {
+  return { id, creativeId: 'test', surface, x, y, w, h, z: id, bornAt: 0 }
 }
 
 describe('风暴曲线', () => {

@@ -32,6 +32,8 @@ function seedAd(store: Store, creativeId: string): AdInstance {
   const ad: AdInstance = {
     id: 900000 + store.ads.length,
     creativeId,
+    // 从素材取呈现面，而不是写死 'popup'——这样将来要塞一个接管实例进 store 也能用同一个帮手。
+    surface: findCreative(creativeId)?.surface ?? 'popup',
     x: 0,
     y: 0,
     w: 50,

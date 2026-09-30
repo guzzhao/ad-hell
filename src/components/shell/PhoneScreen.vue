@@ -6,7 +6,7 @@ import { useStormStore } from '@/stores/storm'
 import StatusBar from '@/components/phone/StatusBar.vue'
 import HomeGrid from '@/components/phone/HomeGrid.vue'
 import AppHost from '@/components/phone/AppHost.vue'
-import AdLayer from '@/components/ads/AdLayer.vue'
+import { SURFACES, SURFACE_ORDER } from '@/components/ads/surfaces'
 import LandingOverlay from '@/components/ads/LandingOverlay.vue'
 import StormHud from '@/components/chrome/StormHud.vue'
 
@@ -34,7 +34,11 @@ const statusTitle = computed(() =>
       <AppHost v-else :app="openApp" @back="openAppId = null" />
     </div>
 
-    <AdLayer />
+    <!--
+      所有呈现面都由注册表驱动，宿主不认识任何具体的层。
+      新增一种呈现面只需在 surfaces.ts 登记，这个模板不用改。
+    -->
+    <component :is="SURFACES[surface]" v-for="surface in SURFACE_ORDER" :key="surface" />
     <StormHud />
     <LandingOverlay />
   </div>

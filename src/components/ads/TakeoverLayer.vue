@@ -1,0 +1,109 @@
+<script setup lang="ts">
+import { computed, type Component } from 'vue'
+import { storeToRefs } from 'pinia'
+import type { AdCreative, AdInstance } from '@/types/ad'
+import { useStormStore } from '@/stores/storm'
+import { findCreative } from '@/data/creatives'
+import CloseButton from './CloseButton.vue'
+import { LAYOUTS } from './layouts'
+
+/**
+ * 全屏接管层。
+ *
+ * 与弹窗层（`AdLayer`）分成两层不是审美选择：
+ * 接管广告必须盖住**所有**弹窗，而页面上那枚「结束体验」出口必须始终在它之上。
+ * 分成两层后，这个优先级由 CSS 的 `z-index` 静态保证，不需要运行期算层级。
+ *
+ * z-index 预算：App 内容 40 < 弹窗层 100 < **接管层 700** < 假落地页 900 < 页面控件 1000。
+ *
+ * 它与弹窗层共用同一个 `layouts.ts` 注册表——这正是扩展缝的意义：
+ * 加一种版式，两层同时就能渲染它，不必改两处。
+ */
+const storm = useStormStore()
+const { ads } = storeToRefs(storm)
+
+/** 渲染所需的全部信息都在这里算好，模板里不做查找，也就不需要非空断言。 */
+interface TakeoverView {
+  ad: AdInstance
+  creative: AdCreative
+  layout: Component
+}
+
+const views = computed<TakeoverView[]>(() => {
+  const result: TakeoverView[] = []
+  for (const ad of ads.value) {
+    if (ad.surface !== 'takeover') continue
+    const creative = findCreative(ad.creativeId)
+    if (!creative) continue
+    result.push({ ad, creative, layout: LAYOUTS[creative.layout] })
+  }
+  return result
+})
+
+function onClose(id: number): void {
+  // 与弹窗层一致：点关闭键只是一个"尝试"，到底关不关得掉由引擎按 closeVariant 判定。
+  storm.attemptClose(id, true)
+}
+</script>
+
+<template>
+  <div class="takeover-layer">
+    <TransitionGroup name="takeover">
+      <!-- 点主体同样是误触跳转，真实广告就是这样 -->
+      <div
+        v-for="view in views"
+        :key="view.ad.id"
+        class="takeover-layer__item"
+        :style="{ zIndex: view.ad.z }"
+        @click="storm.tapAdBody()"
+      >
+        <component :is="view.layout" :creative="view.creative" />
+        <CloseButton :variant="view.creative.closeVariant" @hit="onClose(view.ad.id)" />
+      </div>
+    </TransitionGroup>
+  </div>
+</template>
+
+<!--
+  与 AdLayer 同理：过渡类名由 TransitionGroup 加到**子元素**上，全局样式最稳妥。
+-->
+<style>
+.takeover-layer {
+  position: absolute;
+  inset: 0;
+  /* 介于弹窗层（100）与假落地页（900）之间 */
+  z-index: 700;
+  /* 层本身不吃事件，只有真正渲染出来的接管实例才吃 */
+  pointer-events: none;
+}
+
+.takeover-layer__item {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.takeover-enter-active {
+  animation: takeover-in 200ms ease-out both;
+}
+
+.takeover-leave-active {
+  animation: takeover-out 220ms ease-in both;
+}
+
+@keyframes takeover-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes takeover-out {
+  to {
+    opacity: 0;
+  }
+}
+</style>
