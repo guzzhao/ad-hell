@@ -1,11 +1,5 @@
 import { onBeforeUnmount, onMounted, ref, type Ref } from 'vue'
-import {
-  DESKTOP_BREAKPOINT_PX,
-  PHONE_H,
-  PHONE_W,
-  SHELL_MARGIN,
-  SHELL_MIN_SCALE,
-} from '@/constants'
+import { DESKTOP_BREAKPOINT_PX, PHONE_H, PHONE_W, SHELL_MARGIN, SHELL_MIN_SCALE } from '@/constants'
 
 /**
  * 计算桌面样机的等比缩放系数。

@@ -34,10 +34,12 @@ function shake(): void {
 function playCollapse(): void {
   const el = motion.value
   if (!el || storm.reducedMotion) return
-  gsap
-    .timeline()
-    .to(el, { scale: 1.035, duration: 0.85, ease: 'power2.inOut' })
-    .to(el, { scale: 1, filter: 'brightness(0.22) saturate(0.4)', duration: 1.3, ease: 'power2.in' })
+  gsap.timeline().to(el, { scale: 1.035, duration: 0.85, ease: 'power2.inOut' }).to(el, {
+    scale: 1,
+    filter: 'brightness(0.22) saturate(0.4)',
+    duration: 1.3,
+    ease: 'power2.in',
+  })
 }
 
 /** 每积累若干次生成抖一下，让升级过程有体感。 */

@@ -75,9 +75,7 @@ describe('覆盖面积估算', () => {
   it('结果落在 0..1 之间', () => {
     const rng = mulberry32(7)
     for (let i = 0; i < 40; i++) {
-      const ads = Array.from({ length: 20 }, (_, k) =>
-        makeAd(rng() * 100, rng() * 100, 20, 20, k),
-      )
+      const ads = Array.from({ length: 20 }, (_, k) => makeAd(rng() * 100, rng() * 100, 20, 20, k))
       const c = coverageEstimate(ads)
       expect(c).toBeGreaterThanOrEqual(0)
       expect(c).toBeLessThanOrEqual(1)
@@ -95,16 +93,12 @@ describe('崩塌判定', () => {
   })
 
   it('数量够但覆盖不够时不崩塌', () => {
-    const ads = Array.from({ length: STORM.collapseMinAds + 20 }, (_, i) =>
-      makeAd(0, 0, 4, 4, i),
-    )
+    const ads = Array.from({ length: STORM.collapseMinAds + 20 }, (_, i) => makeAd(0, 0, 4, 4, i))
     expect(isCollapsed(ads)).toBe(false)
   })
 
   it('覆盖够且数量够时崩塌', () => {
-    const ads = Array.from({ length: STORM.collapseMinAds }, (_, i) =>
-      makeAd(0, 0, 100, 100, i),
-    )
+    const ads = Array.from({ length: STORM.collapseMinAds }, (_, i) => makeAd(0, 0, 100, 100, i))
     expect(isCollapsed(ads)).toBe(true)
   })
 })

@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  MISCLICK_EXTRA_ADS_MAX,
-  MISCLICK_EXTRA_ADS_MIN,
-  isClosable,
-  resolveClose,
-} from '../close'
+import { MISCLICK_EXTRA_ADS_MAX, MISCLICK_EXTRA_ADS_MIN, isClosable, resolveClose } from '../close'
 import type { CloseOutcome, CloseVariant } from '@/types/ad'
 
 /**

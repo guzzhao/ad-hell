@@ -40,7 +40,11 @@ const groups: Group[] = [
 
     <section v-for="group in groups" :key="group.category" class="home-group">
       <h2 class="home-group__title">
-        <span class="home-group__tag" :class="`home-group__tag--${group.category}`" aria-hidden="true">
+        <span
+          class="home-group__tag"
+          :class="`home-group__tag--${group.category}`"
+          aria-hidden="true"
+        >
           {{ group.category === 'system' ? 'A' : 'B' }}
         </span>
         {{ group.title }}

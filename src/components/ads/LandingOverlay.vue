@@ -35,7 +35,8 @@ const { landingOpen, misclickCount } = storeToRefs(storm)
         </div>
 
         <p class="landing__stat">
-          你已经误触 <strong>{{ misclickCount }}</strong> 次。每误触一次，屏幕上就多出 2~4 个新弹窗。
+          你已经误触 <strong>{{ misclickCount }}</strong> 次。每误触一次，屏幕上就多出 2~4
+          个新弹窗。
         </p>
       </div>
 

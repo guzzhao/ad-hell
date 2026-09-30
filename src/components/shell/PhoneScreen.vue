@@ -20,7 +20,9 @@ const { phase } = storeToRefs(storm)
 const openAppId = ref<string | null>(null)
 
 const openApp = computed(() => APPS.find((a) => a.id === openAppId.value) ?? null)
-const statusTitle = computed(() => (phase.value === 'collapsed' ? '已停止响应' : (openApp.value?.name ?? '')))
+const statusTitle = computed(() =>
+  phase.value === 'collapsed' ? '已停止响应' : (openApp.value?.name ?? ''),
+)
 </script>
 
 <template>

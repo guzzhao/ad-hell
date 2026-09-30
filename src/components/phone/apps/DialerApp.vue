@@ -2,7 +2,16 @@
 import { findCreative } from '@/data/creatives'
 
 const pad = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#']
-const letters: Record<string, string> = { '2': 'ABC', '3': 'DEF', '4': 'GHI', '5': 'JKL', '6': 'MNO', '7': 'PQRS', '8': 'TUV', '9': 'WXYZ' }
+const letters: Record<string, string> = {
+  '2': 'ABC',
+  '3': 'DEF',
+  '4': 'GHI',
+  '5': 'JKL',
+  '6': 'MNO',
+  '7': 'PQRS',
+  '8': 'TUV',
+  '9': 'WXYZ',
+}
 const ad = findCreative('splash-mall')
 </script>
 
@@ -24,7 +33,11 @@ const ad = findCreative('splash-mall')
       <div
         v-if="ad"
         class="dialer__ad"
-        :style="{ '--ad-bg': ad.palette.bg, '--ad-fg': ad.palette.fg, '--ad-accent': ad.palette.accent }"
+        :style="{
+          '--ad-bg': ad.palette.bg,
+          '--ad-fg': ad.palette.fg,
+          '--ad-accent': ad.palette.accent,
+        }"
       >
         <span class="dialer__ad-skip">跳过 5s</span>
         <strong>{{ ad.headline }}</strong>

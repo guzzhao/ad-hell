@@ -7,10 +7,45 @@ import { APPS, appsByCategory } from '../apps'
  * 只要它们出现在素材文案里，就说明有人不小心把真实品牌写进了虚构素材。
  */
 const REAL_BRANDS = [
-  '淘宝', '天猫', '京东', '拼多多', '抖音', '快手', '微信', '腾讯', '阿里', '支付宝',
-  '百度', '字节', '美团', '大众点评', '滴滴', '小米', '华为', '荣耀', '苹果', 'OPPO',
-  'vivo', '三星', '爱奇艺', '优酷', '芒果', '哔哩哔哩', 'bilibili', '陌陌', '探探',
-  '网易', '新浪', '微博', '金山', '360', '携程', '去哪儿', '饿了么', '唯品会', '苏宁',
+  '淘宝',
+  '天猫',
+  '京东',
+  '拼多多',
+  '抖音',
+  '快手',
+  '微信',
+  '腾讯',
+  '阿里',
+  '支付宝',
+  '百度',
+  '字节',
+  '美团',
+  '大众点评',
+  '滴滴',
+  '小米',
+  '华为',
+  '荣耀',
+  '苹果',
+  'OPPO',
+  'vivo',
+  '三星',
+  '爱奇艺',
+  '优酷',
+  '芒果',
+  '哔哩哔哩',
+  'bilibili',
+  '陌陌',
+  '探探',
+  '网易',
+  '新浪',
+  '微博',
+  '金山',
+  '360',
+  '携程',
+  '去哪儿',
+  '饿了么',
+  '唯品会',
+  '苏宁',
 ]
 
 describe('广告素材合规', () => {
@@ -54,8 +89,10 @@ describe('反转对照的两个分区', () => {
   it('A 类（现实中无广告）有 6 个系统功能', () => {
     const system = appsByCategory('system')
     expect(system.length).toBe(6)
-    expect(system.map((a) => a.id).sort()).toEqual(
-      ['alarm', 'calculator', 'camera', 'dialer', 'messages', 'settings'].sort(),
+    // 用 Set 而不是排序后比较：这里断言的是"就是这几个 id"，与顺序无关。
+    // 顺带避开 Array#sort 的原地修改，以及 toSorted 需要 es2023 lib 的问题。
+    expect(new Set(system.map((a) => a.id))).toEqual(
+      new Set(['alarm', 'calculator', 'camera', 'dialer', 'messages', 'settings']),
     )
   })
 

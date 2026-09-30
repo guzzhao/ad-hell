@@ -9,7 +9,12 @@ const threads = [
 <template>
   <div class="msg">
     <ul class="msg__list">
-      <li v-for="thread in threads" :key="thread.from" class="msg__item" :class="{ 'is-flagged': thread.flagged }">
+      <li
+        v-for="thread in threads"
+        :key="thread.from"
+        class="msg__item"
+        :class="{ 'is-flagged': thread.flagged }"
+      >
         <span class="msg__avatar" aria-hidden="true">{{ thread.from.slice(0, 1) }}</span>
         <div class="msg__body">
           <div class="msg__head">
@@ -20,7 +25,9 @@ const threads = [
             {{ thread.preview }}
             <span v-if="thread.flagged" class="msg__link">ithome.example/upload</span>
           </p>
-          <p v-if="thread.flagged" class="msg__flag">点开这个链接，先弹出来的是浏览器的开屏广告。</p>
+          <p v-if="thread.flagged" class="msg__flag">
+            点开这个链接，先弹出来的是浏览器的开屏广告。
+          </p>
         </div>
       </li>
     </ul>

@@ -19,8 +19,7 @@
   inset: 0;
   overflow: hidden;
   background:
-    radial-gradient(120% 90% at 50% 0%, var(--page-bg-2) 0%, var(--page-bg) 60%),
-    var(--page-bg);
+    radial-gradient(120% 90% at 50% 0%, var(--page-bg-2) 0%, var(--page-bg) 60%), var(--page-bg);
 }
 
 .device-shell__stage {
@@ -103,9 +102,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background:
-    radial-gradient(140% 100% at 20% 0%, #2b3550 0%, #131722 55%, #0c0f16 100%),
-    #0c0f16;
+  background: radial-gradient(140% 100% at 20% 0%, #2b3550 0%, #131722 55%, #0c0f16 100%), #0c0f16;
   color: #f2f4f8;
   /* 弹窗层要相对它定位 */
   isolation: isolate;

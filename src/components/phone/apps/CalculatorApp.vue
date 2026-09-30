@@ -13,7 +13,13 @@ const ad = findCreative('game-legend')
     </div>
 
     <div class="calc__pad">
-      <button v-for="key in keys" :key="key" type="button" class="calc__key" :class="{ 'is-op': '÷×−+='.includes(key) }">
+      <button
+        v-for="key in keys"
+        :key="key"
+        type="button"
+        class="calc__key"
+        :class="{ 'is-op': '÷×−+='.includes(key) }"
+      >
         {{ key }}
       </button>
 
@@ -21,7 +27,11 @@ const ad = findCreative('game-legend')
       <div
         v-if="ad"
         class="calc__ad"
-        :style="{ '--ad-bg': ad.palette.bg, '--ad-fg': ad.palette.fg, '--ad-accent': ad.palette.accent }"
+        :style="{
+          '--ad-bg': ad.palette.bg,
+          '--ad-fg': ad.palette.fg,
+          '--ad-accent': ad.palette.accent,
+        }"
       >
         <span class="calc__ad-tag">广告</span>
         <strong>{{ ad.headline }}</strong>
@@ -29,7 +39,9 @@ const ad = findCreative('game-legend')
       </div>
     </div>
 
-    <p class="calc__caption">计算器也要看广告。想按 0，先关掉它——可它的关闭键在右上角，只有 9px 高。</p>
+    <p class="calc__caption">
+      计算器也要看广告。想按 0，先关掉它——可它的关闭键在右上角，只有 9px 高。
+    </p>
   </div>
 </template>
 
