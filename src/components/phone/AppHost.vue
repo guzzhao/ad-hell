@@ -9,6 +9,10 @@ import DialerApp from './apps/DialerApp.vue'
 import SettingsApp from './apps/SettingsApp.vue'
 import ShortVideoApp from './apps/ShortVideoApp.vue'
 import ShopApp from './apps/ShopApp.vue'
+import GalleryApp from './apps/GalleryApp.vue'
+import AlipayApp from './apps/AlipayApp.vue'
+import MusicApp from './apps/MusicApp.vue'
+import BankApp from './apps/BankApp.vue'
 
 const props = defineProps<{ app: AppMeta }>()
 const emit = defineEmits<{ back: [] }>()
@@ -16,6 +20,7 @@ const emit = defineEmits<{ back: [] }>()
 /** appId → 视图组件。找不到时回退到占位文案，而不是抛错。 */
 const VIEWS: Record<string, Component> = {
   camera: CameraApp,
+  gallery: GalleryApp,
   alarm: AlarmApp,
   calculator: CalculatorApp,
   messages: MessagesApp,
@@ -23,72 +28,59 @@ const VIEWS: Record<string, Component> = {
   settings: SettingsApp,
   video: ShortVideoApp,
   shop: ShopApp,
+  alipay: AlipayApp,
+  music: MusicApp,
+  bank: BankApp,
 }
 
 const view = computed<Component | null>(() => VIEWS[props.app.id] ?? null)
+const isImmersiveApp = computed(() => ['video', 'camera'].includes(props.app.id))
+const isBleedApp = computed(() =>
+  ['shop', 'gallery', 'alipay', 'music', 'bank'].includes(props.app.id),
+)
 </script>
 
 <template>
-  <div class="app-host">
-    <header class="app-host__bar">
-      <button type="button" class="app-host__back" @click="emit('back')">
+  <div class="app-host relative flex flex-col h-full" :class="`app-host--${app.id}`">
+    <header
+      class="app-host__bar flex items-center justify-between flex-none gap-2 px-3.5 pt-0.5 pb-2 z-30"
+      :class="{
+        'app-host__bar--overlay !absolute top-0 inset-x-0 bg-transparent pointer-events-none':
+          app.id === 'video',
+      }"
+    >
+      <button
+        type="button"
+        class="app-host__back inline-flex items-center gap-[3px] min-h-[40px] px-1.5 text-[13px] font-medium text-[rgba(242,244,248,0.85)] cursor-pointer"
+        :class="{
+          'pointer-events-auto bg-black/45 rounded-full backdrop-blur-md px-2.5 min-h-[32px] mt-1':
+            app.id === 'video',
+        }"
+        @click="emit('back')"
+      >
         <span aria-hidden="true">‹</span> 主屏
       </button>
-      <span class="app-host__title">{{ app.name }}</span>
-      <span class="app-host__spacer" aria-hidden="true" />
+      <span class="app-host__title text-[14px] font-semibold text-white">{{
+        app.id === 'video' ? '' : app.name
+      }}</span>
+      <span class="app-host__spacer w-[52px]" aria-hidden="true" />
     </header>
 
-    <div class="phone-scroll app-host__body">
+    <div
+      class="app-host__body flex-1 min-h-0 px-[18px] pb-[80px]"
+      :class="{
+        'app-host__body--immersive !p-0 flex flex-col overflow-hidden': isImmersiveApp,
+        'app-host__body--bleed !p-0 flex flex-col': isBleedApp,
+        'phone-scroll': !isImmersiveApp && !isBleedApp,
+      }"
+    >
       <component :is="view" v-if="view" />
-      <p v-else class="app-host__missing">这个应用还没做。</p>
+      <p
+        v-else
+        class="app-host__missing mt-10 text-center text-[13px] text-[rgba(242,244,248,0.5)]"
+      >
+        这个应用还没做。
+      </p>
     </div>
   </div>
 </template>
-
-<style scoped>
-.app-host {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.app-host__bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex: none;
-  gap: 8px;
-  padding: 2px 14px 10px;
-}
-
-.app-host__back {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  /* 这是页面自己的返回控件，不是广告的关闭键，所以要给足可点面积 */
-  min-height: 44px;
-  padding: 0 6px;
-  font-size: 13px;
-  color: rgba(242, 244, 248, 0.78);
-}
-
-.app-host__title {
-  font-size: 13.5px;
-  font-weight: 600;
-}
-
-.app-host__spacer {
-  width: 52px;
-}
-
-.app-host__body {
-  padding: 0 18px 80px;
-}
-
-.app-host__missing {
-  margin-top: 40px;
-  text-align: center;
-  font-size: 13px;
-  color: rgba(242, 244, 248, 0.5);
-}
-</style>

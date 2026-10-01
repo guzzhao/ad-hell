@@ -25,81 +25,78 @@ const { shakeArmed } = storeToRefs(storm)
 
 <template>
   <Transition name="shake-hint">
-    <div v-if="shakeArmed" class="shake-hint">
+    <div
+      v-if="shakeArmed"
+      class="shake-hint fixed left-1/2 -translate-x-1/2 bottom-[calc(14px+env(safe-area-inset-bottom,0px))] flex flex-col items-center gap-1.5 z-[1000]"
+    >
       <!--
         授权按钮必须在用户手势里被点击，iOS 才会真的弹窗；
         这正是为什么它不能自动请求 —— 而现实中的摇一摇广告也是这么做的。
       -->
-      <button v-if="needsPermission" type="button" class="shake-hint__btn" @click="emit('request')">
-        允许访问运动与方向
+      <button
+        v-if="needsPermission"
+        type="button"
+        class="shake-hint__btn shake-hint__btn--perm inline-flex items-center gap-3 min-h-[48px] px-5 rounded-full bg-[#121620]/90 border border-white/20 text-white backdrop-blur-xl shadow-[0_16px_36px_-10px_rgba(0,0,0,0.8)] active:scale-95 active:bg-[#1e2637]/95 transition-all cursor-pointer"
+        @click="emit('request')"
+      >
+        <span class="shake-hint__phone-icon text-base" aria-hidden="true">🔒</span>
+        允许访问运动与方向以激活互动
       </button>
 
-      <button v-else type="button" class="shake-hint__btn" @click="emit('simulate')">
-        <span class="shake-hint__icon" aria-hidden="true">↔</span>
-        摇一摇
+      <button
+        v-else
+        type="button"
+        class="shake-hint__btn inline-flex items-center gap-3 min-h-[48px] pl-4 pr-5 rounded-full bg-[#121620]/90 border border-white/20 text-white backdrop-blur-xl shadow-[0_16px_36px_-10px_rgba(0,0,0,0.8)] active:scale-95 active:bg-[#1e2637]/95 transition-all cursor-pointer"
+        @click="emit('simulate')"
+      >
+        <span class="shake-hint__phone-anim grid place-items-center w-7 h-7" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="shake-phone-svg w-[22px] h-[22px]"
+          >
+            <rect x="5" y="2" width="14" height="20" rx="3" />
+            <line x1="12" y1="18" x2="12.01" y2="18" stroke-width="2.5" />
+          </svg>
+        </span>
+        <div class="shake-hint__texts flex flex-col items-start text-left">
+          <span class="shake-hint__main text-[13px] font-bold tracking-wide text-[#ffd54a]"
+            >晃动手机 跳转详情</span
+          >
+          <span class="shake-hint__sub text-[10px] text-[#f2f4f8]/70"
+            >检测到晃动即可自动进入 · 或点击此栏</span
+          >
+        </div>
       </button>
-
-      <p class="shake-hint__note">
-        {{
-          needsPermission
-            ? '这条广告请求读取你的运动传感器'
-            : '晃动手机即跳转；桌面可左右晃动样机，或点上面的按钮'
-        }}
-      </p>
     </div>
   </Transition>
 </template>
 
 <style scoped>
-.shake-hint {
-  position: fixed;
-  left: 50%;
-  /* 只用 translateX 居中；过渡只改透明度，不去动 transform，免得互相覆盖 */
-  transform: translateX(-50%);
-  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  /* 高于弹窗层（100）、接管层（700）与页内假落地页（900） */
-  z-index: 1000;
+.shake-phone-svg {
+  animation: phone-shake-tilt 1.4s ease-in-out infinite;
+  transform-origin: bottom center;
 }
 
-.shake-hint__btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  /* 触控目标下限 44px */
-  min-height: 44px;
-  padding: 0 18px;
-  border-radius: 999px;
-  background: rgba(12, 15, 20, 0.86);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #eef1f6;
-  font-size: 13.5px;
-  font-weight: 500;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 12px 28px -14px rgba(0, 0, 0, 0.95);
-}
-
-.shake-hint__btn:active {
-  background: rgba(30, 36, 46, 0.94);
-}
-
-.shake-hint__icon {
-  font-size: 15px;
-  letter-spacing: -0.1em;
-}
-
-.shake-hint__note {
-  max-width: 280px;
-  margin: 0;
-  text-align: center;
-  font-size: 11px;
-  line-height: 1.5;
-  color: rgba(238, 241, 246, 0.66);
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+@keyframes phone-shake-tilt {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-18deg);
+  }
+  40% {
+    transform: rotate(18deg);
+  }
+  60% {
+    transform: rotate(-12deg);
+  }
+  80% {
+    transform: rotate(12deg);
+  }
 }
 
 .shake-hint-enter-active,
@@ -110,5 +107,11 @@ const { shakeArmed } = storeToRefs(storm)
 .shake-hint-enter-from,
 .shake-hint-leave-to {
   opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shake-phone-svg {
+    animation: none;
+  }
 }
 </style>

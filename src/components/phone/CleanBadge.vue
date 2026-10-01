@@ -9,33 +9,13 @@ defineProps<{ text: string }>()
 </script>
 
 <template>
-  <p class="clean-badge">
-    <span class="clean-badge__dot" aria-hidden="true" />
+  <p
+    class="clean-badge flex items-center gap-2 mt-[18px] px-[13px] py-[11px] border border-dashed border-green-400/40 rounded-xl bg-green-400/10 text-xs leading-relaxed text-[#b9f5cd]"
+  >
+    <span
+      class="clean-badge__dot shrink-0 w-[7px] h-[7px] rounded-full bg-green-400 shadow-[0_0_0_3px_rgba(74,222,128,0.18)]"
+      aria-hidden="true"
+    />
     {{ text }}
   </p>
 </template>
-
-<style scoped>
-.clean-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 18px 0 0;
-  padding: 11px 13px;
-  border: 1px dashed rgba(74, 222, 128, 0.42);
-  border-radius: 12px;
-  background: rgba(74, 222, 128, 0.07);
-  font-size: 12px;
-  line-height: 1.6;
-  color: #b9f5cd;
-}
-
-.clean-badge__dot {
-  flex: none;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #4ade80;
-  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.18);
-}
-</style>

@@ -13,16 +13,26 @@ import StormHud from '@/components/chrome/StormHud.vue'
 const storm = useStormStore()
 const { phase } = storeToRefs(storm)
 
-/**
- * 当前打开的 App。属于纯展示状态，不必进 store。
- * 重新体验时 DeviceShell 会整体卸载重建，因此这里自然回到主屏。
- */
 const openAppId = ref<string | null>(null)
 
 const openApp = computed(() => APPS.find((a) => a.id === openAppId.value) ?? null)
 const statusTitle = computed(() =>
   phase.value === 'collapsed' ? '已停止响应' : (openApp.value?.name ?? ''),
 )
+
+function handleOpenApp(appId: string) {
+  openAppId.value = appId
+  if (storm.adsEnabled) {
+    storm.triggerAppAd(appId)
+  }
+}
+
+function handleBack() {
+  openAppId.value = null
+  if (storm.explorationMode === 'manual') {
+    storm.ads = []
+  }
+}
 </script>
 
 <template>
@@ -30,8 +40,8 @@ const statusTitle = computed(() =>
     <StatusBar :title="statusTitle" />
 
     <div class="phone-screen__body">
-      <HomeGrid v-if="!openApp" @open="openAppId = $event" />
-      <AppHost v-else :app="openApp" @back="openAppId = null" />
+      <HomeGrid v-if="!openApp" @open="handleOpenApp" />
+      <AppHost v-else :app="openApp" @back="handleBack" />
     </div>
 
     <!--

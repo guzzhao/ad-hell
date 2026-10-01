@@ -113,13 +113,13 @@ describe('摇一摇素材', () => {
 })
 
 describe('反转对照的两个分区', () => {
-  it('A 类（现实中无广告）有 6 个系统功能', () => {
+  it('A 类（现实中无广告）有 7 个系统功能', () => {
     const system = appsByCategory('system')
-    expect(system.length).toBe(6)
+    expect(system.length).toBe(7)
     // 用 Set 而不是排序后比较：这里断言的是"就是这几个 id"，与顺序无关。
     // 顺带避开 Array#sort 的原地修改，以及 toSorted 需要 es2023 lib 的问题。
     expect(new Set(system.map((a) => a.id))).toEqual(
-      new Set(['alarm', 'calculator', 'camera', 'dialer', 'messages', 'settings']),
+      new Set(['alarm', 'calculator', 'camera', 'dialer', 'gallery', 'messages', 'settings']),
     )
   })
 

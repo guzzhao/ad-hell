@@ -1,6 +1,6 @@
 import { onMounted, watch } from 'vue'
 import { useRafFn } from '@vueuse/core'
-import { useStormStore } from '@/stores/storm'
+import { DEFAULT_SEED, useStormStore } from '@/stores/storm'
 
 /**
  * 单帧最多推进多少毫秒。
@@ -38,10 +38,9 @@ export function useStormLoop(): void {
   )
 
   onMounted(() => {
-    // 先把循环点着，再让风暴开始：storm.start() 会把 phase 改成 storm，
-    // watch 随之触发；此时若循环没在跑，watch 会再点一次，造成一帧被安排两次。
+    // 先把循环点着，再让风暴开始：默认进入纯手动探索模式（平时不自动弹窗）
     resume()
-    storm.start()
+    storm.start(DEFAULT_SEED, 'manual')
   })
 
   // 「重新体验」把 phase 拉回 storm，而循环此前已经 pause 过了，需要重新点火。

@@ -18,72 +18,25 @@ const emit = defineEmits<{ hit: [] }>()
 
 /** `none` 变体根本没有关闭键——这是报道里"无法关闭"那一类。 */
 const closable = computed(() => isClosable(props.variant))
+
+const variantClasses: Record<CloseVariant, string> = {
+  honest: 'top-1.5 right-1.5 w-7 h-7 text-xs text-white bg-black/40',
+  deceptive: 'top-1.5 right-1.5 w-7 h-7 text-xs text-white bg-black/40',
+  tiny: 'top-1.5 right-1.5 w-5 h-5 text-[10px] text-white/70 bg-black/25',
+  corner: 'top-1.5 right-1.5 w-[22px] h-[22px] text-[11px] text-black/60 bg-black/10',
+  none: '',
+}
 </script>
 
 <template>
   <button
     v-if="closable"
     type="button"
-    class="close-btn"
-    :class="`close-btn--${variant}`"
+    class="close-btn absolute grid place-items-center p-0 leading-none rounded-full cursor-pointer z-10 before:content-[''] before:absolute before:-inset-2 before:rounded-full"
+    :class="[`close-btn--${variant}`, variantClasses[variant]]"
     aria-label="关闭"
     @click.stop="emit('hit')"
   >
     <span aria-hidden="true">✕</span>
   </button>
 </template>
-
-<style scoped>
-.close-btn {
-  position: absolute;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  line-height: 1;
-  border-radius: 50%;
-}
-
-/* 正常关闭键：看得见、点得到 */
-.close-btn--honest {
-  top: 6px;
-  right: 6px;
-  width: 28px;
-  height: 28px;
-  font-size: 12px;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.38);
-}
-
-/* 虚假关闭键：外观与正常关闭键完全一致 —— 用户无法凭视觉分辨，这正是陷阱所在 */
-.close-btn--deceptive {
-  top: 6px;
-  right: 6px;
-  width: 28px;
-  height: 28px;
-  font-size: 12px;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.38);
-}
-
-/* 微型浅灰小字：命中区只有 14px */
-.close-btn--tiny {
-  top: 4px;
-  right: 4px;
-  width: 14px;
-  height: 14px;
-  font-size: 8px;
-  color: rgba(255, 255, 255, 0.42);
-  background: transparent;
-}
-
-/* 放在左上角不易点击处，命中区 16px，颜色还很低对比 */
-.close-btn--corner {
-  top: 4px;
-  left: 4px;
-  width: 16px;
-  height: 16px;
-  font-size: 9px;
-  color: rgba(0, 0, 0, 0.42);
-  background: transparent;
-}
-</style>

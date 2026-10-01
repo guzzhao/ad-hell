@@ -17,7 +17,7 @@ function onTap(): void {
 </script>
 
 <template>
-  <div class="ad-layer">
+  <div class="ad-layer absolute inset-0 z-[100] pointer-events-none">
     <TransitionGroup name="ad">
       <AdPopup v-for="ad in ads" :key="ad.id" :ad="ad" @close="onClose" @tap="onTap" />
     </TransitionGroup>
@@ -32,13 +32,6 @@ function onTap(): void {
   但仍低于「结束体验」出口（1000）与页内假落地页（900）。
 -->
 <style>
-.ad-layer {
-  position: absolute;
-  inset: 0;
-  z-index: 100;
-  pointer-events: none;
-}
-
 .ad-enter-active {
   animation: ad-pop-in 240ms cubic-bezier(0.2, 1.35, 0.4, 1) both;
 }

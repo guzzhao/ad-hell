@@ -53,6 +53,16 @@ export const useStormStore = defineStore('storm', () => {
    * 界面据此显示「点击任意处开启声音」，而不是让用户以为页面坏了。
    */
   const audioBlocked = ref(false)
+  /**
+   * 探索模式：'manual'（纯手动探索，平时完全不自动弹广告，由操作触发）
+   *           'auto'（自动风暴模式，广告随时间涌现）
+   */
+  const explorationMode = ref<'manual' | 'auto'>('manual')
+  /**
+   * 全局广告展示开关：
+   * 当前阶段打磨手机系统与原生应用界面，完全关闭广告展示；广告组件均保留供后续开启。
+   */
+  const adsEnabled = ref(false)
 
   // ── 非响应式的内部记账 ───────────────────────────────────
   let rng: () => number = mulberry32(DEFAULT_SEED)
@@ -106,14 +116,36 @@ export const useStormStore = defineStore('storm', () => {
     audioBlocked.value = false
   }
 
-  function start(seed: number = DEFAULT_SEED): void {
+  function start(
+    seed: number = DEFAULT_SEED,
+    mode: 'manual' | 'auto' = 'auto',
+    enableAds: boolean = mode === 'auto',
+  ): void {
     reset(seed)
+    explorationMode.value = mode
+    adsEnabled.value = enableAds
     phase.value = 'storm'
   }
 
   /** 「重新体验」：换一个种子，让第二遍不至于完全一样。 */
   function restart(): void {
-    start(Date.now() >>> 0)
+    start(Date.now() >>> 0, explorationMode.value, adsEnabled.value)
+  }
+
+  function setAdsEnabled(enabled: boolean): void {
+    adsEnabled.value = enabled
+    if (!enabled) {
+      ads.value = []
+      landingOpen.value = false
+    }
+  }
+
+  function setExplorationMode(mode: 'manual' | 'auto'): void {
+    explorationMode.value = mode
+    if (mode === 'manual' && ads.value.length > 1) {
+      // 切换到手动探索时，清除过多堆叠弹窗，最多保留最新 1 个
+      ads.value = ads.value.slice(-1)
+    }
   }
 
   function spawnOne(): void {
@@ -134,9 +166,93 @@ export const useStormStore = defineStore('storm', () => {
     spawnedCount.value += 1
   }
 
-  /** 误触惩罚：追加若干弹窗。 */
+  /** 定位生成指定广告，用于操作触发模式 */
+  function spawnTargeted(creativeId: string): void {
+    const creative = findCreative(creativeId)
+    if (!creative) return
+
+    if (creative.surface === 'takeover') {
+      spawnTakeover(creativeId)
+      return
+    }
+
+    let x = 9
+    let y = 26
+    if (creative.layout === 'splash' || creative.layout === 'fakeCall') {
+      x = 0
+      y = 0
+    } else if (creative.layout === 'banner') {
+      x = 4
+      y = 3
+    } else if (creative.layout === 'floating') {
+      x = 20
+      y = 76
+    }
+
+    ads.value.push({
+      id: nextId++,
+      creativeId: creative.id,
+      surface: creative.surface,
+      x,
+      y,
+      w: creative.size.w,
+      h: creative.size.h,
+      z: zCounter++,
+      bornAt: elapsedMs.value,
+    })
+    spawnedCount.value += 1
+  }
+
+  /** 点击特定 App 或触发特定操作时，弹出单个对应广告 */
+  function triggerAppAd(appId: string): void {
+    if (!adsEnabled.value) return
+
+    // 若已有全屏接管或开屏广告，不打扰
+    if (
+      ads.value.some(
+        (ad) => ad.surface === 'takeover' || findCreative(ad.creativeId)?.layout === 'splash',
+      )
+    ) {
+      return
+    }
+
+    // 手动探索模式下，保证屏幕克制，每次仅展示 1 个广告
+    if (explorationMode.value === 'manual' && ads.value.length >= 1) {
+      ads.value = []
+    }
+
+    switch (appId) {
+      case 'shop':
+        spawnTargeted('splash-mall')
+        break
+      case 'video':
+        spawnTargeted('splash-video')
+        break
+      case 'dialer':
+        spawnTakeover('call-loan-service')
+        break
+      case 'camera':
+        spawnTargeted('loan-fast')
+        break
+      case 'calculator':
+        spawnTargeted('game-legend')
+        break
+      case 'alarm':
+        spawnTargeted('health-bp')
+        break
+      case 'settings':
+        spawnTargeted('fake-system')
+        break
+      case 'messages':
+        spawnTargeted('shop-99')
+        break
+    }
+  }
+
+  /** 误触惩罚：追加弹窗。手动模式下只追加 1 个，避免泛滥 */
   function applyPenalty(count: number): void {
-    for (let i = 0; i < count; i++) spawnOne()
+    const penalty = explorationMode.value === 'manual' ? 1 : count
+    for (let i = 0; i < penalty; i++) spawnOne()
   }
 
   /**
@@ -203,10 +319,12 @@ export const useStormStore = defineStore('storm', () => {
     elapsedMs.value += dt
     spawnAccumulator += dt
 
-    runBeats()
+    if (explorationMode.value === 'auto') {
+      runBeats()
+    }
     expireTakeovers()
 
-    if (spawnAccumulator >= interval.value) {
+    if (explorationMode.value === 'auto' && spawnAccumulator >= interval.value) {
       // 只补一个，并且不累积"欠账"：否则从后台切回来会瞬间爆发几十个弹窗。
       spawnAccumulator = 0
       // 数量未达当前目标才补，这就是"打地鼠"机制——关掉一个，过一会儿又补回来。
@@ -215,10 +333,12 @@ export const useStormStore = defineStore('storm', () => {
       if (popupCount.value < target.value) spawnOne()
     }
 
-    // 兜底：到点必然收场。即使有人手速超神，风暴也不会无限拖延。
-    if (isCollapsed(ads.value) || elapsedMs.value >= STORM.durationMs) {
-      collapseElapsed = 0
-      phase.value = 'collapsed'
+    // 只有自动风暴模式下才会自动判定崩塌
+    if (explorationMode.value === 'auto') {
+      if (isCollapsed(ads.value) || elapsedMs.value >= STORM.durationMs) {
+        collapseElapsed = 0
+        phase.value = 'collapsed'
+      }
     }
   }
 
@@ -261,6 +381,14 @@ export const useStormStore = defineStore('storm', () => {
   /** 从页内假落地页返回。 */
   function closeLanding(): void {
     landingOpen.value = false
+    if (explorationMode.value === 'manual') {
+      ads.value = []
+    }
+  }
+
+  /** 关闭/清空所有弹窗广告 */
+  function closeAllAds(): void {
+    ads.value = []
   }
 
   /**
@@ -322,6 +450,8 @@ export const useStormStore = defineStore('storm', () => {
     landingOpen,
     muted,
     audioBlocked,
+    explorationMode,
+    adsEnabled,
     // 派生
     coverage,
     popupCount,
@@ -334,11 +464,16 @@ export const useStormStore = defineStore('storm', () => {
     // 动作
     start,
     restart,
+    setExplorationMode,
+    setAdsEnabled,
+    spawnTargeted,
+    triggerAppAd,
     advance,
     attemptClose,
     tapAdBody,
     handleShake,
     closeLanding,
+    closeAllAds,
     enterTruth,
     setReducedMotion,
     toggleMuted,

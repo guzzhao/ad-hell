@@ -78,13 +78,21 @@ describe('App 冒烟测试', () => {
     wrapper.unmount()
   })
 
-  it('主屏同时呈现 A 类与 B 类两个分区，且点明反差', () => {
+  it('主屏呈现真实手机桌面，且不包含说教口号文案', () => {
     const wrapper = mount(App)
     const text = wrapper.text()
 
-    expect(text).toContain('本来就该干干净净的')
-    expect(text).toContain('平时广告最多的')
-    expect(text).toContain('一个广告都没有')
+    // 真实应用齐全
+    expect(text).toContain('相机')
+    expect(text).toContain('设置')
+    expect(text).toContain('短视频')
+    expect(text).toContain('购物')
+
+    // 严禁出现破坏真实感的口号文案
+    expect(text).not.toContain('本来就该干干净净的')
+    expect(text).not.toContain('平时广告最多的')
+    expect(text).not.toContain('一个广告都没有')
+    expect(text).not.toContain('探索模式')
 
     wrapper.unmount()
   })

@@ -3,131 +3,142 @@ import { storeToRefs } from 'pinia'
 import { useStormStore } from '@/stores/storm'
 
 /**
- * 页内假落地页。
- *
- * "误触跳转"必须让人看得见、且必须自己退回来——否则误触只是个无感的数字。
- * 关键约束：它**只在页内**，不触发任何真实外链跳转（prd.md R3 / design.md §6）。
+ * 真实落地页：模仿应用商店下载详情页。
+ * 适度、克制且真实，具备清晰的应用信息、进度与返回入口。
  */
 const storm = useStormStore()
-const { landingOpen, misclickCount } = storeToRefs(storm)
+const { landingOpen } = storeToRefs(storm)
 </script>
 
 <template>
   <Transition name="landing">
     <div
       v-if="landingOpen"
-      class="landing"
+      class="landing absolute inset-0 z-[900] flex flex-col bg-slate-50 text-slate-900"
       role="dialog"
       aria-modal="true"
-      aria-label="误触跳转演示"
+      aria-label="应用详情"
     >
-      <div class="landing__page">
-        <span class="landing__badge">你刚刚误触了广告</span>
+      <!-- 顶部系统导航栏：避让顶部刘海/状态栏，提供明确的返回和关闭通道 -->
+      <header
+        class="landing__nav flex items-center justify-between pt-[42px] px-4 pb-3 bg-white border-b border-slate-200"
+      >
+        <button
+          type="button"
+          class="landing__back inline-flex items-center gap-0.5 text-[14.5px] font-semibold text-blue-600 px-2 py-1.5 rounded-lg active:bg-blue-50 cursor-pointer"
+          aria-label="返回"
+          @click="storm.closeLanding()"
+        >
+          <span class="landing__back-arrow text-xl leading-none" aria-hidden="true">‹</span> 返回
+        </button>
+        <span class="landing__nav-title text-[13.5px] font-semibold text-slate-700">应用详情</span>
+        <button
+          type="button"
+          class="landing__close-btn grid place-items-center w-8 h-8 rounded-full bg-slate-100 text-slate-600 text-[13px] font-semibold active:bg-slate-200 cursor-pointer border-none"
+          aria-label="关闭详情"
+          @click="storm.closeLanding()"
+        >
+          ✕
+        </button>
+      </header>
 
-        <h2 class="landing__title">正在为你打开…</h2>
-        <p class="landing__note">
-          这是一个演示用的假落地页，没有跳转到任何真实网站，也不会加载任何外部内容。
-        </p>
-
-        <div class="landing__wheel" aria-hidden="true">
-          <span class="landing__wheel-ring">幸运转盘</span>
-          <span class="landing__wheel-sub">恭喜获得 1 次抽奖机会</span>
+      <div class="landing__page flex-1 min-h-0 overflow-y-auto px-[18px] pt-5 pb-6">
+        <!-- 应用基本信息 -->
+        <div class="landing__app-header flex gap-4 items-center">
+          <div
+            class="landing__app-icon grid place-items-center w-[68px] h-[68px] rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-[0_4px_14px_-3px_rgba(234,88,12,0.35)]"
+            aria-hidden="true"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              class="landing__icon-svg w-8 h-8"
+            >
+              <path d="M6 3 3 7v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-3-4Z" />
+              <path d="M3 7h18M16 11a4 4 0 0 1-8 0" />
+            </svg>
+          </div>
+          <div class="landing__app-info flex flex-col gap-0.5">
+            <h2 class="landing__app-name m-0 text-[16.5px] font-bold text-slate-900">拼一拼优选</h2>
+            <p class="landing__app-sub m-0 text-[11.5px] text-slate-500">
+              品质生活 · 特惠商城 · 48.6 MB
+            </p>
+            <div class="landing__rating flex items-center gap-1.5 mt-0.5 text-[11px]">
+              <span class="landing__stars text-amber-500 tracking-tighter">★★★★★</span>
+              <span class="landing__score font-semibold text-amber-600">4.8 分</span>
+              <span class="landing__dl-count text-slate-400">5600 万次安装</span>
+            </div>
+          </div>
         </div>
 
-        <p class="landing__stat">
-          你已经误触 <strong>{{ misclickCount }}</strong> 次。每误触一次，屏幕上就多出 2~4
-          个新弹窗。
-        </p>
+        <!-- 下载与安装进度条 -->
+        <div class="landing__progress-card mt-5 p-4 rounded-xl bg-white border border-slate-200">
+          <div
+            class="landing__progress-top flex justify-between text-xs font-semibold text-slate-800"
+          >
+            <span class="landing__progress-status">正在下载安装包…</span>
+            <span class="landing__progress-percent text-blue-600">76%</span>
+          </div>
+          <div class="landing__progress-bar mt-2 h-[5px] rounded-full bg-slate-100 overflow-hidden">
+            <div class="landing__progress-fill h-full w-[76%] rounded-full bg-blue-600" />
+          </div>
+          <p class="landing__progress-speed mt-1.5 text-[10.5px] text-slate-500">
+            12.4 MB/s · 已通过安全扫描
+          </p>
+        </div>
+
+        <!-- 真实截图画廊预览 -->
+        <div class="landing__gallery grid grid-cols-3 gap-2 mt-5" aria-hidden="true">
+          <div
+            class="landing__shot landing__shot--1 flex flex-col items-center justify-center gap-[3px] h-24 rounded-[10px] p-2 text-center text-white bg-gradient-to-br from-blue-500 to-blue-700"
+          >
+            <span class="landing__shot-title text-[11.5px] font-semibold">每日特惠</span>
+            <span class="landing__shot-sub text-[9.5px] opacity-85">精选大牌折扣</span>
+          </div>
+          <div
+            class="landing__shot landing__shot--2 flex flex-col items-center justify-center gap-[3px] h-24 rounded-[10px] p-2 text-center text-white bg-gradient-to-br from-emerald-500 to-emerald-700"
+          >
+            <span class="landing__shot-title text-[11.5px] font-semibold">品质保障</span>
+            <span class="landing__shot-sub text-[9.5px] opacity-85">正品溯源验真</span>
+          </div>
+          <div
+            class="landing__shot landing__shot--3 flex flex-col items-center justify-center gap-[3px] h-24 rounded-[10px] p-2 text-center text-white bg-gradient-to-br from-indigo-500 to-indigo-700"
+          >
+            <span class="landing__shot-title text-[11.5px] font-semibold">极速物流</span>
+            <span class="landing__shot-sub text-[9.5px] opacity-85">售后无忧保障</span>
+          </div>
+        </div>
       </div>
 
-      <button type="button" class="landing__back" @click="storm.closeLanding()">返回</button>
+      <!-- 底部操作悬浮栏：提供明确的关闭和返回入口 -->
+      <footer
+        class="landing__footer flex flex-col items-center px-[18px] pt-3.5 pb-[calc(14px+env(safe-area-inset-bottom,0px))] bg-white border-t border-slate-200"
+      >
+        <button
+          type="button"
+          class="landing__cancel-btn flex items-center justify-center w-full h-11 rounded-full bg-slate-100 text-slate-700 text-sm font-semibold border border-slate-300 cursor-pointer transition-all active:bg-slate-200 active:scale-[0.98]"
+          @click="storm.closeLanding()"
+        >
+          ✕ 取消下载并返回
+        </button>
+      </footer>
     </div>
   </Transition>
 </template>
 
 <style scoped>
-.landing {
-  position: absolute;
-  inset: 0;
-  z-index: 900;
-  display: flex;
-  flex-direction: column;
-  background: #f4f5f7;
-  color: #171a20;
+.landing-enter-active,
+.landing-leave-active {
+  transition:
+    transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.28s ease;
 }
 
-.landing__page {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding: 26px 22px;
-}
-
-.landing__badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: #ffe0dc;
-  color: #b3261a;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.landing__title {
-  margin: 16px 0 0;
-  font-size: 24px;
-  font-weight: 800;
-}
-
-.landing__note {
-  margin: 8px 0 0;
-  font-size: 12.5px;
-  line-height: 1.7;
-  color: #5b6270;
-}
-
-.landing__wheel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  margin: 24px 0;
-  padding: 30px 16px;
-  border-radius: 18px;
-  background: linear-gradient(150deg, #ffd54a 0%, #ff8a3d 55%, #e23b2e 100%);
-  color: #fff;
-}
-
-.landing__wheel-ring {
-  font-size: 20px;
-  font-weight: 800;
-}
-
-.landing__wheel-sub {
-  font-size: 12px;
-  opacity: 0.92;
-}
-
-.landing__stat {
-  margin: 0;
-  font-size: 12.5px;
-  line-height: 1.7;
-  color: #3c424e;
-}
-
-.landing__stat strong {
-  color: #b3261a;
-  font-size: 15px;
-}
-
-.landing__back {
-  flex: none;
-  /* 这是页面自己的控件，不是广告按钮，所以给足可点面积 */
-  min-height: 56px;
-  margin: 0;
-  background: #171a20;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 700;
+.landing-enter-from,
+.landing-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
 }
 </style>

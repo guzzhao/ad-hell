@@ -1,100 +1,45 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { findCreative } from '@/data/creatives'
+import { useStormStore } from '@/stores/storm'
 
 /**
- * App 内部的"原生广告位"。
- *
- * 风暴弹窗（AdLayer）是覆盖在全屏之上的独立图层；这个组件是**长在 App 界面里**的
- * 广告位。两者一起构成"这个 App 本身已经被广告占领"的观感——
- * 只有 A 类（现实中本该无广告的）App 会用到它。
+ * App 内部的原生广告位（保留组件，当前阶段打磨原生界面，由 adsEnabled 控制显示）。
  */
 const props = defineProps<{ creativeId: string; caption?: string }>()
+const storm = useStormStore()
 
 const creative = computed(() => findCreative(props.creativeId))
 </script>
 
 <template>
-  <figure v-if="creative" class="in-app-ad">
+  <figure v-if="storm.adsEnabled && creative" class="in-app-ad my-4">
     <div
-      class="in-app-ad__card"
+      class="in-app-ad__card flex items-center gap-2.5 px-3 py-[11px] rounded-[13px] shadow-[0_8px_22px_-12px_rgba(0,0,0,0.7)] bg-[var(--ad-bg)] text-[var(--ad-fg)]"
       :style="{
         '--ad-bg': creative.palette.bg,
         '--ad-fg': creative.palette.fg,
         '--ad-accent': creative.palette.accent,
       }"
     >
-      <span class="in-app-ad__tag">广告</span>
-      <div class="in-app-ad__text">
-        <strong>{{ creative.headline }}</strong>
-        <small>{{ creative.subline }}</small>
+      <span
+        class="in-app-ad__tag shrink-0 self-start px-[5px] py-px border border-current rounded text-[9px] opacity-75"
+        >广告</span
+      >
+      <div class="in-app-ad__text flex flex-col gap-0.5 min-w-0">
+        <strong class="text-[12.5px] font-bold leading-snug">{{ creative.headline }}</strong>
+        <small class="text-[10.5px] opacity-80">{{ creative.subline }}</small>
       </div>
-      <span class="in-app-ad__cta">{{ creative.cta }}</span>
+      <span
+        class="in-app-ad__cta shrink-0 ml-auto px-[11px] py-1.5 rounded-full bg-[var(--ad-accent)] text-[#14161a] text-[11px] font-bold whitespace-nowrap"
+        >{{ creative.cta }}</span
+      >
     </div>
-    <figcaption v-if="caption" class="in-app-ad__caption">{{ caption }}</figcaption>
+    <figcaption
+      v-if="caption"
+      class="in-app-ad__caption mt-[7px] mx-0.5 text-[11px] leading-relaxed text-[#f2f4f8]/50"
+    >
+      {{ caption }}
+    </figcaption>
   </figure>
 </template>
-
-<style scoped>
-.in-app-ad {
-  margin: 16px 0;
-}
-
-.in-app-ad__card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 11px 12px;
-  border-radius: 13px;
-  background: var(--ad-bg);
-  color: var(--ad-fg);
-  box-shadow: 0 8px 22px -12px rgba(0, 0, 0, 0.7);
-}
-
-.in-app-ad__tag {
-  flex: none;
-  align-self: flex-start;
-  padding: 1px 5px;
-  border: 1px solid currentColor;
-  border-radius: 4px;
-  font-size: 9px;
-  opacity: 0.75;
-}
-
-.in-app-ad__text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.in-app-ad__text strong {
-  font-size: 12.5px;
-  font-weight: 700;
-  line-height: 1.3;
-}
-
-.in-app-ad__text small {
-  font-size: 10.5px;
-  opacity: 0.82;
-}
-
-.in-app-ad__cta {
-  flex: none;
-  margin-left: auto;
-  padding: 6px 11px;
-  border-radius: 999px;
-  background: var(--ad-accent);
-  color: #14161a;
-  font-size: 11px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.in-app-ad__caption {
-  margin: 7px 2px 0;
-  font-size: 11px;
-  line-height: 1.6;
-  color: rgba(242, 244, 248, 0.5);
-}
-</style>

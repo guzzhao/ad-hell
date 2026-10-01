@@ -24,61 +24,22 @@ const advice = [
 </script>
 
 <template>
-  <ol class="advice">
-    <li v-for="(item, index) in advice" :key="item.title" class="advice__item">
-      <span class="advice__num" aria-hidden="true">{{ index + 1 }}</span>
+  <ol class="advice list-none m-0 p-0">
+    <li
+      v-for="(item, index) in advice"
+      :key="item.title"
+      class="advice__item flex gap-3.5 py-[18px] border-t border-white/[0.08] first:border-t-0 first:pt-1"
+    >
+      <span
+        class="advice__num shrink-0 grid place-items-center w-[26px] h-[26px] rounded-lg bg-[#ffd54a]/15 text-[#ffd54a] font-mono text-[13px] font-bold"
+        aria-hidden="true"
+      >
+        {{ index + 1 }}
+      </span>
       <div class="advice__body">
-        <h4>{{ item.title }}</h4>
-        <p>{{ item.body }}</p>
+        <h4 class="m-0 text-[14.5px] font-semibold leading-snug text-white">{{ item.title }}</h4>
+        <p class="m-0 mt-[7px] text-[13px] leading-relaxed text-[#98a0b0]">{{ item.body }}</p>
       </div>
     </li>
   </ol>
 </template>
-
-<style scoped>
-.advice {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.advice__item {
-  display: flex;
-  gap: 14px;
-  padding: 18px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.advice__item:first-child {
-  border-top: none;
-  padding-top: 4px;
-}
-
-.advice__num {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
-  background: rgba(255, 213, 74, 0.14);
-  color: #ffd54a;
-  font-family: var(--font-num);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.advice__body h4 {
-  margin: 0;
-  font-size: 14.5px;
-  font-weight: 600;
-  line-height: 1.5;
-}
-
-.advice__body p {
-  margin: 7px 0 0;
-  font-size: 13px;
-  line-height: 1.85;
-  color: var(--ink-dim);
-}
-</style>

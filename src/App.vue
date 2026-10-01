@@ -29,7 +29,13 @@ const { needsPermission, requestMotionPermission, simulate } = useShakeSource()
  * 不会因为漏写 onBeforeUnmount 而在热更新后累积监听器。
  */
 useEventListener(window, 'keydown', (event) => {
-  if (event.key === 'Escape') storm.enterTruth()
+  if (event.key === 'Escape') {
+    if (storm.landingOpen) {
+      storm.closeLanding()
+    } else {
+      storm.enterTruth()
+    }
+  }
 })
 </script>
 

@@ -20,113 +20,42 @@ onMounted(() => {
 
 <template>
   <div class="chain">
-    <div class="chain__units">
-      <div v-for="item in unitPrices" :key="item.label" class="chain__unit">
-        <span class="chain__unit-label">{{ item.label }}</span>
-        <span class="chain__unit-value">
-          {{ item.value }}<small>{{ item.unit }}</small>
+    <div class="chain__units grid grid-cols-2 gap-3">
+      <div
+        v-for="item in unitPrices"
+        :key="item.label"
+        class="chain__unit p-4 sm:p-[18px] rounded-[14px] bg-white/[0.05] border border-white/[0.08]"
+      >
+        <span class="chain__unit-label block text-xs text-[#98a0b0]">{{ item.label }}</span>
+        <span
+          class="chain__unit-value block mt-1.5 font-mono text-3xl font-bold tracking-tight text-white"
+        >
+          {{ item.value
+          }}<small class="ml-1 text-sm font-medium text-[#98a0b0]">{{ item.unit }}</small>
         </span>
       </div>
     </div>
 
-    <p class="chain__derive">
-      日活 <b>100 万</b> 的应用，每天触发 <b>3 次</b>弹窗
+    <p class="chain__derive mt-6 text-sm leading-[1.9] text-[#98a0b0]">
+      日活 <b class="text-[#e8eaef] font-semibold">100 万</b> 的应用，每天触发
+      <b class="text-[#e8eaef] font-semibold">3 次</b>弹窗
       <span aria-hidden="true">→</span>
-      <b class="chain__result">月收益可达 150 万元以上</b>
+      <b class="chain__result font-semibold text-[#ffd54a]">月收益可达 150 万元以上</b>
     </p>
 
-    <div class="chain__bar">
-      <div class="chain__bar-fill" :style="{ width: shown ? '100%' : '0%' }">
-        <span class="chain__bar-label">150 万元 / 月</span>
+    <div class="chain__bar mt-3.5 h-[34px] rounded-[10px] bg-white/[0.06] overflow-hidden">
+      <div
+        class="chain__bar-fill flex items-center justify-end h-full pr-3 rounded-[10px] bg-gradient-to-r from-[#ff8a3d] to-[#e23b2e] transition-[width] duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        :style="{ width: shown ? '100%' : '0%' }"
+      >
+        <span class="chain__bar-label font-mono text-[13px] font-bold text-white whitespace-nowrap"
+          >150 万元 / 月</span
+        >
       </div>
     </div>
 
-    <p class="chain__source">数据引自央视新闻相关报道，为报道中引述的行业数字。</p>
+    <p class="chain__source mt-3.5 text-[11.5px] text-[#5d6675]">
+      数据引自央视新闻相关报道，为报道中引述的行业数字。
+    </p>
   </div>
 </template>
-
-<style scoped>
-.chain__units {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.chain__unit {
-  padding: 16px 18px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.chain__unit-label {
-  display: block;
-  font-size: 12px;
-  color: var(--ink-dim);
-}
-
-.chain__unit-value {
-  display: block;
-  margin-top: 6px;
-  font-family: var(--font-num);
-  font-size: 30px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.chain__unit-value small {
-  margin-left: 3px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--ink-dim);
-}
-
-.chain__derive {
-  margin: 24px 0 0;
-  font-size: 14px;
-  line-height: 1.9;
-  color: var(--ink-dim);
-}
-
-.chain__derive b {
-  color: var(--ink);
-  font-weight: 600;
-}
-
-.chain__result {
-  color: #ffd54a !important;
-}
-
-.chain__bar {
-  margin-top: 14px;
-  height: 34px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.06);
-  overflow: hidden;
-}
-
-.chain__bar-fill {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  height: 100%;
-  padding-right: 12px;
-  border-radius: 10px;
-  background: linear-gradient(90deg, #ff8a3d 0%, #e23b2e 100%);
-  transition: width 1.1s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.chain__bar-label {
-  font-family: var(--font-num);
-  font-size: 13px;
-  font-weight: 700;
-  color: #fff;
-  white-space: nowrap;
-}
-
-.chain__source {
-  margin: 14px 0 0;
-  font-size: 11.5px;
-  color: var(--ink-faint);
-}
-</style>

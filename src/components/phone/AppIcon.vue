@@ -8,7 +8,7 @@ defineProps<{ name: string }>()
 
 <template>
   <svg
-    class="app-icon"
+    class="app-icon w-full h-full block"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -67,13 +67,26 @@ defineProps<{ name: string }>()
       <path d="M3.5 6.6h17" />
       <path d="M15.6 10.2a3.6 3.6 0 0 1-7.2 0" />
     </template>
+
+    <template v-else-if="name === 'gallery'">
+      <rect x="3" y="3" width="18" height="18" rx="3" />
+      <circle cx="8.5" cy="8.5" r="1.5" />
+      <path d="m21 15-5-5L5 21" />
+    </template>
+
+    <template v-else-if="name === 'alipay'">
+      <rect x="3" y="3" width="18" height="18" rx="3.5" />
+      <path d="M7 8h10M12 8v4M8 12h8M9 16c2-1 4.5-2 5-5M9.5 13.5c1 1.5 2.5 3 4.5 4" />
+    </template>
+
+    <template v-else-if="name === 'music'">
+      <path d="M9 18V5l12-2v13" />
+      <circle cx="6" cy="18" r="3" />
+      <circle cx="18" cy="16" r="3" />
+    </template>
+
+    <template v-else-if="name === 'bank'">
+      <path d="m3 9 9-6 9 6M4 10h16M5 10v7M9 10v7M15 10v7M19 10v7M3 17h18M2 21h20" />
+    </template>
   </svg>
 </template>
-
-<style scoped>
-.app-icon {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-</style>

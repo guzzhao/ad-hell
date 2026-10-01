@@ -59,13 +59,13 @@ function onClose(id: number): void {
 </script>
 
 <template>
-  <div class="takeover-layer">
+  <div class="takeover-layer absolute inset-0 z-[700] pointer-events-none">
     <TransitionGroup name="takeover">
       <!-- 点主体同样是误触跳转，真实广告就是这样 -->
       <div
         v-for="view in views"
         :key="view.id"
-        class="takeover-layer__item"
+        class="takeover-layer__item absolute inset-0 pointer-events-auto cursor-pointer"
         :style="view.style"
         @click="storm.tapAdBody()"
       >
@@ -80,22 +80,6 @@ function onClose(id: number): void {
   与 AdLayer 同理：过渡类名由 TransitionGroup 加到**子元素**上，全局样式最稳妥。
 -->
 <style>
-.takeover-layer {
-  position: absolute;
-  inset: 0;
-  /* 介于弹窗层（100）与假落地页（900）之间 */
-  z-index: 700;
-  /* 层本身不吃事件，只有真正渲染出来的接管实例才吃 */
-  pointer-events: none;
-}
-
-.takeover-layer__item {
-  position: absolute;
-  inset: 0;
-  pointer-events: auto;
-  cursor: pointer;
-}
-
 .takeover-enter-active {
   animation: takeover-in 200ms ease-out both;
 }

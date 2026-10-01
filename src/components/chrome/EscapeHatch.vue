@@ -14,52 +14,21 @@ const storm = useStormStore()
 </script>
 
 <template>
-  <div class="escape">
-    <button type="button" class="escape__btn" @click="storm.enterTruth()">
+  <div
+    class="escape fixed top-[calc(12px+env(safe-area-inset-top,0px))] right-[calc(12px+env(safe-area-inset-right,0px))] z-[1000]"
+  >
+    <button
+      type="button"
+      class="escape__btn inline-flex items-center gap-1.5 min-h-[34px] px-3 rounded-full bg-[#0f141e]/45 border border-white/12 text-[#eef1f6]/80 text-[11.5px] font-medium backdrop-blur-md shadow-[0_4px_16px_-4px_rgba(0,0,0,0.5)] transition-all duration-200 ease-out hover:bg-[#19202e]/85 hover:text-white active:scale-95 cursor-pointer"
+      @click="storm.enterTruth()"
+    >
       <span class="escape__label">结束体验</span>
-      <kbd class="escape__kbd" aria-hidden="true">Esc</kbd>
+      <kbd
+        class="escape__kbd px-[5px] py-px rounded bg-white/10 font-mono text-[9px] tracking-wider opacity-70"
+        aria-hidden="true"
+      >
+        Esc
+      </kbd>
     </button>
   </div>
 </template>
-
-<style scoped>
-.escape {
-  position: fixed;
-  top: calc(10px + env(safe-area-inset-top, 0px));
-  right: calc(10px + env(safe-area-inset-right, 0px));
-  /* 高于弹窗层（100）与页内假落地页（900） */
-  z-index: 1000;
-}
-
-.escape__btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  /* 触控目标下限 44px */
-  min-height: 44px;
-  padding: 0 14px;
-  border-radius: 999px;
-  background: rgba(12, 15, 20, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  color: #eef1f6;
-  font-size: 13px;
-  font-weight: 500;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.9);
-}
-
-.escape__btn:active {
-  background: rgba(30, 36, 46, 0.92);
-}
-
-.escape__kbd {
-  padding: 2px 6px;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.12);
-  font-family: var(--font-num);
-  font-size: 10px;
-  letter-spacing: 0.04em;
-  opacity: 0.75;
-}
-</style>

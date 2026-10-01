@@ -10,8 +10,9 @@ import type { AppMeta } from '@/types/ad'
  * 这个反差本身就是论点：广告已经不满足于待在靠广告赚钱的 App 里了。
  */
 export const APPS: readonly AppMeta[] = [
-  // ── A 类：本来就该干干净净的 ──────────────────────────────
+  // ── A 类：系统应用 ──────────────────────────────
   { id: 'camera', name: '相机', category: 'system' },
+  { id: 'gallery', name: '图库', category: 'system' },
   { id: 'alarm', name: '闹钟', category: 'system' },
   { id: 'calculator', name: '计算器', category: 'system' },
   { id: 'messages', name: '信息', category: 'system' },
@@ -22,7 +23,13 @@ export const APPS: readonly AppMeta[] = [
   },
   { id: 'settings', name: '设置', category: 'system' },
 
-  // ── B 类：平时广告最多的 ──────────────────────────────────
+  // ── B 类：第三方常用应用 ──────────────────────────────────
+  {
+    id: 'alipay',
+    name: '支付宝',
+    category: 'commercial',
+    note: '这里一个广告都没有。',
+  },
   {
     id: 'video',
     name: '短视频',
@@ -34,6 +41,18 @@ export const APPS: readonly AppMeta[] = [
     name: '购物',
     category: 'commercial',
     note: '这里也一个广告都没有。',
+  },
+  {
+    id: 'music',
+    name: '音乐',
+    category: 'commercial',
+    note: '这里一个广告都没有。',
+  },
+  {
+    id: 'bank',
+    name: '手机银行',
+    category: 'commercial',
+    note: '这里一个广告都没有。',
   },
 ]
 

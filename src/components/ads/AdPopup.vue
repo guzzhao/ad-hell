@@ -47,16 +47,13 @@ const boxStyle = computed<CSSProperties>(() => {
 
 <template>
   <!-- 点弹窗主体 = 误触跳转，与点假关闭键同罪。真实广告就是这样。 -->
-  <div v-if="creative && layout" class="ad-popup" :style="boxStyle" @click="emit('tap')">
+  <div
+    v-if="creative && layout"
+    class="ad-popup absolute pointer-events-auto cursor-pointer"
+    :style="boxStyle"
+    @click="emit('tap')"
+  >
     <component :is="layout" :creative="creative" />
     <CloseButton :variant="creative.closeVariant" @hit="emit('close', ad.id)" />
   </div>
 </template>
-
-<style scoped>
-.ad-popup {
-  position: absolute;
-  pointer-events: auto;
-  cursor: pointer;
-}
-</style>
