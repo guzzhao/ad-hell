@@ -167,75 +167,100 @@ function toggleSongLike(song: Song, e?: MouseEvent): void {
 </script>
 
 <template>
-  <div class="music-app">
+  <div class="flex flex-col h-full bg-[#0d0f18] text-white overflow-hidden relative">
     <!-- 顶部导航 -->
-    <header class="music-header">
-      <div class="music-tabs">
+    <header
+      class="flex justify-between items-center px-4 pt-3 pb-2 shrink-0 border-b border-white/5"
+    >
+      <div class="flex gap-4">
         <button
           type="button"
-          class="music-tab"
-          :class="{ 'is-active': activeTab === 'recommend' }"
+          class="text-sm text-gray-400 font-medium cursor-pointer pb-1 transition-all"
+          :class="{
+            '!text-white !font-bold border-b-2 border-rose-500': activeTab === 'recommend',
+          }"
           @click="activeTab = 'recommend'"
         >
           推荐
         </button>
         <button
           type="button"
-          class="music-tab"
-          :class="{ 'is-active': activeTab === 'charts' }"
+          class="text-sm text-gray-400 font-medium cursor-pointer pb-1 transition-all"
+          :class="{ '!text-white !font-bold border-b-2 border-rose-500': activeTab === 'charts' }"
           @click="activeTab = 'charts'"
         >
           排行榜
         </button>
         <button
           type="button"
-          class="music-tab"
-          :class="{ 'is-active': activeTab === 'my' }"
+          class="text-sm text-gray-400 font-medium cursor-pointer pb-1 transition-all"
+          :class="{ '!text-white !font-bold border-b-2 border-rose-500': activeTab === 'my' }"
           @click="activeTab = 'my'"
         >
           我的
         </button>
       </div>
-      <button type="button" class="music-search-btn" aria-label="搜索">🔍</button>
+      <button type="button" class="text-sm text-gray-400 cursor-pointer" aria-label="搜索">
+        🔍
+      </button>
     </header>
 
     <!-- 滚动歌单与榜单内容 -->
-    <main class="music-content phone-scroll">
+    <main class="flex-1 px-4 pt-3 pb-24 phone-scroll flex flex-col gap-4">
       <!-- 推荐大横幅 -->
-      <section class="music-hero-banner">
-        <div class="banner-tag">每日私享 · 官方甄选</div>
-        <h3 class="banner-title">秋雨午后 · 惬意轻音乐</h3>
-        <p class="banner-sub">根据你的近期收听习惯生成 · 30 首精选好歌</p>
-        <button type="button" class="banner-play-btn" @click="selectSong(0)">▶ 立即播放</button>
+      <section
+        class="rounded-2xl p-4 bg-gradient-to-br from-rose-900/80 via-purple-900/60 to-slate-900 border border-rose-500/20 shadow-lg relative overflow-hidden"
+      >
+        <div class="text-[10px] text-rose-300 font-bold uppercase tracking-wider mb-1">
+          每日私享 · 官方甄选
+        </div>
+        <h3 class="text-base font-bold mb-1">秋雨午后 · 惬意轻音乐</h3>
+        <p class="text-xs text-gray-300 mb-3">根据你的近期收听习惯生成 · 30 首精选好歌</p>
+        <button
+          type="button"
+          class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-rose-600 text-white text-xs font-semibold cursor-pointer active:scale-95 shadow-md"
+          @click="selectSong(0)"
+        >
+          ▶ 立即播放
+        </button>
       </section>
 
       <!-- 热门单曲列表 -->
-      <section class="music-list-section">
-        <div class="section-title-row">
-          <strong class="section-title">热歌飙升榜</strong>
-          <span class="section-sub">实时更新 ›</span>
+      <section class="flex flex-col gap-2.5">
+        <div class="flex justify-between items-center mb-1">
+          <strong class="text-xs font-semibold text-gray-200 tracking-wide">热歌飙升榜</strong>
+          <span class="text-[11px] text-gray-400 cursor-pointer">实时更新 ›</span>
         </div>
 
-        <div class="song-list">
+        <div class="flex flex-col gap-2">
           <div
             v-for="(song, idx) in songs"
             :key="song.id"
-            class="song-item"
-            :class="{ 'is-current': idx === currentSongIndex }"
+            class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 cursor-pointer transition-colors"
+            :class="{ '!bg-white/10': idx === currentSongIndex }"
             @click="selectSong(idx)"
           >
-            <span class="song-rank" :class="{ 'rank-top': idx < 3 }">{{ idx + 1 }}</span>
-            <div class="song-cover" :style="{ background: song.coverBg }">
+            <span
+              class="w-5 text-center text-xs font-bold text-gray-500"
+              :class="{ '!text-rose-400': idx < 3 }"
+              >{{ idx + 1 }}</span
+            >
+            <div
+              class="w-10 h-10 rounded-lg grid place-items-center text-xl shrink-0 shadow-sm"
+              :style="{ background: song.coverBg }"
+            >
               <span>{{ song.coverEmoji }}</span>
             </div>
-            <div class="song-info">
-              <span class="song-name">{{ song.title }}</span>
-              <span class="song-artist">{{ song.artist }} - {{ song.album }}</span>
+            <div class="flex-1 flex flex-col min-w-0">
+              <span class="text-xs font-medium text-white truncate">{{ song.title }}</span>
+              <span class="text-[10.5px] text-gray-400 truncate"
+                >{{ song.artist }} - {{ song.album }}</span
+              >
             </div>
             <button
               type="button"
-              class="song-like-btn"
-              :class="{ 'is-liked': song.liked }"
+              class="text-xs p-1 text-gray-400 cursor-pointer active:scale-90 transition-transform"
+              :class="{ '!text-rose-500': song.liked }"
               aria-label="喜欢歌曲"
               @click="toggleSongLike(song, $event)"
             >
@@ -247,39 +272,72 @@ function toggleSongLike(song: Song, e?: MouseEvent): void {
     </main>
 
     <!-- 底部常驻迷你播放条 (Mini Player) -->
-    <div class="mini-player" @click="showFullPlayer = true">
-      <div
-        class="mini-cover"
-        :class="{ 'is-spinning': isPlaying }"
-        :style="{ background: currentSong.coverBg }"
-      >
-        <span>{{ currentSong.coverEmoji }}</span>
+    <div
+      class="absolute bottom-0 inset-x-0 h-14 bg-slate-900/95 backdrop-blur-xl border-t border-white/10 px-4 flex items-center justify-between z-30 cursor-pointer"
+      @click="showFullPlayer = true"
+    >
+      <div class="flex items-center gap-2.5 flex-1 min-w-0">
+        <div
+          class="w-9 h-9 rounded-full grid place-items-center text-base shrink-0 shadow-md transition-all"
+          :class="{ 'animate-[spin_12s_linear_infinite]': isPlaying }"
+          :style="{ background: currentSong.coverBg }"
+        >
+          <span>{{ currentSong.coverEmoji }}</span>
+        </div>
+        <div class="flex flex-col min-w-0 flex-1">
+          <span class="text-xs font-medium text-white truncate">{{ currentSong.title }}</span>
+          <span class="text-[10.5px] text-gray-400 truncate">{{ currentSong.artist }}</span>
+        </div>
       </div>
-      <div class="mini-info">
-        <span class="mini-title">{{ currentSong.title }}</span>
-        <span class="mini-artist">{{ currentSong.artist }}</span>
-      </div>
-      <div class="mini-controls">
-        <button type="button" class="mini-btn" aria-label="播放暂停" @click="togglePlay">
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          class="text-lg text-white p-1 cursor-pointer active:scale-90"
+          aria-label="播放暂停"
+          @click="togglePlay"
+        >
           {{ isPlaying ? '⏸' : '▶' }}
         </button>
-        <button type="button" class="mini-btn" aria-label="下一首" @click="nextTrack">⏭</button>
+        <button
+          type="button"
+          class="text-lg text-gray-300 p-1 cursor-pointer active:scale-90"
+          aria-label="下一首"
+          @click="nextTrack"
+        >
+          ⏭
+        </button>
       </div>
     </div>
 
     <!-- 全屏高保真黑胶唱片播放器 -->
-    <Transition name="player-slide">
-      <div v-if="showFullPlayer" class="full-player" role="dialog" aria-modal="true">
-        <header class="player-top">
-          <button type="button" class="player-down-btn" @click="showFullPlayer = false">⌄</button>
-          <div class="player-header-title">
-            <strong class="full-song-title">{{ currentSong.title }}</strong>
-            <span class="full-song-artist">{{ currentSong.artist }}</span>
+    <Transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="translate-y-full opacity-0"
+      leave-active-class="transition duration-250 ease-in"
+      leave-to-class="translate-y-full opacity-0"
+    >
+      <div
+        v-if="showFullPlayer"
+        class="absolute inset-0 z-50 bg-gradient-to-b from-slate-900 via-[#1a0f1d] to-black p-6 flex flex-col justify-between text-white"
+        role="dialog"
+        aria-modal="true"
+      >
+        <header class="flex justify-between items-center pb-2">
+          <button
+            type="button"
+            class="text-2xl text-gray-400 p-1 cursor-pointer"
+            @click="showFullPlayer = false"
+          >
+            ⌄
+          </button>
+          <div class="flex flex-col items-center">
+            <strong class="text-sm font-semibold">{{ currentSong.title }}</strong>
+            <span class="text-xs text-gray-400">{{ currentSong.artist }}</span>
           </div>
           <button
             type="button"
-            class="player-like-btn"
-            :class="{ 'is-liked': currentSong.liked }"
+            class="text-base p-1 cursor-pointer"
+            :class="{ '!text-rose-500': currentSong.liked }"
             @click="toggleSongLike(currentSong)"
           >
             {{ currentSong.liked ? '❤️' : '🤍' }}
@@ -287,47 +345,56 @@ function toggleSongLike(song: Song, e?: MouseEvent): void {
         </header>
 
         <!-- 唱盘黑胶中心展示 -->
-        <div class="player-disc-area">
-          <div class="disc-tonearm" :class="{ 'is-playing': isPlaying }" />
-          <div class="vinyl-outer" :class="{ 'is-spinning': isPlaying }">
-            <div class="vinyl-core" :style="{ background: currentSong.coverBg }">
-              <span class="vinyl-emoji">{{ currentSong.coverEmoji }}</span>
+        <div class="relative my-auto flex items-center justify-center">
+          <div
+            class="w-56 h-56 rounded-full bg-stone-900 border-8 border-stone-800 shadow-2xl grid place-items-center relative"
+            :class="{ 'animate-[spin_18s_linear_infinite]': isPlaying }"
+          >
+            <div
+              class="w-24 h-24 rounded-full grid place-items-center text-4xl shadow-inner border-2 border-stone-700"
+              :style="{ background: currentSong.coverBg }"
+            >
+              <span>{{ currentSong.coverEmoji }}</span>
             </div>
           </div>
         </div>
 
         <!-- 歌词轮播区域 -->
-        <div class="player-lyrics">
+        <div class="flex flex-col items-center gap-1.5 my-3 text-center">
           <p
             v-for="(line, lidx) in currentSong.lyrics"
             :key="lidx"
-            class="lyric-line"
-            :class="{ 'is-active': lidx === 2 }"
+            class="text-xs transition-all m-0"
+            :class="
+              lidx === 2 ? 'text-rose-400 font-semibold scale-105' : 'text-gray-500 opacity-60'
+            "
           >
             {{ line }}
           </p>
         </div>
 
         <!-- 播放进度条 -->
-        <div class="player-scrubber">
-          <div class="scrub-bar">
+        <div class="flex flex-col gap-1.5 my-2">
+          <div class="h-1 bg-white/15 rounded-full overflow-hidden">
             <div
-              class="scrub-fill"
+              class="h-full bg-rose-500 rounded-full transition-all"
               :style="{ width: `${(currentSec / currentSong.durationSec) * 100}%` }"
             />
           </div>
-          <div class="scrub-time">
+          <div class="flex justify-between text-[10px] text-gray-400 font-mono">
             <span>{{ formatTime(currentSec) }}</span>
             <span>{{ currentSong.duration }}</span>
           </div>
         </div>
 
         <!-- 底层主要控制栏 -->
-        <footer class="player-foot-controls">
-          <button type="button" class="foot-btn" aria-label="循环模式">🔁</button>
+        <footer class="flex items-center justify-around pt-2">
+          <button type="button" class="text-lg text-gray-400 cursor-pointer" aria-label="循环模式">
+            🔁
+          </button>
           <button
             type="button"
-            class="foot-btn foot-btn--nav"
+            class="text-2xl text-white cursor-pointer active:scale-90"
             aria-label="上一首"
             @click="prevTrack"
           >
@@ -335,7 +402,7 @@ function toggleSongLike(song: Song, e?: MouseEvent): void {
           </button>
           <button
             type="button"
-            class="foot-btn foot-btn--main"
+            class="w-14 h-14 rounded-full bg-rose-600 text-white text-2xl grid place-items-center cursor-pointer shadow-lg active:scale-95"
             aria-label="播放暂停"
             @click="togglePlay"
           >
@@ -343,505 +410,17 @@ function toggleSongLike(song: Song, e?: MouseEvent): void {
           </button>
           <button
             type="button"
-            class="foot-btn foot-btn--nav"
+            class="text-2xl text-white cursor-pointer active:scale-90"
             aria-label="下一首"
             @click="nextTrack"
           >
             ⏭
           </button>
-          <button type="button" class="foot-btn" aria-label="播放列表">📑</button>
+          <button type="button" class="text-lg text-gray-400 cursor-pointer" aria-label="播放列表">
+            📑
+          </button>
         </footer>
       </div>
     </Transition>
   </div>
 </template>
-
-<style scoped>
-.music-app {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background: #0f141c;
-  color: #f1f5f9;
-  overflow: hidden;
-  position: relative;
-}
-
-/* 顶部 Tab */
-.music-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 16px 8px;
-  background: rgba(15, 20, 28, 0.95);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.music-tabs {
-  display: flex;
-  gap: 16px;
-}
-
-.music-tab {
-  font-size: 15px;
-  color: rgba(255, 255, 255, 0.6);
-  background: none;
-  border: none;
-  cursor: pointer;
-  position: relative;
-  padding: 4px 0;
-  transition: all 0.15s ease;
-}
-
-.music-tab.is-active {
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.music-tab.is-active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 16px;
-  height: 2.5px;
-  border-radius: 999px;
-  background: #f43f5e;
-}
-
-.music-search-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-/* 主体列表 */
-.music-content {
-  flex: 1;
-  padding: 12px 14px 70px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.music-hero-banner {
-  background: linear-gradient(135deg, #be123c 0%, #4c0519 100%);
-  border-radius: 18px;
-  padding: 18px 16px;
-  box-shadow: 0 8px 24px rgba(190, 18, 60, 0.25);
-}
-
-.banner-tag {
-  font-size: 10.5px;
-  color: #fecdd3;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-
-.banner-title {
-  margin: 0 0 4px;
-  font-size: 17px;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.banner-sub {
-  margin: 0 0 14px;
-  font-size: 11.5px;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.banner-play-btn {
-  background: #ffffff;
-  color: #be123c;
-  border: none;
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.section-title-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.section-title {
-  font-size: 14px;
-  color: #ffffff;
-}
-
-.section-sub {
-  font-size: 11.5px;
-  color: rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-}
-
-.song-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.song-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.song-item:active,
-.song-item.is-current {
-  background: rgba(244, 63, 94, 0.12);
-  border: 1px solid rgba(244, 63, 94, 0.25);
-}
-
-.song-rank {
-  font-size: 14px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.4);
-  width: 18px;
-  text-align: center;
-}
-
-.song-rank.rank-top {
-  color: #f43f5e;
-}
-
-.song-cover {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-  font-size: 18px;
-  flex: none;
-}
-
-.song-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.song-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #ffffff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.song-artist {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.song-like-btn {
-  background: none;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-/* 底部迷你播放条 */
-.mini-player {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 56px;
-  background: rgba(24, 31, 46, 0.95);
-  backdrop-filter: blur(18px);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  display: flex;
-  align-items: center;
-  padding: 0 14px;
-  gap: 10px;
-  cursor: pointer;
-  z-index: 20;
-}
-
-.mini-cover {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 16px;
-  border: 2px solid #334155;
-  flex: none;
-}
-
-.mini-cover.is-spinning {
-  animation: spin-vinyl 8s linear infinite;
-}
-
-.mini-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.mini-title {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: #ffffff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.mini-artist {
-  font-size: 10.5px;
-  color: rgba(255, 255, 255, 0.55);
-}
-
-.mini-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.mini-btn {
-  background: none;
-  border: none;
-  color: #ffffff;
-  font-size: 18px;
-  cursor: pointer;
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
-}
-
-/* 全屏黑胶播放器 */
-.full-player {
-  position: absolute;
-  inset: 0;
-  z-index: 50;
-  background: linear-gradient(180deg, #182236 0%, #0d121d 100%);
-  display: flex;
-  flex-direction: column;
-  padding: 10px 18px 24px;
-  color: #ffffff;
-}
-
-.player-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.player-down-btn {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.player-header-title {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.full-song-title {
-  font-size: 14.5px;
-  font-weight: 700;
-}
-
-.full-song-artist {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.player-like-btn {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-/* 唱盘 */
-.player-disc-area {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 16px 0 10px;
-}
-
-.disc-tonearm {
-  position: absolute;
-  top: -16px;
-  left: 54%;
-  width: 60px;
-  height: 18px;
-  background: #94a3b8;
-  transform-origin: top left;
-  transform: rotate(-30deg);
-  transition: transform 0.4s ease;
-  z-index: 10;
-  border-radius: 4px;
-}
-
-.disc-tonearm.is-playing {
-  transform: rotate(0deg);
-}
-
-.vinyl-outer {
-  width: 170px;
-  height: 170px;
-  border-radius: 50%;
-  background: radial-gradient(#111827 0%, #030712 100%);
-  border: 10px solid #1f2937;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
-  display: grid;
-  place-items: center;
-}
-
-.vinyl-outer.is-spinning {
-  animation: spin-vinyl 12s linear infinite;
-}
-
-.vinyl-core {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  box-shadow: 0 0 0 6px #111827;
-}
-
-.vinyl-emoji {
-  font-size: 32px;
-}
-
-@keyframes spin-vinyl {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* 歌词 */
-.player-lyrics {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  text-align: center;
-  padding: 6px 0;
-}
-
-.lyric-line {
-  margin: 0;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
-  transition: all 0.2s ease;
-}
-
-.lyric-line.is-active {
-  font-size: 13.5px;
-  color: #38bdf8;
-  font-weight: 600;
-}
-
-/* 进度条 */
-.player-scrubber {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 12px;
-}
-
-.scrub-bar {
-  height: 3px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.2);
-  overflow: hidden;
-}
-
-.scrub-fill {
-  height: 100%;
-  background: #f43f5e;
-  border-radius: 999px;
-  transition: width 0.3s linear;
-}
-
-.scrub-time {
-  display: flex;
-  justify-content: space-between;
-  font-size: 10.5px;
-  color: rgba(255, 255, 255, 0.5);
-  font-variant-numeric: tabular-nums;
-}
-
-/* 控制按钮 */
-.player-foot-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 8px;
-}
-
-.foot-btn {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.foot-btn--nav {
-  font-size: 24px;
-}
-
-.foot-btn--main {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: #f43f5e;
-  color: #ffffff;
-  font-size: 24px;
-  display: grid;
-  place-items: center;
-  box-shadow: 0 6px 18px rgba(244, 63, 94, 0.4);
-}
-
-.player-slide-enter-active,
-.player-slide-leave-active {
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.player-slide-enter-from,
-.player-slide-leave-to {
-  transform: translateY(100%);
-}
-</style>

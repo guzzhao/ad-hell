@@ -49,7 +49,7 @@ const boxStyle = computed<CSSProperties>(() => {
   <!-- 点弹窗主体 = 误触跳转，与点假关闭键同罪。真实广告就是这样。 -->
   <div
     v-if="creative && layout"
-    class="ad-popup absolute pointer-events-auto cursor-pointer"
+    class="absolute pointer-events-auto cursor-pointer"
     :style="boxStyle"
     @click="emit('tap')"
   >

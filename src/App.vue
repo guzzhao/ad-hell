@@ -40,7 +40,7 @@ useEventListener(window, 'keydown', (event) => {
 </script>
 
 <template>
-  <div class="app-root">
+  <div class="fixed inset-0">
     <DeviceShell v-if="phase !== 'truth'" />
     <TruthPanel v-else />
     <EscapeHatch v-if="phase === 'storm' || phase === 'collapsed'" />
@@ -54,10 +54,3 @@ useEventListener(window, 'keydown', (event) => {
     />
   </div>
 </template>
-
-<style scoped>
-.app-root {
-  position: fixed;
-  inset: 0;
-}
-</style>

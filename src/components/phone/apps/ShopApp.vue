@@ -164,23 +164,34 @@ function buySelectedProduct(): void {
 </script>
 
 <template>
-  <div class="shop-app">
+  <div class="flex flex-col h-full bg-[#f4f5f7] text-[#1f2937] overflow-hidden relative">
     <!-- 顶部搜索导航 -->
-    <header class="shop-header">
-      <div class="shop-search-bar">
-        <span class="search-icon">🔍</span>
-        <input type="text" class="search-input" placeholder="搜索精选好物、数码潮玩、品牌大促…" />
-        <button type="button" class="search-btn">搜索</button>
+    <header class="bg-white px-3.5 pt-2 pb-2 shrink-0 border-b border-gray-200/80 shadow-xs z-10">
+      <div
+        class="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1.5 text-xs text-gray-500"
+      >
+        <span>🔍</span>
+        <input
+          type="text"
+          class="bg-transparent border-none outline-none flex-1 text-xs text-gray-800 placeholder-gray-400"
+          placeholder="搜索精选好物、数码潮玩、品牌大促…"
+        />
+        <button
+          type="button"
+          class="px-2.5 py-0.5 rounded-full bg-orange-600 text-white text-[11px] font-medium cursor-pointer"
+        >
+          搜索
+        </button>
       </div>
 
       <!-- 分类横向滑动条 -->
-      <nav class="shop-cat-nav" aria-label="商品分类">
+      <nav class="flex gap-2 overflow-x-auto mt-2 no-scrollbar" aria-label="商品分类">
         <button
           v-for="cat in categories"
           :key="cat"
           type="button"
-          class="cat-chip"
-          :class="{ 'is-active': activeCategory === cat }"
+          class="px-2.5 py-1 rounded-full text-xs text-gray-600 whitespace-nowrap cursor-pointer transition-all"
+          :class="{ '!bg-orange-500 !text-white !font-semibold': activeCategory === cat }"
           @click="activeCategory = cat"
         >
           {{ cat }}
@@ -188,83 +199,119 @@ function buySelectedProduct(): void {
       </nav>
     </header>
 
-    <div class="shop-content phone-scroll">
+    <div class="flex-1 px-3 py-3 phone-scroll flex flex-col gap-3 pb-20">
       <!-- 官方运营活动大横幅 -->
-      <section class="shop-hero-card" aria-label="品质焕新季">
-        <div class="hero-left">
-          <span class="hero-badge">品牌特惠 · 限时专享</span>
-          <h2 class="hero-title">秋季品质焕新季</h2>
-          <p class="hero-sub">官方自营保障 · 每满200减30 · 极速次日达</p>
+      <section
+        class="rounded-2xl p-3.5 bg-gradient-to-r from-orange-500 via-rose-500 to-red-500 text-white flex justify-between items-center shadow-sm"
+        aria-label="品质焕新季"
+      >
+        <div>
+          <span
+            class="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-black/20 text-orange-100 mb-1 inline-block"
+            >品牌特惠 · 限时专享</span
+          >
+          <h2 class="text-base font-bold m-0 mb-0.5">秋季品质焕新季</h2>
+          <p class="text-[11px] text-white/80 m-0">官方自营保障 · 每满200减30 · 极速次日达</p>
         </div>
-        <div class="hero-right" aria-hidden="true">
-          <span class="hero-gift-icon">🎁</span>
+        <div aria-hidden="true">
+          <span class="text-4xl">🎁</span>
         </div>
       </section>
 
       <!-- 快捷功能金刚区 -->
-      <div class="shop-portals">
-        <button type="button" class="portal-item">
-          <span class="portal-icon">🎫</span>
-          <span class="portal-label">领大额券</span>
+      <div class="grid grid-cols-4 gap-2 bg-white rounded-2xl p-2.5 shadow-sm">
+        <button type="button" class="flex flex-col items-center gap-1 cursor-pointer">
+          <span
+            class="w-10 h-10 rounded-xl grid place-items-center text-lg bg-orange-50 text-orange-600"
+            >🎫</span
+          >
+          <span class="text-[11px] text-gray-700">领大额券</span>
         </button>
-        <button type="button" class="portal-item">
-          <span class="portal-icon">⚡</span>
-          <span class="portal-label">限时秒杀</span>
+        <button type="button" class="flex flex-col items-center gap-1 cursor-pointer">
+          <span
+            class="w-10 h-10 rounded-xl grid place-items-center text-lg bg-orange-50 text-orange-600"
+            >⚡</span
+          >
+          <span class="text-[11px] text-gray-700">限时秒杀</span>
         </button>
-        <button type="button" class="portal-item">
-          <span class="portal-icon">🏆</span>
-          <span class="portal-label">热卖榜单</span>
+        <button type="button" class="flex flex-col items-center gap-1 cursor-pointer">
+          <span
+            class="w-10 h-10 rounded-xl grid place-items-center text-lg bg-orange-50 text-orange-600"
+            >🏆</span
+          >
+          <span class="text-[11px] text-gray-700">热卖榜单</span>
         </button>
-        <button type="button" class="portal-item">
-          <span class="portal-icon">📦</span>
-          <span class="portal-label">顺丰自营</span>
+        <button type="button" class="flex flex-col items-center gap-1 cursor-pointer">
+          <span
+            class="w-10 h-10 rounded-xl grid place-items-center text-lg bg-orange-50 text-orange-600"
+            >📦</span
+          >
+          <span class="text-[11px] text-gray-700">顺丰自营</span>
         </button>
       </div>
 
       <!-- 双列瀑布流商品卡片 -->
-      <section class="shop-section">
-        <div class="section-header">
-          <span class="section-title">今日优选好物</span>
-          <span class="section-filter">品质溯源 · 官方认证</span>
+      <section class="flex flex-col gap-2.5">
+        <div class="flex justify-between items-center px-1">
+          <span class="text-xs font-bold text-gray-800">今日优选好物</span>
+          <span class="text-[10.5px] text-gray-400">品质溯源 · 官方认证</span>
         </div>
 
-        <div class="shop-grid">
+        <div class="grid grid-cols-2 gap-2.5">
           <article
             v-for="item in filteredProducts"
             :key="item.id"
-            class="product-card"
+            class="bg-white rounded-2xl overflow-hidden shadow-xs border border-gray-100/80 flex flex-col cursor-pointer group"
             @click="openDetail(item)"
           >
             <!-- 商品大图 -->
-            <div class="product-thumb" :style="{ background: item.gradient }">
-              <span class="thumb-emoji">{{ item.thumb }}</span>
-              <span class="product-tag">{{ item.tag }}</span>
+            <div
+              class="aspect-square relative grid place-items-center select-none overflow-hidden"
+              :style="{ background: item.gradient }"
+            >
+              <span class="text-5xl group-hover:scale-105 transition-transform">{{
+                item.thumb
+              }}</span>
+              <span
+                class="absolute top-2 left-2 text-[9px] font-bold px-1.5 py-0.5 rounded bg-orange-600 text-white shadow-xs"
+                >{{ item.tag }}</span
+              >
             </div>
 
             <!-- 商品文字信息 -->
-            <div class="product-info">
-              <strong class="product-name">{{ item.name }}</strong>
-              <p class="product-sub">{{ item.subtitle }}</p>
-
-              <!-- 价格与加购栏 -->
-              <div class="product-foot">
-                <div class="price-box">
-                  <span class="currency">¥</span>
-                  <span class="price-num">{{ item.price }}</span>
-                  <span class="orig-price">¥{{ item.origPrice }}</span>
-                </div>
-                <button
-                  type="button"
-                  class="add-cart-btn"
-                  aria-label="加入购物车"
-                  @click.stop="addToCart(item, $event)"
-                >
-                  +
-                </button>
+            <div class="p-2.5 flex flex-col flex-1 justify-between">
+              <div>
+                <strong class="text-xs font-semibold text-gray-800 line-clamp-1 block">{{
+                  item.name
+                }}</strong>
+                <p class="text-[10.5px] text-gray-400 line-clamp-1 mt-0.5 mb-2">
+                  {{ item.subtitle }}
+                </p>
               </div>
 
-              <div class="sales-row">
-                <span class="sales-text">{{ item.sales }}</span>
+              <!-- 价格与加购栏 -->
+              <div>
+                <div class="flex justify-between items-center mt-auto">
+                  <div class="flex items-baseline gap-0.5">
+                    <span class="text-xs text-red-600 font-bold">¥</span>
+                    <span class="text-base text-red-600 font-bold font-mono">{{ item.price }}</span>
+                    <span class="text-[10px] text-gray-400 line-through ml-1"
+                      >¥{{ item.origPrice }}</span
+                    >
+                  </div>
+                  <button
+                    type="button"
+                    class="w-6 h-6 rounded-full bg-red-600 text-white font-bold grid place-items-center text-sm cursor-pointer active:scale-90 transition-transform"
+                    aria-label="加入购物车"
+                    @click.stop="addToCart(item, $event)"
+                  >
+                    +
+                  </button>
+                </div>
+
+                <div class="mt-1.5 text-[9.5px] text-gray-400">
+                  <span>{{ item.sales }}</span>
+                </div>
               </div>
             </div>
           </article>
@@ -273,48 +320,81 @@ function buySelectedProduct(): void {
     </div>
 
     <!-- 底部悬浮购物车栏入口 -->
-    <div v-if="cartTotalCount > 0" class="shop-cart-pill" @click="showCartDrawer = true">
-      <div class="cart-pill-left">
-        <span class="cart-icon">🛒</span>
-        <span class="cart-badge">{{ cartTotalCount }}</span>
-        <span class="cart-total-text">合计: ¥{{ cartTotalPrice }}</span>
+    <div
+      v-if="cartTotalCount > 0"
+      class="absolute bottom-4 inset-x-4 h-12 rounded-full bg-gray-900/95 backdrop-blur-md text-white px-4 flex items-center justify-between z-30 shadow-xl cursor-pointer"
+      @click="showCartDrawer = true"
+    >
+      <div class="flex items-center gap-2">
+        <span class="text-lg">🛒</span>
+        <span
+          class="px-1.5 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none"
+          >{{ cartTotalCount }}</span
+        >
+        <span class="text-xs font-semibold ml-1">合计: ¥{{ cartTotalPrice }}</span>
       </div>
-      <button type="button" class="cart-checkout-btn">去结算 ›</button>
+      <button
+        type="button"
+        class="px-3.5 py-1.5 rounded-full bg-red-600 text-white text-xs font-semibold cursor-pointer active:scale-95"
+      >
+        去结算 ›
+      </button>
     </div>
 
     <!-- 购物车抽屉半屏弹窗 -->
-    <Transition name="drawer">
+    <Transition
+      enter-active-class="transition duration-250 ease-out"
+      enter-from-class="translate-y-full opacity-0"
+      leave-active-class="transition duration-200 ease-in"
+      leave-to-class="translate-y-full opacity-0"
+    >
       <div
         v-if="showCartDrawer"
-        class="cart-drawer"
+        class="absolute inset-x-0 bottom-0 max-h-[75%] rounded-t-3xl bg-white shadow-2xl z-50 flex flex-col p-4"
         role="dialog"
         aria-modal="true"
         aria-label="购物车清单"
       >
-        <div class="drawer-head">
+        <div class="flex justify-between items-center pb-3 border-b border-gray-100 text-sm">
           <strong>已选商品 ({{ cartTotalCount }})</strong>
-          <button type="button" class="drawer-close-btn" @click="showCartDrawer = false">✕</button>
+          <button
+            type="button"
+            class="w-6 h-6 rounded-full bg-gray-100 grid place-items-center text-xs text-gray-500 cursor-pointer"
+            @click="showCartDrawer = false"
+          >
+            ✕
+          </button>
         </div>
 
-        <div class="cart-items phone-scroll">
-          <div v-for="item in cart" :key="item.product.id" class="cart-row">
-            <span class="cart-row-thumb">{{ item.product.thumb }}</span>
-            <div class="cart-row-info">
-              <span class="cart-row-name">{{ item.product.name }}</span>
-              <span class="cart-row-price">¥{{ item.product.price }}</span>
+        <div class="flex-1 my-2 overflow-y-auto flex flex-col gap-2.5 max-h-60 phone-scroll">
+          <div
+            v-for="item in cart"
+            :key="item.product.id"
+            class="flex items-center gap-2.5 py-1 border-b border-gray-50 last:border-none"
+          >
+            <span class="text-2xl w-8 h-8 rounded-lg bg-gray-50 grid place-items-center">{{
+              item.product.thumb
+            }}</span>
+            <div class="flex-1 flex flex-col min-w-0">
+              <span class="text-xs font-medium text-gray-800 truncate">{{
+                item.product.name
+              }}</span>
+              <span class="text-xs font-bold text-red-600 font-mono"
+                >¥{{ item.product.price }}</span
+              >
             </div>
-            <div class="cart-stepper">
+            <div class="flex items-center gap-2 bg-gray-100 rounded-full px-2 py-0.5">
               <button
                 type="button"
-                class="step-btn"
+                class="text-xs text-gray-600 font-bold px-1 cursor-pointer"
                 @click="updateCartQuantity(item.product.id, -1)"
               >
                 −
               </button>
-              <span class="step-num">{{ item.quantity }}</span>
+              <span class="text-xs font-mono font-semibold">{{ item.quantity }}</span>
               <button
                 type="button"
-                class="step-btn"
+                class="text-xs text-gray-600 font-bold px-1 cursor-pointer"
                 @click="updateCartQuantity(item.product.id, 1)"
               >
                 +
@@ -323,12 +403,16 @@ function buySelectedProduct(): void {
           </div>
         </div>
 
-        <div class="drawer-bottom">
-          <div class="bottom-total">
-            <span class="total-label">实付预估:</span>
-            <span class="total-amount">¥{{ cartTotalPrice }}</span>
+        <div class="pt-3 border-t border-gray-100 flex flex-col gap-2">
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-500">实付预估:</span>
+            <span class="text-base font-bold text-red-600 font-mono">¥{{ cartTotalPrice }}</span>
           </div>
-          <button type="button" class="pay-btn" @click="showCartDrawer = false">
+          <button
+            type="button"
+            class="w-full h-10 rounded-full bg-red-600 text-white text-sm font-semibold cursor-pointer active:bg-red-700"
+            @click="showCartDrawer = false"
+          >
             立即下单 (免运费)
           </button>
         </div>
@@ -336,32 +420,70 @@ function buySelectedProduct(): void {
     </Transition>
 
     <!-- 商品详情全屏弹窗 -->
-    <Transition name="fade">
-      <div v-if="selectedProduct" class="product-modal" @click="selectedProduct = null">
-        <div class="modal-card" @click.stop>
-          <button type="button" class="modal-close" @click="selectedProduct = null">✕</button>
-          <div class="modal-thumb" :style="{ background: selectedProduct.gradient }">
-            <span class="modal-emoji">{{ selectedProduct.thumb }}</span>
-            <span class="modal-tag">{{ selectedProduct.tag }}</span>
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 scale-95"
+      leave-active-class="transition duration-150 ease-in"
+      leave-to-class="opacity-0 scale-95"
+    >
+      <div
+        v-if="selectedProduct"
+        class="absolute inset-0 z-50 bg-black/75 backdrop-blur-sm grid place-items-center p-4"
+        @click="selectedProduct = null"
+      >
+        <div
+          class="w-full max-w-[340px] bg-white rounded-3xl overflow-hidden shadow-2xl relative flex flex-col"
+          @click.stop
+        >
+          <button
+            type="button"
+            class="absolute top-3 right-3 z-10 w-7 h-7 rounded-full bg-black/40 text-white grid place-items-center text-xs cursor-pointer"
+            @click="selectedProduct = null"
+          >
+            ✕
+          </button>
+          <div
+            class="aspect-square relative grid place-items-center text-8xl"
+            :style="{ background: selectedProduct.gradient }"
+          >
+            <span>{{ selectedProduct.thumb }}</span>
+            <span
+              class="absolute top-3 left-3 text-[10px] font-bold px-2 py-0.5 rounded bg-orange-600 text-white"
+              >{{ selectedProduct.tag }}</span
+            >
           </div>
-          <div class="modal-body">
-            <div class="modal-price-row">
-              <span class="modal-price">¥{{ selectedProduct.price }}</span>
-              <span class="modal-orig">原价 ¥{{ selectedProduct.origPrice }}</span>
-              <span class="modal-sales">{{ selectedProduct.sales }}</span>
+          <div class="p-4 flex flex-col gap-2">
+            <div class="flex items-baseline gap-2">
+              <span class="text-xl font-bold text-red-600 font-mono"
+                >¥{{ selectedProduct.price }}</span
+              >
+              <span class="text-xs text-gray-400 line-through"
+                >原价 ¥{{ selectedProduct.origPrice }}</span
+              >
+              <span class="ml-auto text-xs text-gray-400">{{ selectedProduct.sales }}</span>
             </div>
-            <h3 class="modal-title">{{ selectedProduct.name }}</h3>
-            <p class="modal-desc">{{ selectedProduct.subtitle }}</p>
-            <div class="modal-rating">
+            <h3 class="text-sm font-bold text-gray-900 m-0">{{ selectedProduct.name }}</h3>
+            <p class="text-xs text-gray-500 m-0 leading-relaxed">{{ selectedProduct.subtitle }}</p>
+            <div
+              class="flex justify-between items-center text-xs text-gray-500 pt-2 border-t border-gray-100"
+            >
               <span>🌟 {{ selectedProduct.rating }}</span>
-              <span class="modal-service">顺丰包邮 · 7天无理由</span>
+              <span class="text-emerald-600">顺丰包邮 · 7天无理由</span>
             </div>
           </div>
-          <div class="modal-foot">
-            <button type="button" class="modal-add-btn" @click="addSelectedToCartAndClose">
+          <div class="p-4 pt-0 flex gap-2">
+            <button
+              type="button"
+              class="flex-1 h-10 rounded-full bg-orange-100 text-orange-700 text-xs font-semibold cursor-pointer active:bg-orange-200"
+              @click="addSelectedToCartAndClose"
+            >
               加入购物车
             </button>
-            <button type="button" class="modal-buy-btn" @click="buySelectedProduct">
+            <button
+              type="button"
+              class="flex-1 h-10 rounded-full bg-red-600 text-white text-xs font-semibold cursor-pointer active:bg-red-700"
+              @click="buySelectedProduct"
+            >
               立即购买
             </button>
           </div>
@@ -370,715 +492,19 @@ function buySelectedProduct(): void {
     </Transition>
 
     <!-- 加入购物车轻提示 Toast -->
-    <Transition name="toast">
-      <div v-if="showToast" class="shop-toast" aria-live="polite">
+    <Transition
+      enter-active-class="transition-opacity duration-200 ease-out"
+      enter-from-class="opacity-0"
+      leave-active-class="transition-opacity duration-200 ease-in"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="showToast"
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/85 text-white px-4 py-2 rounded-full text-xs z-[60] pointer-events-none"
+        aria-live="polite"
+      >
         <span>✓ {{ toastMsg }}</span>
       </div>
     </Transition>
   </div>
 </template>
-
-<style scoped>
-.shop-app {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  color: #ffffff;
-  background: #0d1117;
-  overflow: hidden;
-  user-select: none;
-}
-
-/* 顶部搜索栏与分类 */
-.shop-header {
-  padding: 8px 14px 6px;
-  background: #161b22;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.shop-search-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.search-icon {
-  font-size: 12px;
-  opacity: 0.6;
-}
-
-.search-input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  color: #ffffff;
-  font-size: 11.5px;
-  outline: none;
-}
-
-.search-input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.search-btn {
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: #f59e0b;
-  color: #111827;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.shop-cat-nav {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding: 10px 2px 2px;
-  scrollbar-width: none;
-}
-
-.shop-cat-nav::-webkit-scrollbar {
-  display: none;
-}
-
-.cat-chip {
-  flex: none;
-  padding: 4px 11px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 11px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.cat-chip.is-active {
-  background: #f59e0b;
-  color: #0f172a;
-  font-weight: 700;
-}
-
-/* 主内容区 */
-.shop-content {
-  flex: 1;
-  padding: 12px 14px 70px;
-  overflow-y: auto;
-}
-
-/* 运营大卡 */
-.shop-hero-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #b45309 0%, #78350f 100%);
-  border: 1px solid rgba(251, 191, 36, 0.25);
-  box-shadow: 0 10px 24px -8px rgba(180, 83, 9, 0.4);
-  margin-bottom: 14px;
-}
-
-.hero-left {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.hero-badge {
-  display: inline-block;
-  font-size: 9.5px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.2);
-  color: #fef3c7;
-  width: fit-content;
-}
-
-.hero-title {
-  margin: 3px 0 0;
-  font-size: 16px;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: 0.02em;
-}
-
-.hero-sub {
-  margin: 0;
-  font-size: 10.5px;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.hero-gift-icon {
-  font-size: 34px;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
-}
-
-/* 金刚区 */
-.shop-portals {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.portal-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 4px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.portal-item:active {
-  background: rgba(255, 255, 255, 0.1);
-  transform: scale(0.96);
-}
-
-.portal-icon {
-  font-size: 20px;
-}
-
-.portal-label {
-  font-size: 10.5px;
-  color: rgba(255, 255, 255, 0.85);
-  font-weight: 500;
-}
-
-/* 商品区 */
-.section-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.section-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.section-filter {
-  font-size: 10.5px;
-  color: #f59e0b;
-}
-
-.shop-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-.product-card {
-  display: flex;
-  flex-direction: column;
-  border-radius: 14px;
-  background: #161b22;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.15s ease;
-}
-
-.product-card:active {
-  transform: scale(0.98);
-}
-
-.product-thumb {
-  position: relative;
-  display: grid;
-  place-items: center;
-  height: 100px;
-  overflow: hidden;
-}
-
-.thumb-emoji {
-  font-size: 42px;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
-}
-
-.product-tag {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  padding: 1.5px 6px;
-  border-radius: 4px;
-  background: rgba(245, 158, 11, 0.9);
-  color: #111827;
-  font-size: 9px;
-  font-weight: 700;
-}
-
-.product-info {
-  display: flex;
-  flex-direction: column;
-  padding: 9px 10px 10px;
-  gap: 4px;
-}
-
-.product-name {
-  font-size: 12px;
-  font-weight: 600;
-  color: #ffffff;
-  line-height: 1.35;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.product-sub {
-  margin: 0;
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.45);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.product-foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 4px;
-}
-
-.price-box {
-  display: flex;
-  align-items: baseline;
-  gap: 2px;
-}
-
-.currency {
-  font-size: 11px;
-  font-weight: 700;
-  color: #f59e0b;
-}
-
-.price-num {
-  font-size: 15px;
-  font-weight: 800;
-  color: #f59e0b;
-}
-
-.orig-price {
-  font-size: 9.5px;
-  color: rgba(255, 255, 255, 0.35);
-  text-decoration: line-through;
-  margin-left: 3px;
-}
-
-.add-cart-btn {
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #f59e0b;
-  color: #0f172a;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.15s ease;
-}
-
-.add-cart-btn:active {
-  transform: scale(0.85);
-}
-
-.sales-row {
-  font-size: 9.5px;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-/* 底部悬浮购物车栏 */
-.shop-cart-pill {
-  position: absolute;
-  bottom: 14px;
-  left: 14px;
-  right: 14px;
-  z-index: 40;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: rgba(22, 27, 34, 0.95);
-  border: 1px solid rgba(245, 158, 11, 0.4);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(16px);
-  cursor: pointer;
-  animation: slide-up 0.24s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes slide-up {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.cart-pill-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.cart-icon {
-  font-size: 18px;
-}
-
-.cart-badge {
-  padding: 1px 6px;
-  border-radius: 999px;
-  background: #ef4444;
-  color: #ffffff;
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.cart-total-text {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: #f59e0b;
-}
-
-.cart-checkout-btn {
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: #f59e0b;
-  color: #0f172a;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-/* 购物车抽屉 */
-.cart-drawer {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  max-height: 70%;
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  background: #161b22;
-  border-radius: 20px 20px 0 0;
-  box-shadow: 0 -10px 35px rgba(0, 0, 0, 0.7);
-  padding: 16px 16px calc(14px + env(safe-area-inset-bottom, 0px));
-}
-
-.drawer-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 13.5px;
-}
-
-.drawer-close-btn {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-}
-
-.cart-items {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 12px 0;
-}
-
-.cart-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.cart-row-thumb {
-  font-size: 26px;
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  display: grid;
-  place-items: center;
-}
-
-.cart-row-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.cart-row-name {
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.cart-row-price {
-  font-size: 12px;
-  color: #f59e0b;
-  font-weight: 700;
-}
-
-.cart-stepper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 2px 6px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.step-btn {
-  width: 22px;
-  height: 22px;
-  display: grid;
-  place-items: center;
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.step-num {
-  font-size: 12px;
-  font-weight: 600;
-  min-width: 14px;
-  text-align: center;
-}
-
-.drawer-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.bottom-total {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-}
-
-.total-label {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.total-amount {
-  font-size: 17px;
-  font-weight: 800;
-  color: #f59e0b;
-}
-
-.pay-btn {
-  padding: 8px 18px;
-  border-radius: 999px;
-  background: #f59e0b;
-  color: #0f172a;
-  font-size: 12.5px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-/* 详情浮层 */
-.product-modal {
-  position: absolute;
-  inset: 0;
-  z-index: 60;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(14px);
-  display: grid;
-  place-items: center;
-  padding: 16px;
-}
-
-.modal-card {
-  position: relative;
-  width: 100%;
-  max-width: 320px;
-  border-radius: 20px;
-  background: #161b22;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
-}
-
-.modal-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 10;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
-  color: #ffffff;
-  font-size: 12px;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-}
-
-.modal-thumb {
-  position: relative;
-  height: 160px;
-  display: grid;
-  place-items: center;
-}
-
-.modal-emoji {
-  font-size: 64px;
-}
-
-.modal-tag {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  padding: 2px 7px;
-  border-radius: 4px;
-  background: #f59e0b;
-  color: #0f172a;
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.modal-body {
-  padding: 14px 16px;
-}
-
-.modal-price-row {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-}
-
-.modal-price {
-  font-size: 20px;
-  font-weight: 800;
-  color: #f59e0b;
-}
-
-.modal-orig {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
-  text-decoration: line-through;
-}
-
-.modal-sales {
-  margin-left: auto;
-  font-size: 10.5px;
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.modal-title {
-  margin: 6px 0 3px;
-  font-size: 14.5px;
-  font-weight: 700;
-}
-
-.modal-desc {
-  margin: 0;
-  font-size: 11.5px;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.65);
-}
-
-.modal-rating {
-  margin-top: 10px;
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: #ffd54a;
-}
-
-.modal-service {
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.modal-foot {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 12px 16px 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.modal-add-btn,
-.modal-buy-btn {
-  height: 38px;
-  border-radius: 999px;
-  font-size: 12.5px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.modal-add-btn {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-}
-
-.modal-buy-btn {
-  background: #f59e0b;
-  color: #0f172a;
-}
-
-/* Toast 提示 */
-.shop-toast {
-  position: absolute;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 80;
-  padding: 6px 16px;
-  border-radius: 999px;
-  background: rgba(16, 185, 129, 0.95);
-  color: #ffffff;
-  font-size: 11.5px;
-  font-weight: 600;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-}
-
-.drawer-enter-active,
-.drawer-leave-active {
-  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.drawer-enter-from,
-.drawer-leave-to {
-  transform: translateY(100%);
-}
-
-.toast-enter-active,
-.toast-leave-active {
-  transition: all 0.2s ease;
-}
-
-.toast-enter-from,
-.toast-leave-to {
-  opacity: 0;
-  transform: translate(-50%, -10px);
-}
-</style>

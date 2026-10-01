@@ -24,10 +24,15 @@ const { shakeArmed } = storeToRefs(storm)
 </script>
 
 <template>
-  <Transition name="shake-hint">
+  <Transition
+    enter-active-class="transition-opacity duration-200 ease-out"
+    enter-from-class="opacity-0"
+    leave-active-class="transition-opacity duration-200 ease-in"
+    leave-to-class="opacity-0"
+  >
     <div
       v-if="shakeArmed"
-      class="shake-hint fixed left-1/2 -translate-x-1/2 bottom-[calc(14px+env(safe-area-inset-bottom,0px))] flex flex-col items-center gap-1.5 z-[1000]"
+      class="fixed left-1/2 -translate-x-1/2 bottom-[calc(14px+env(safe-area-inset-bottom,0px))] flex flex-col items-center gap-1.5 z-[1000]"
     >
       <!--
         授权按钮必须在用户手势里被点击，iOS 才会真的弹窗；
@@ -36,82 +41,36 @@ const { shakeArmed } = storeToRefs(storm)
       <button
         v-if="needsPermission"
         type="button"
-        class="shake-hint__btn shake-hint__btn--perm inline-flex items-center gap-3 min-h-[48px] px-5 rounded-full bg-[#121620]/90 border border-white/20 text-white backdrop-blur-xl shadow-[0_16px_36px_-10px_rgba(0,0,0,0.8)] active:scale-95 active:bg-[#1e2637]/95 transition-all cursor-pointer"
+        class="inline-flex items-center gap-3 min-h-[48px] px-5 rounded-full bg-[#121620]/90 border border-white/20 text-white backdrop-blur-xl shadow-[0_16px_36px_-10px_rgba(0,0,0,0.8)] active:scale-95 active:bg-[#1e2637]/95 transition-all cursor-pointer"
         @click="emit('request')"
       >
-        <span class="shake-hint__phone-icon text-base" aria-hidden="true">🔒</span>
+        <span class="text-base" aria-hidden="true">🔒</span>
         允许访问运动与方向以激活互动
       </button>
 
       <button
         v-else
         type="button"
-        class="shake-hint__btn inline-flex items-center gap-3 min-h-[48px] pl-4 pr-5 rounded-full bg-[#121620]/90 border border-white/20 text-white backdrop-blur-xl shadow-[0_16px_36px_-10px_rgba(0,0,0,0.8)] active:scale-95 active:bg-[#1e2637]/95 transition-all cursor-pointer"
+        class="inline-flex items-center gap-3 min-h-[48px] pl-4 pr-5 rounded-full bg-[#121620]/90 border border-white/20 text-white backdrop-blur-xl shadow-[0_16px_36px_-10px_rgba(0,0,0,0.8)] active:scale-95 active:bg-[#1e2637]/95 transition-all cursor-pointer"
         @click="emit('simulate')"
       >
-        <span class="shake-hint__phone-anim grid place-items-center w-7 h-7" aria-hidden="true">
+        <span class="grid place-items-center w-7 h-7" aria-hidden="true">
           <svg
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             stroke-width="2"
-            class="shake-phone-svg w-[22px] h-[22px]"
+            class="animate-[phone-shake-tilt_1.4s_ease-in-out_infinite] origin-bottom w-[22px] h-[22px]"
           >
             <rect x="5" y="2" width="14" height="20" rx="3" />
             <line x1="12" y1="18" x2="12.01" y2="18" stroke-width="2.5" />
           </svg>
         </span>
-        <div class="shake-hint__texts flex flex-col items-start text-left">
-          <span class="shake-hint__main text-[13px] font-bold tracking-wide text-[#ffd54a]"
-            >晃动手机 跳转详情</span
-          >
-          <span class="shake-hint__sub text-[10px] text-[#f2f4f8]/70"
-            >检测到晃动即可自动进入 · 或点击此栏</span
-          >
+        <div class="flex flex-col items-start text-left">
+          <span class="text-[13px] font-bold tracking-wide text-[#ffd54a]">晃动手机 跳转详情</span>
+          <span class="text-[10px] text-[#f2f4f8]/70">检测到晃动即可自动进入 · 或点击此栏</span>
         </div>
       </button>
     </div>
   </Transition>
 </template>
-
-<style scoped>
-.shake-phone-svg {
-  animation: phone-shake-tilt 1.4s ease-in-out infinite;
-  transform-origin: bottom center;
-}
-
-@keyframes phone-shake-tilt {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  20% {
-    transform: rotate(-18deg);
-  }
-  40% {
-    transform: rotate(18deg);
-  }
-  60% {
-    transform: rotate(-12deg);
-  }
-  80% {
-    transform: rotate(12deg);
-  }
-}
-
-.shake-hint-enter-active,
-.shake-hint-leave-active {
-  transition: opacity 200ms ease;
-}
-
-.shake-hint-enter-from,
-.shake-hint-leave-to {
-  opacity: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .shake-phone-svg {
-    animation: none;
-  }
-}
-</style>

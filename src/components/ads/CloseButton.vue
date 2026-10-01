@@ -32,8 +32,8 @@ const variantClasses: Record<CloseVariant, string> = {
   <button
     v-if="closable"
     type="button"
-    class="close-btn absolute grid place-items-center p-0 leading-none rounded-full cursor-pointer z-10 before:content-[''] before:absolute before:-inset-2 before:rounded-full"
-    :class="[`close-btn--${variant}`, variantClasses[variant]]"
+    class="absolute grid place-items-center p-0 leading-none rounded-full cursor-pointer z-10 before:content-[''] before:absolute before:-inset-2 before:rounded-full"
+    :class="variantClasses[variant]"
     aria-label="关闭"
     @click.stop="emit('hit')"
   >

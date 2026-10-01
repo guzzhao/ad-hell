@@ -172,76 +172,83 @@ function prevPhoto(): void {
 </script>
 
 <template>
-  <div class="gallery-app">
+  <div class="flex flex-col h-full bg-[#0a0d14] text-white overflow-hidden relative">
     <!-- 顶部选项卡 -->
-    <header class="gallery-header">
-      <div class="gallery-tabs">
+    <header
+      class="flex justify-between items-center px-4 pt-3 pb-2 shrink-0 border-b border-white/5"
+    >
+      <div class="flex gap-4">
         <button
           type="button"
-          class="gallery-tab"
-          :class="{ 'is-active': activeTab === 'photos' }"
+          class="text-sm text-gray-400 font-medium cursor-pointer pb-1 transition-all"
+          :class="{ '!text-white !font-bold border-b-2 border-white': activeTab === 'photos' }"
           @click="activeTab = 'photos'"
         >
           照片
         </button>
         <button
           type="button"
-          class="gallery-tab"
-          :class="{ 'is-active': activeTab === 'albums' }"
+          class="text-sm text-gray-400 font-medium cursor-pointer pb-1 transition-all"
+          :class="{ '!text-white !font-bold border-b-2 border-white': activeTab === 'albums' }"
           @click="activeTab = 'albums'"
         >
           相册
         </button>
         <button
           type="button"
-          class="gallery-tab"
-          :class="{ 'is-active': activeTab === 'moments' }"
+          class="text-sm text-gray-400 font-medium cursor-pointer pb-1 transition-all"
+          :class="{ '!text-white !font-bold border-b-2 border-white': activeTab === 'moments' }"
           @click="activeTab = 'moments'"
         >
           时刻
         </button>
       </div>
-      <button type="button" class="gallery-search-btn" aria-label="搜索照片">🔍</button>
+      <button type="button" class="text-sm text-gray-400 cursor-pointer" aria-label="搜索照片">
+        🔍
+      </button>
     </header>
 
     <!-- 照片分类过滤胶囊 -->
-    <div v-if="activeTab === 'photos'" class="gallery-filters">
+    <div
+      v-if="activeTab === 'photos'"
+      class="flex gap-2 px-4 py-2 overflow-x-auto shrink-0 no-scrollbar"
+    >
       <button
         type="button"
-        class="filter-chip"
-        :class="{ 'is-active': filterCategory === 'all' }"
+        class="px-3 py-1 rounded-full text-xs bg-white/10 text-gray-300 whitespace-nowrap cursor-pointer transition-all"
+        :class="{ '!bg-white !text-black !font-semibold': filterCategory === 'all' }"
         @click="filterCategory = 'all'"
       >
         全部 ({{ photos.length }})
       </button>
       <button
         type="button"
-        class="filter-chip"
-        :class="{ 'is-active': filterCategory === 'scenery' }"
+        class="px-3 py-1 rounded-full text-xs bg-white/10 text-gray-300 whitespace-nowrap cursor-pointer transition-all"
+        :class="{ '!bg-white !text-black !font-semibold': filterCategory === 'scenery' }"
         @click="filterCategory = 'scenery'"
       >
         风景
       </button>
       <button
         type="button"
-        class="filter-chip"
-        :class="{ 'is-active': filterCategory === 'portrait' }"
+        class="px-3 py-1 rounded-full text-xs bg-white/10 text-gray-300 whitespace-nowrap cursor-pointer transition-all"
+        :class="{ '!bg-white !text-black !font-semibold': filterCategory === 'portrait' }"
         @click="filterCategory = 'portrait'"
       >
         人像
       </button>
       <button
         type="button"
-        class="filter-chip"
-        :class="{ 'is-active': filterCategory === 'pet' }"
+        class="px-3 py-1 rounded-full text-xs bg-white/10 text-gray-300 whitespace-nowrap cursor-pointer transition-all"
+        :class="{ '!bg-white !text-black !font-semibold': filterCategory === 'pet' }"
         @click="filterCategory = 'pet'"
       >
         萌宠
       </button>
       <button
         type="button"
-        class="filter-chip"
-        :class="{ 'is-active': filterCategory === 'food' }"
+        class="px-3 py-1 rounded-full text-xs bg-white/10 text-gray-300 whitespace-nowrap cursor-pointer transition-all"
+        :class="{ '!bg-white !text-black !font-semibold': filterCategory === 'food' }"
         @click="filterCategory = 'food'"
       >
         美食
@@ -249,28 +256,29 @@ function prevPhoto(): void {
     </div>
 
     <!-- 照片视图 -->
-    <main v-if="activeTab === 'photos'" class="gallery-scroll phone-scroll">
-      <div class="photo-grid">
+    <main v-if="activeTab === 'photos'" class="flex-1 px-4 py-3 phone-scroll">
+      <div class="grid grid-cols-2 gap-3">
         <article
           v-for="photo in filteredPhotos"
           :key="photo.id"
-          class="photo-card"
+          class="relative aspect-[3/4] rounded-2xl overflow-hidden p-3 flex flex-col justify-between cursor-pointer group shadow-lg"
           :style="{ background: photo.gradient }"
           @click="selectedPhoto = photo"
         >
-          <div class="photo-visual">
-            <span class="photo-emoji">{{ photo.emoji }}</span>
+          <div
+            class="flex-1 grid place-items-center text-5xl select-none group-hover:scale-105 transition-transform"
+          >
+            <span>{{ photo.emoji }}</span>
           </div>
 
-          <div class="photo-card-info">
-            <span class="photo-card-title">{{ photo.title }}</span>
-            <span class="photo-card-time">{{ photo.date }} {{ photo.time }}</span>
+          <div class="flex flex-col z-10 [text-shadow:0_1px_3px_rgba(0,0,0,0.8)]">
+            <span class="text-xs font-semibold text-white truncate">{{ photo.title }}</span>
+            <span class="text-[10px] text-white/70">{{ photo.date }} {{ photo.time }}</span>
           </div>
 
           <button
             type="button"
-            class="photo-card-like"
-            :class="{ 'is-liked': photo.liked }"
+            class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm grid place-items-center text-xs cursor-pointer z-10 active:scale-90 transition-transform"
             aria-label="收藏照片"
             @click="toggleLike(photo, $event)"
           >
@@ -281,53 +289,73 @@ function prevPhoto(): void {
     </main>
 
     <!-- 相册视图 -->
-    <main v-else-if="activeTab === 'albums'" class="gallery-scroll phone-scroll">
-      <div class="albums-grid">
-        <div v-for="album in albums" :key="album.name" class="album-card">
-          <div class="album-cover" :style="{ background: album.bg }">
-            <span class="album-emoji">{{ album.coverEmoji }}</span>
+    <main v-else-if="activeTab === 'albums'" class="flex-1 px-4 py-3 phone-scroll">
+      <div class="grid grid-cols-2 gap-3.5">
+        <div v-for="album in albums" :key="album.name" class="flex flex-col gap-1.5 cursor-pointer">
+          <div
+            class="aspect-square rounded-2xl grid place-items-center text-4xl shadow-md"
+            :style="{ background: album.bg }"
+          >
+            <span>{{ album.coverEmoji }}</span>
           </div>
-          <span class="album-name">{{ album.name }}</span>
-          <span class="album-count">{{ album.count }} 项</span>
+          <span class="text-xs font-semibold text-white">{{ album.name }}</span>
+          <span class="text-[10.5px] text-gray-400">{{ album.count }} 项</span>
         </div>
       </div>
     </main>
 
     <!-- 时刻视图 -->
-    <main v-else class="gallery-scroll phone-scroll">
-      <div class="moments-list">
-        <div class="moment-hero" style="background: linear-gradient(135deg, #1e3a8a, #f59e0b)">
-          <span class="moment-badge">精选时刻 · 9月</span>
-          <h3 class="moment-title">初秋的色彩与漫步</h3>
-          <p class="moment-sub">共记录 28 张高清照片 · 杭州与贡嘎山</p>
+    <main v-else class="flex-1 px-4 py-3 phone-scroll">
+      <div class="flex flex-col gap-3.5">
+        <div
+          class="rounded-2xl p-4 text-white shadow-lg bg-gradient-to-br from-blue-900 to-amber-500"
+        >
+          <span
+            class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-black/30 backdrop-blur-sm inline-block mb-2"
+            >精选时刻 · 9月</span
+          >
+          <h3 class="text-base font-bold mb-1">初秋的色彩与漫步</h3>
+          <p class="text-xs text-white/80">共记录 28 张高清照片 · 杭州与贡嘎山</p>
         </div>
-        <div class="moment-hero" style="background: linear-gradient(135deg, #065f46, #047857)">
-          <span class="moment-badge">周末时光</span>
-          <h3 class="moment-title">治愈系咖啡与手作</h3>
-          <p class="moment-sub">共记录 14 张高清照片 · 慢调日常</p>
+        <div
+          class="rounded-2xl p-4 text-white shadow-lg bg-gradient-to-br from-emerald-800 to-emerald-600"
+        >
+          <span
+            class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-black/30 backdrop-blur-sm inline-block mb-2"
+            >周末时光</span
+          >
+          <h3 class="text-base font-bold mb-1">治愈系咖啡与手作</h3>
+          <p class="text-xs text-white/80">共记录 14 张高清照片 · 慢调日常</p>
         </div>
       </div>
     </main>
 
     <!-- 全屏照片查看模态框 -->
-    <Transition name="fade-zoom">
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 scale-95"
+      leave-active-class="transition duration-150 ease-in"
+      leave-to-class="opacity-0 scale-95"
+    >
       <div
         v-if="selectedPhoto"
-        class="photo-modal"
+        class="absolute inset-0 z-50 bg-black/95 backdrop-blur-lg flex flex-col justify-between p-4"
         role="dialog"
         aria-modal="true"
         aria-label="查看照片详情"
         @click="selectedPhoto = null"
       >
-        <div class="modal-box" @click.stop>
-          <header class="modal-top">
-            <div class="modal-title-group">
-              <strong class="modal-title">{{ selectedPhoto.title }}</strong>
-              <span class="modal-loc">📍 {{ selectedPhoto.location }}</span>
+        <div class="w-full h-full flex flex-col justify-between" @click.stop>
+          <header class="flex justify-between items-center text-white pb-2">
+            <div>
+              <strong class="text-sm font-semibold">{{ selectedPhoto.title }}</strong>
+              <span class="text-[11px] text-gray-400 block mt-0.5"
+                >📍 {{ selectedPhoto.location }}</span
+              >
             </div>
             <button
               type="button"
-              class="modal-close-btn"
+              class="w-8 h-8 rounded-full bg-white/10 grid place-items-center text-sm cursor-pointer"
               aria-label="关闭"
               @click="selectedPhoto = null"
             >
@@ -335,27 +363,41 @@ function prevPhoto(): void {
             </button>
           </header>
 
-          <div class="modal-preview" :style="{ background: selectedPhoto.gradient }">
-            <span class="modal-emoji">{{ selectedPhoto.emoji }}</span>
+          <div
+            class="flex-1 my-3 rounded-2xl grid place-items-center text-8xl shadow-2xl"
+            :style="{ background: selectedPhoto.gradient }"
+          >
+            <span>{{ selectedPhoto.emoji }}</span>
           </div>
 
-          <footer class="modal-meta-bar">
-            <div class="modal-exif">
-              <span class="exif-icon">📷</span>
-              <span class="exif-text">{{ selectedPhoto.exif }}</span>
+          <footer class="flex flex-col gap-3 pt-2 border-t border-white/10">
+            <div class="flex items-center gap-2 text-xs text-gray-400">
+              <span>📷</span>
+              <span>{{ selectedPhoto.exif }}</span>
             </div>
-            <div class="modal-actions">
+            <div class="flex justify-between items-center">
               <button
                 type="button"
-                class="modal-act-btn"
-                :class="{ 'is-liked': selectedPhoto.liked }"
+                class="px-3.5 py-1.5 rounded-full bg-white/10 text-xs font-medium cursor-pointer active:scale-95"
                 @click="toggleLike(selectedPhoto)"
               >
                 {{ selectedPhoto.liked ? '❤️ 已收藏' : '🤍 收藏' }}
               </button>
-              <div class="modal-nav-btns">
-                <button type="button" class="nav-btn" @click="prevPhoto">‹ 上一张</button>
-                <button type="button" class="nav-btn" @click="nextPhoto">下一张 ›</button>
+              <div class="flex gap-2">
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-full bg-white/10 text-xs text-gray-300 cursor-pointer hover:bg-white/20 active:scale-95"
+                  @click="prevPhoto"
+                >
+                  ‹ 上一张
+                </button>
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-full bg-white/10 text-xs text-gray-300 cursor-pointer hover:bg-white/20 active:scale-95"
+                  @click="nextPhoto"
+                >
+                  下一张 ›
+                </button>
               </div>
             </div>
           </footer>
@@ -364,392 +406,3 @@ function prevPhoto(): void {
     </Transition>
   </div>
 </template>
-
-<style scoped>
-.gallery-app {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background: #090d16;
-  color: #f8fafc;
-  overflow: hidden;
-}
-
-/* 顶部 Tab */
-.gallery-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 16px 8px;
-  background: rgba(15, 23, 42, 0.9);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.gallery-tabs {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.gallery-tab {
-  font-size: 15px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
-  background: none;
-  border: none;
-  cursor: pointer;
-  position: relative;
-  padding: 4px 0;
-  transition: all 0.15s ease;
-}
-
-.gallery-tab.is-active {
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.gallery-tab.is-active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 16px;
-  height: 2.5px;
-  border-radius: 999px;
-  background: #38bdf8;
-}
-
-.gallery-search-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-/* 过滤标签 */
-.gallery-filters {
-  display: flex;
-  gap: 8px;
-  padding: 10px 16px 6px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.gallery-filters::-webkit-scrollbar {
-  display: none;
-}
-
-.filter-chip {
-  flex: none;
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.filter-chip.is-active {
-  background: #38bdf8;
-  color: #041426;
-  border-color: #38bdf8;
-  font-weight: 600;
-}
-
-/* 照片滚动区域 */
-.gallery-scroll {
-  flex: 1;
-  padding: 8px 14px 20px;
-}
-
-.photo-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-.photo-card {
-  position: relative;
-  aspect-ratio: 1;
-  border-radius: 14px;
-  overflow: hidden;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  transition: transform 0.15s ease;
-}
-
-.photo-card:active {
-  transform: scale(0.97);
-}
-
-.photo-visual {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-}
-
-.photo-emoji {
-  font-size: 48px;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
-}
-
-.photo-card-info {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
-  padding: 8px 4px 2px;
-  border-radius: 8px;
-}
-
-.photo-card-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: #ffffff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.photo-card-time {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.65);
-}
-
-.photo-card-like {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 3;
-  background: rgba(0, 0, 0, 0.45);
-  border: none;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-/* 相册视图 */
-.albums-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  padding-top: 6px;
-}
-
-.album-card {
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-}
-
-.album-cover {
-  aspect-ratio: 1;
-  border-radius: 16px;
-  display: grid;
-  place-items: center;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-  margin-bottom: 6px;
-}
-
-.album-emoji {
-  font-size: 42px;
-}
-
-.album-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #ffffff;
-}
-
-.album-count {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-/* 时刻列表 */
-.moments-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding-top: 6px;
-}
-
-.moment-hero {
-  border-radius: 18px;
-  padding: 20px 16px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
-}
-
-.moment-badge {
-  font-size: 10.5px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.2);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-
-.moment-title {
-  margin: 10px 0 4px;
-  font-size: 18px;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.moment-sub {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.85);
-  margin: 0;
-}
-
-/* 全屏模态查看器 */
-.photo-modal {
-  position: absolute;
-  inset: 0;
-  z-index: 50;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(14px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-}
-
-.modal-box {
-  width: 100%;
-  max-height: 92%;
-  display: flex;
-  flex-direction: column;
-  background: #111827;
-  border-radius: 20px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-}
-
-.modal-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.modal-title-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.modal-title {
-  font-size: 14px;
-  color: #ffffff;
-}
-
-.modal-loc {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.55);
-}
-
-.modal-close-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  color: #ffffff;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.modal-preview {
-  aspect-ratio: 4 / 3;
-  display: grid;
-  place-items: center;
-}
-
-.modal-emoji {
-  font-size: 72px;
-}
-
-.modal-meta-bar {
-  padding: 12px 16px;
-  background: #1a2233;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.modal-exif {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.modal-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.modal-act-btn {
-  background: rgba(255, 255, 255, 0.12);
-  border: none;
-  padding: 5px 12px;
-  border-radius: 999px;
-  color: #ffffff;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.modal-nav-btns {
-  display: flex;
-  gap: 8px;
-}
-
-.nav-btn {
-  background: rgba(255, 255, 255, 0.12);
-  border: none;
-  padding: 5px 10px;
-  border-radius: 999px;
-  color: #ffffff;
-  font-size: 11.5px;
-  cursor: pointer;
-}
-
-.nav-btn:active,
-.modal-act-btn:active {
-  background: rgba(255, 255, 255, 0.25);
-}
-
-.fade-zoom-enter-active,
-.fade-zoom-leave-active {
-  transition: all 0.22s ease;
-}
-
-.fade-zoom-enter-from,
-.fade-zoom-leave-to {
-  opacity: 0;
-  transform: scale(0.92);
-}
-</style>

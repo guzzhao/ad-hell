@@ -65,7 +65,7 @@ function onClose(id: number): void {
       <div
         v-for="view in views"
         :key="view.id"
-        class="takeover-layer__item absolute inset-0 pointer-events-auto cursor-pointer"
+        class="absolute inset-0 pointer-events-auto cursor-pointer"
         :style="view.style"
         @click="storm.tapAdBody()"
       >
@@ -75,31 +75,3 @@ function onClose(id: number): void {
     </TransitionGroup>
   </div>
 </template>
-
-<!--
-  与 AdLayer 同理：过渡类名由 TransitionGroup 加到**子元素**上，全局样式最稳妥。
--->
-<style>
-.takeover-enter-active {
-  animation: takeover-in 200ms ease-out both;
-}
-
-.takeover-leave-active {
-  animation: takeover-out 220ms ease-in both;
-}
-
-@keyframes takeover-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes takeover-out {
-  to {
-    opacity: 0;
-  }
-}
-</style>

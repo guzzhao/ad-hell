@@ -84,17 +84,21 @@ const transactions: Transaction[] = [
 </script>
 
 <template>
-  <div class="alipay-app">
+  <div class="flex flex-col h-full bg-[#f4f6f9] text-[#1f2937] overflow-hidden relative">
     <!-- 顶部支付宝蓝大背景与功能区 -->
-    <header class="alipay-header">
-      <div class="alipay-top-bar">
-        <div class="alipay-search">
-          <span class="search-icon">🔍</span>
-          <span class="search-ph">消费券 · 乘车码 · 医保电子凭证</span>
+    <header
+      class="bg-gradient-to-br from-[#1677ff] to-[#0958d9] text-white px-3.5 pt-2 pb-3.5 shrink-0"
+    >
+      <div class="flex items-center gap-2.5 mb-3">
+        <div
+          class="flex-1 h-[34px] rounded-full bg-white/20 flex items-center px-3 gap-1.5 text-xs text-white/85 backdrop-blur-sm"
+        >
+          <span>🔍</span>
+          <span class="truncate">消费券 · 乘车码 · 医保电子凭证</span>
         </div>
         <button
           type="button"
-          class="alipay-msg-btn"
+          class="text-lg text-white cursor-pointer"
           aria-label="消息"
           @click="showTip('暂无未读消息')"
         >
@@ -103,104 +107,190 @@ const transactions: Transaction[] = [
       </div>
 
       <!-- 四大核心快捷金刚入口 -->
-      <div class="alipay-core-grid">
-        <button type="button" class="core-item" @click="showScanner = true">
-          <span class="core-icon">⛶</span>
-          <span class="core-label">扫一扫</span>
+      <div class="flex justify-around items-center">
+        <button
+          type="button"
+          class="flex flex-col items-center gap-1 text-white cursor-pointer"
+          @click="showScanner = true"
+        >
+          <span class="text-[26px] leading-none">⛶</span>
+          <span class="text-[12.5px] font-medium">扫一扫</span>
         </button>
-        <button type="button" class="core-item" @click="showPayCode = true">
-          <span class="core-icon">▦</span>
-          <span class="core-label">付钱/收钱</span>
+        <button
+          type="button"
+          class="flex flex-col items-center gap-1 text-white cursor-pointer"
+          @click="showPayCode = true"
+        >
+          <span class="text-[26px] leading-none">▦</span>
+          <span class="text-[12.5px] font-medium">付钱/收钱</span>
         </button>
-        <button type="button" class="core-item" @click="showTip('已自动出示杭州公共交通乘车码')">
-          <span class="core-icon">🚌</span>
-          <span class="core-label">出行</span>
+        <button
+          type="button"
+          class="flex flex-col items-center gap-1 text-white cursor-pointer"
+          @click="showTip('已自动出示杭州公共交通乘车码')"
+        >
+          <span class="text-[26px] leading-none">🚌</span>
+          <span class="text-[12.5px] font-medium">出行</span>
         </button>
-        <button type="button" class="core-item" @click="showTip('卡包已收纳 12 张会员卡与优惠券')">
-          <span class="core-icon">🪪</span>
-          <span class="core-label">卡包</span>
+        <button
+          type="button"
+          class="flex flex-col items-center gap-1 text-white cursor-pointer"
+          @click="showTip('卡包已收纳 12 张会员卡与优惠券')"
+        >
+          <span class="text-[26px] leading-none">🪪</span>
+          <span class="text-[12.5px] font-medium">卡包</span>
         </button>
       </div>
     </header>
 
     <!-- 主体可滚动区 -->
-    <main class="alipay-body phone-scroll">
+    <main class="flex-1 px-3 pt-2.5 pb-6 flex flex-col gap-2.5 phone-scroll">
       <!-- 宫格服务区 -->
-      <div class="alipay-service-card">
-        <div class="service-grid">
-          <button type="button" class="service-item" @click="showTip('转账功能已就绪')">
-            <span class="service-icon" style="background: #e6f4ff; color: #1677ff">⇄</span>
-            <span class="service-name">转账</span>
+      <div class="bg-white rounded-2xl px-2 pt-3.5 pb-2.5 shadow-sm">
+        <div class="grid grid-cols-4 gap-x-1.5 gap-y-3">
+          <button
+            type="button"
+            class="flex flex-col items-center gap-1.5 cursor-pointer"
+            @click="showTip('转账功能已就绪')"
+          >
+            <span
+              class="w-10 h-10 rounded-xl grid place-items-center text-[19px] font-semibold bg-[#e6f4ff] text-[#1677ff]"
+              >⇄</span
+            >
+            <span class="text-[11.5px] text-gray-700">转账</span>
           </button>
-          <button type="button" class="service-item" @click="showTip('信用卡本期账单已全部结清')">
-            <span class="service-icon" style="background: #fff1f0; color: #f5222d">💳</span>
-            <span class="service-name">信用卡还款</span>
+          <button
+            type="button"
+            class="flex flex-col items-center gap-1.5 cursor-pointer"
+            @click="showTip('信用卡本期账单已全部结清')"
+          >
+            <span
+              class="w-10 h-10 rounded-xl grid place-items-center text-[19px] font-semibold bg-[#fff1f0] text-[#f5222d]"
+              >💳</span
+            >
+            <span class="text-[11.5px] text-gray-700">信用卡还款</span>
           </button>
-          <button type="button" class="service-item" @click="showTip('当前话费余额充沛 ¥96.50')">
-            <span class="service-icon" style="background: #f6ffed; color: #52c41a">📱</span>
-            <span class="service-name">充值中心</span>
+          <button
+            type="button"
+            class="flex flex-col items-center gap-1.5 cursor-pointer"
+            @click="showTip('当前话费余额充沛 ¥96.50')"
+          >
+            <span
+              class="w-10 h-10 rounded-xl grid place-items-center text-[19px] font-semibold bg-[#f6ffed] text-[#52c41a]"
+              >📱</span
+            >
+            <span class="text-[11.5px] text-gray-700">充值中心</span>
           </button>
-          <button type="button" class="service-item" @click="showTip('余额宝昨日收益 +¥3.28')">
-            <span class="service-icon" style="background: #fff7e6; color: #fa8c16">📈</span>
-            <span class="service-name">余额宝</span>
+          <button
+            type="button"
+            class="flex flex-col items-center gap-1.5 cursor-pointer"
+            @click="showTip('余额宝昨日收益 +¥3.28')"
+          >
+            <span
+              class="w-10 h-10 rounded-xl grid place-items-center text-[19px] font-semibold bg-[#fff7e6] text-[#fa8c16]"
+              >📈</span
+            >
+            <span class="text-[11.5px] text-gray-700">余额宝</span>
           </button>
-          <button type="button" class="service-item" @click="showTip('花呗下期应还 ¥0.00')">
-            <span class="service-icon" style="background: #e6f7ff; color: #1890ff">🌸</span>
-            <span class="service-name">花呗</span>
+          <button
+            type="button"
+            class="flex flex-col items-center gap-1.5 cursor-pointer"
+            @click="showTip('花呗下期应还 ¥0.00')"
+          >
+            <span
+              class="w-10 h-10 rounded-xl grid place-items-center text-[19px] font-semibold bg-[#e6f7ff] text-[#1890ff]"
+              >🌸</span
+            >
+            <span class="text-[11.5px] text-gray-700">花呗</span>
           </button>
-          <button type="button" class="service-item" @click="showTip('水费/电费/燃气费均无欠费')">
-            <span class="service-icon" style="background: #f9f0ff; color: #722ed1">⚡</span>
-            <span class="service-name">生活缴费</span>
+          <button
+            type="button"
+            class="flex flex-col items-center gap-1.5 cursor-pointer"
+            @click="showTip('水费/电费/燃气费均无欠费')"
+          >
+            <span
+              class="w-10 h-10 rounded-xl grid place-items-center text-[19px] font-semibold bg-[#f9f0ff] text-[#722ed1]"
+              >⚡</span
+            >
+            <span class="text-[11.5px] text-gray-700">生活缴费</span>
           </button>
-          <button type="button" class="service-item" @click="showTip('市民中心社保/公积金已绑定')">
-            <span class="service-icon" style="background: #e6fffb; color: #13c2c2">🏛️</span>
-            <span class="service-name">市民中心</span>
+          <button
+            type="button"
+            class="flex flex-col items-center gap-1.5 cursor-pointer"
+            @click="showTip('市民中心社保/公积金已绑定')"
+          >
+            <span
+              class="w-10 h-10 rounded-xl grid place-items-center text-[19px] font-semibold bg-[#e6fffb] text-[#13c2c2]"
+              >🏛️</span
+            >
+            <span class="text-[11.5px] text-gray-700">市民中心</span>
           </button>
-          <button type="button" class="service-item" @click="showTip('更多 120+ 便民小程序')">
-            <span class="service-icon" style="background: #f0f2f5; color: #595959">···</span>
-            <span class="service-name">更多</span>
+          <button
+            type="button"
+            class="flex flex-col items-center gap-1.5 cursor-pointer"
+            @click="showTip('更多 120+ 便民小程序')"
+          >
+            <span
+              class="w-10 h-10 rounded-xl grid place-items-center text-[19px] font-semibold bg-[#f0f2f5] text-[#595959]"
+              >···</span
+            >
+            <span class="text-[11.5px] text-gray-700">更多</span>
           </button>
         </div>
       </div>
 
       <!-- 蚂蚁森林绿色卡片 -->
-      <section class="alipay-forest-card">
-        <div class="forest-left">
-          <div class="forest-badge">🌲 蚂蚁森林 · 绿色守护</div>
-          <h4 class="forest-title">保护地巡护中 · 已累计减碳 42kg</h4>
-          <p class="forest-sub">今日步行 8,420 步，已转化低碳能量</p>
+      <section
+        class="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-2xl px-3.5 py-3 text-white flex items-center justify-between shadow-[0_4px_12px_rgba(5,150,105,0.2)]"
+      >
+        <div>
+          <div class="text-[11px] font-semibold opacity-90">🌲 蚂蚁森林 · 绿色守护</div>
+          <h4 class="my-0.5 text-[13px] font-bold">保护地巡护中 · 已累计减碳 42kg</h4>
+          <p class="m-0 text-[10.5px] opacity-80">今日步行 8,420 步，已转化低碳能量</p>
         </div>
-        <div class="forest-right">
+        <div>
           <button
             type="button"
-            class="energy-bubble"
-            :class="{ 'is-collected': collectedForest }"
+            class="w-[54px] h-[54px] rounded-full border-[1.5px] flex flex-col items-center justify-center text-white cursor-pointer shadow-[0_4px_10px_rgba(0,0,0,0.15)] transition-all"
+            :class="
+              collectedForest
+                ? 'bg-white/15 border-white/20'
+                : 'bg-white/25 border-white/50 animate-pulse'
+            "
             aria-label="收取能量"
             @click="collectEnergy"
           >
-            <span class="energy-num">{{ collectedForest ? '✓' : `+${forestEnergy}g` }}</span>
-            <span class="energy-label">{{ collectedForest ? '已收取' : '点我收取' }}</span>
+            <span class="text-[11.5px] font-bold">{{
+              collectedForest ? '✓' : `+${forestEnergy}g`
+            }}</span>
+            <span class="text-[9px] opacity-90">{{ collectedForest ? '已收取' : '点我收取' }}</span>
           </button>
         </div>
       </section>
 
       <!-- 最近动态账单列表 -->
-      <section class="alipay-bill-card">
-        <div class="bill-card-head">
-          <strong class="bill-title">近期账单明细</strong>
-          <span class="bill-more">查看全部账单 ›</span>
+      <section class="bg-white rounded-2xl p-3.5 shadow-sm">
+        <div class="flex justify-between items-center mb-3">
+          <strong class="text-[13.5px] font-semibold text-gray-900">近期账单明细</strong>
+          <span class="text-[11.5px] text-gray-500 cursor-pointer">查看全部账单 ›</span>
         </div>
 
-        <div class="bill-list">
-          <div v-for="t in transactions" :key="t.id" class="bill-item">
-            <div class="bill-avatar" :style="{ background: t.bg }">
+        <div class="flex flex-col gap-3">
+          <div v-for="t in transactions" :key="t.id" class="flex items-center gap-2.5">
+            <div
+              class="w-9 h-9 rounded-full grid place-items-center text-lg shrink-0 text-white"
+              :style="{ background: t.bg }"
+            >
               <span>{{ t.icon }}</span>
             </div>
-            <div class="bill-info">
-              <span class="bill-name">{{ t.title }}</span>
-              <span class="bill-time">{{ t.time }} · {{ t.subtitle }}</span>
+            <div class="flex-1 flex flex-col overflow-hidden">
+              <span class="text-[12.5px] font-semibold text-gray-800 truncate">{{ t.title }}</span>
+              <span class="text-[10.5px] text-gray-400">{{ t.time }} · {{ t.subtitle }}</span>
             </div>
-            <span class="bill-amount" :class="{ 'is-income': t.isPositive }">
+            <span
+              class="text-[13.5px] font-bold"
+              :class="t.isPositive ? 'text-green-600' : 'text-gray-900'"
+            >
               {{ t.amount }}
             </span>
           </div>
@@ -209,22 +299,44 @@ const transactions: Transaction[] = [
     </main>
 
     <!-- 付款码弹窗 -->
-    <Transition name="fade-scale">
-      <div v-if="showPayCode" class="modal-mask" @click="showPayCode = false">
-        <div class="paycode-card" @click.stop>
-          <div class="paycode-head">
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 scale-95"
+      leave-active-class="transition duration-150 ease-in"
+      leave-to-class="opacity-0 scale-95"
+    >
+      <div
+        v-if="showPayCode"
+        class="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm grid place-items-center p-4.5"
+        @click="showPayCode = false"
+      >
+        <div
+          class="w-full bg-white rounded-[20px] p-4 flex flex-col items-center shadow-2xl"
+          @click.stop
+        >
+          <div class="w-full flex justify-between items-center mb-3 text-sm font-semibold">
             <strong>向商家付款</strong>
-            <button type="button" class="close-x" @click="showPayCode = false">✕</button>
+            <button
+              type="button"
+              class="bg-gray-100 w-[26px] h-[26px] rounded-full grid place-items-center cursor-pointer text-gray-600"
+              @click="showPayCode = false"
+            >
+              ✕
+            </button>
           </div>
-          <div class="barcode-box">
-            <div class="barcode-lines" />
-            <span class="barcode-num">6214 **** **** 8829</span>
+          <div class="w-full flex flex-col items-center gap-1 mb-3.5">
+            <div
+              class="w-[85%] h-12 bg-[repeating-linear-gradient(90deg,#111827_0px,#111827_2px,transparent_2px,transparent_5px,#111827_5px,#111827_8px,transparent_8px,transparent_11px)]"
+            />
+            <span class="text-[11px] tracking-widest text-gray-500">6214 **** **** 8829</span>
           </div>
-          <div class="qrcode-box">
-            <div class="mock-qr" />
-            <span class="qr-refresh">每分钟自动刷新 · 付款保护中</span>
+          <div class="flex flex-col items-center gap-1.5">
+            <div
+              class="w-[140px] h-[140px] border-4 border-gray-900 p-1.5 bg-[radial-gradient(#111827_2px,transparent_2px)] bg-[size:8px_8px]"
+            />
+            <span class="text-[10.5px] text-gray-400">每分钟自动刷新 · 付款保护中</span>
           </div>
-          <div class="paycode-channel">
+          <div class="mt-3.5 text-[11.5px] text-blue-600">
             <span>优先扣款渠道：余额宝 (推荐) ›</span>
           </div>
         </div>
@@ -232,508 +344,66 @@ const transactions: Transaction[] = [
     </Transition>
 
     <!-- 扫一扫弹窗 -->
-    <Transition name="fade-scale">
-      <div v-if="showScanner" class="modal-mask" @click="showScanner = false">
-        <div class="scanner-card" @click.stop>
-          <div class="scanner-top">
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 scale-95"
+      leave-active-class="transition duration-150 ease-in"
+      leave-to-class="opacity-0 scale-95"
+    >
+      <div
+        v-if="showScanner"
+        class="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm grid place-items-center p-4.5"
+        @click="showScanner = false"
+      >
+        <div
+          class="w-full bg-white rounded-[20px] p-4 flex flex-col items-center shadow-2xl"
+          @click.stop
+        >
+          <div class="w-full flex justify-between items-center mb-3 text-sm font-semibold">
             <strong>扫一扫 / 识物</strong>
-            <button type="button" class="close-x" @click="showScanner = false">✕</button>
+            <button
+              type="button"
+              class="bg-gray-100 w-[26px] h-[26px] rounded-full grid place-items-center cursor-pointer text-gray-600"
+              @click="showScanner = false"
+            >
+              ✕
+            </button>
           </div>
-          <div class="scan-frame">
-            <div class="scan-laser" />
-            <div class="scan-corner scan-corner--tl" />
-            <div class="scan-corner scan-corner--tr" />
-            <div class="scan-corner scan-corner--bl" />
-            <div class="scan-corner scan-corner--br" />
+          <div class="w-[180px] h-[180px] border border-blue-500/40 relative overflow-hidden my-4">
+            <div
+              class="absolute left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-blue-500 to-transparent shadow-[0_0_10px_#1677ff] animate-[laser-scan_2s_linear_infinite]"
+            />
+            <div
+              class="absolute top-0 left-0 w-3.5 h-3.5 border-blue-500 border-t-[3px] border-l-[3px]"
+            />
+            <div
+              class="absolute top-0 right-0 w-3.5 h-3.5 border-blue-500 border-t-[3px] border-r-[3px]"
+            />
+            <div
+              class="absolute bottom-0 left-0 w-3.5 h-3.5 border-blue-500 border-b-[3px] border-l-[3px]"
+            />
+            <div
+              class="absolute bottom-0 right-0 w-3.5 h-3.5 border-blue-500 border-b-[3px] border-r-[3px]"
+            />
           </div>
-          <span class="scan-tip">将二维码 / 条形码放入框内即可自动扫描</span>
+          <span class="text-[11.5px] text-gray-500">将二维码 / 条形码放入框内即可自动扫描</span>
         </div>
       </div>
     </Transition>
 
     <!-- 交互轻提示 Toast -->
-    <Transition name="toast">
-      <div v-if="showToast" class="alipay-toast">
+    <Transition
+      enter-active-class="transition-opacity duration-200 ease-out"
+      enter-from-class="opacity-0"
+      leave-active-class="transition-opacity duration-200 ease-in"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="showToast"
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4.5 py-2 rounded-full text-xs z-[60] pointer-events-none"
+      >
         {{ toastText }}
       </div>
     </Transition>
   </div>
 </template>
-
-<style scoped>
-.alipay-app {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background: #f4f6f9;
-  color: #1f2937;
-  overflow: hidden;
-  position: relative;
-}
-
-/* 顶部支付宝蓝 */
-.alipay-header {
-  background: linear-gradient(135deg, #1677ff 0%, #0958d9 100%);
-  color: #ffffff;
-  padding: 8px 14px 14px;
-  flex: none;
-}
-
-.alipay-top-bar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.alipay-search {
-  flex: 1;
-  height: 34px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.22);
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
-  gap: 6px;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(8px);
-}
-
-.search-ph {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.alipay-msg-btn {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  color: #ffffff;
-}
-
-/* 四大金刚入口 */
-.alipay-core-grid {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-
-.core-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  background: none;
-  border: none;
-  color: #ffffff;
-  cursor: pointer;
-}
-
-.core-icon {
-  font-size: 26px;
-  line-height: 1;
-}
-
-.core-label {
-  font-size: 12.5px;
-  font-weight: 500;
-}
-
-/* 身体卡片流 */
-.alipay-body {
-  flex: 1;
-  padding: 10px 12px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* 宫格服务卡 */
-.alipay-service-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 14px 8px 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-.service-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px 6px;
-}
-
-.service-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.service-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  font-size: 19px;
-  font-weight: 600;
-}
-
-.service-name {
-  font-size: 11.5px;
-  color: #374151;
-}
-
-/* 蚂蚁森林卡片 */
-.alipay-forest-card {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  border-radius: 16px;
-  padding: 12px 14px;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
-}
-
-.forest-badge {
-  font-size: 11px;
-  font-weight: 600;
-  opacity: 0.9;
-}
-
-.forest-title {
-  margin: 3px 0 2px;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.forest-sub {
-  margin: 0;
-  font-size: 10.5px;
-  opacity: 0.8;
-}
-
-.energy-bubble {
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.25);
-  border: 1.5px solid rgba(255, 255, 255, 0.5);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  animation: pulse-energy 2s ease-in-out infinite;
-}
-
-.energy-bubble.is-collected {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.2);
-  animation: none;
-}
-
-.energy-num {
-  font-size: 11.5px;
-  font-weight: 700;
-}
-
-.energy-label {
-  font-size: 9px;
-  opacity: 0.9;
-}
-
-@keyframes pulse-energy {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.08);
-  }
-}
-
-/* 账单卡片 */
-.alipay-bill-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 14px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-.bill-card-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.bill-title {
-  font-size: 13.5px;
-  color: #111827;
-}
-
-.bill-more {
-  font-size: 11.5px;
-  color: #6b7280;
-  cursor: pointer;
-}
-
-.bill-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.bill-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.bill-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 18px;
-  flex: none;
-}
-
-.bill-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.bill-name {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: #1f2937;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.bill-time {
-  font-size: 10.5px;
-  color: #9ca3af;
-}
-
-.bill-amount {
-  font-size: 13.5px;
-  font-weight: 700;
-  color: #111827;
-}
-
-.bill-amount.is-income {
-  color: #16a34a;
-}
-
-/* 弹窗遮罩 */
-.modal-mask {
-  position: absolute;
-  inset: 0;
-  z-index: 50;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  display: grid;
-  place-items: center;
-  padding: 18px;
-}
-
-.paycode-card,
-.scanner-card {
-  width: 100%;
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-.paycode-head,
-.scanner-top {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  font-size: 14px;
-}
-
-.close-x {
-  background: #f3f4f6;
-  border: none;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.barcode-box {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 14px;
-}
-
-.barcode-lines {
-  width: 85%;
-  height: 48px;
-  background: repeating-linear-gradient(
-    90deg,
-    #111827 0px,
-    #111827 2px,
-    transparent 2px,
-    transparent 5px,
-    #111827 5px,
-    #111827 8px,
-    transparent 8px,
-    transparent 11px
-  );
-}
-
-.barcode-num {
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  color: #6b7280;
-}
-
-.qrcode-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.mock-qr {
-  width: 140px;
-  height: 140px;
-  border: 4px solid #111827;
-  padding: 6px;
-  background-image:
-    radial-gradient(#111827 2px, transparent 2px), radial-gradient(#111827 2px, transparent 2px);
-  background-size: 8px 8px;
-  background-position:
-    0 0,
-    4px 4px;
-}
-
-.qr-refresh {
-  font-size: 10.5px;
-  color: #9ca3af;
-}
-
-.paycode-channel {
-  margin-top: 14px;
-  font-size: 11.5px;
-  color: #1677ff;
-}
-
-/* 扫一扫取景框 */
-.scan-frame {
-  width: 180px;
-  height: 180px;
-  border: 1px solid rgba(22, 119, 255, 0.4);
-  position: relative;
-  overflow: hidden;
-  margin: 16px 0;
-}
-
-.scan-laser {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, #1677ff, transparent);
-  box-shadow: 0 0 10px #1677ff;
-  animation: laser-scan 2s linear infinite;
-}
-
-@keyframes laser-scan {
-  0% {
-    top: 0;
-  }
-  100% {
-    top: 100%;
-  }
-}
-
-.scan-corner {
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  border-color: #1677ff;
-  border-style: solid;
-}
-
-.scan-corner--tl {
-  top: 0;
-  left: 0;
-  border-width: 3px 0 0 3px;
-}
-
-.scan-corner--tr {
-  top: 0;
-  right: 0;
-  border-width: 3px 3px 0 0;
-}
-
-.scan-corner--bl {
-  bottom: 0;
-  left: 0;
-  border-width: 0 0 3px 3px;
-}
-
-.scan-corner--br {
-  bottom: 0;
-  right: 0;
-  border-width: 0 3px 3px 0;
-}
-
-.scan-tip {
-  font-size: 11.5px;
-  color: #6b7280;
-}
-
-/* 交互吐司 */
-.alipay-toast {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.78);
-  color: #ffffff;
-  padding: 8px 18px;
-  border-radius: 999px;
-  font-size: 12px;
-  z-index: 60;
-  pointer-events: none;
-}
-
-.toast-enter-active,
-.toast-leave-active {
-  transition: opacity 0.2s ease;
-}
-
-.toast-enter-from,
-.toast-leave-to {
-  opacity: 0;
-}
-</style>

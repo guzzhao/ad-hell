@@ -13,20 +13,14 @@ onMounted(() => {
 
 <template>
   <div
-    class="status-bar relative z-40 flex items-center justify-between gap-2 shrink-0 pt-3.5 px-[22px] pb-1.5 text-[13px] font-semibold tracking-wide text-[#f2f4f8]/90 pointer-events-none"
+    class="relative z-40 flex items-center justify-between gap-2 shrink-0 pt-3.5 px-[22px] pb-1.5 text-[13px] font-semibold tracking-wide text-[#f2f4f8]/90 pointer-events-none"
   >
-    <span class="status-bar__clock tabular-nums">{{ clock }}</span>
-    <span class="status-bar__title text-xs font-medium text-[#f2f4f8]/55">{{ title }}</span>
-    <span class="status-bar__icons inline-flex items-center gap-1.5" aria-hidden="true">
-      <span class="status-bar__net text-[10.5px] font-bold tracking-tighter opacity-90 -mr-px"
-        >5G</span
-      >
+    <span class="tabular-nums">{{ clock }}</span>
+    <span class="text-xs font-medium text-[#f2f4f8]/55">{{ title }}</span>
+    <span class="inline-flex items-center gap-1.5" aria-hidden="true">
+      <span class="text-[10.5px] font-bold tracking-tighter opacity-90 -mr-px">5G</span>
       <!-- 信号格 -->
-      <svg
-        class="status-bar__icon h-[11px] w-auto block opacity-85"
-        viewBox="0 0 16 12"
-        fill="currentColor"
-      >
+      <svg class="h-[11px] w-auto block opacity-85" viewBox="0 0 16 12" fill="currentColor">
         <rect x="0" y="8.5" width="2.6" height="3.5" rx="0.8" />
         <rect x="4.2" y="6" width="2.6" height="6" rx="0.8" />
         <rect x="8.4" y="3.5" width="2.6" height="8.5" rx="0.8" />
@@ -34,7 +28,7 @@ onMounted(() => {
       </svg>
       <!-- WiFi 图标 -->
       <svg
-        class="status-bar__icon h-[11px] w-auto block opacity-85"
+        class="h-[11px] w-auto block opacity-85"
         viewBox="0 0 16 12"
         fill="none"
         stroke="currentColor"
@@ -47,7 +41,7 @@ onMounted(() => {
       </svg>
       <!-- 电池图标 -->
       <svg
-        class="status-bar__icon status-bar__battery h-[10.5px] w-auto block opacity-85"
+        class="h-[10.5px] w-auto block opacity-85"
         viewBox="0 0 25 12"
         fill="none"
         stroke="currentColor"

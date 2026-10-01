@@ -10,10 +10,10 @@ defineProps<{ text: string }>()
 
 <template>
   <p
-    class="clean-badge flex items-center gap-2 mt-[18px] px-[13px] py-[11px] border border-dashed border-green-400/40 rounded-xl bg-green-400/10 text-xs leading-relaxed text-[#b9f5cd]"
+    class="flex items-center gap-2 mt-[18px] px-[13px] py-[11px] border border-dashed border-green-400/40 rounded-xl bg-green-400/10 text-xs leading-relaxed text-[#b9f5cd]"
   >
     <span
-      class="clean-badge__dot shrink-0 w-[7px] h-[7px] rounded-full bg-green-400 shadow-[0_0_0_3px_rgba(74,222,128,0.18)]"
+      class="shrink-0 w-[7px] h-[7px] rounded-full bg-green-400 shadow-[0_0_0_3px_rgba(74,222,128,0.18)]"
       aria-hidden="true"
     />
     {{ text }}

@@ -224,9 +224,9 @@ function onPointerDown(e: PointerEvent): void {
   // 如果在操作栏或评论抽屉中，不劫持
   const target = e.target as HTMLElement | null
   if (
-    target?.closest('.video-app__actions') ||
+    target?.closest('.actions-bar') ||
     target?.closest('.comments-drawer') ||
-    target?.closest('.video-app__nav')
+    target?.closest('.nav-header')
   ) {
     return
   }
@@ -414,7 +414,7 @@ const sampleComments = [
 
 <template>
   <div
-    class="video-app"
+    class="relative flex flex-col h-full w-full bg-black text-white overflow-hidden select-none touch-none"
     @pointerdown="onPointerDown"
     @pointermove="onPointerMove"
     @pointerup="onPointerUp"
@@ -422,78 +422,95 @@ const sampleComments = [
     @wheel.passive="handleWheel"
   >
     <!-- 顶部状态与分类导航 (固定在视口最上方) -->
-    <header class="video-app__nav">
-      <button type="button" class="video-app__live-btn" aria-label="直播入口">
-        <span class="live-dot" /> 直播
+    <header
+      class="nav-header absolute top-0 inset-x-0 z-30 flex items-center justify-between px-4 pt-10 pb-2 text-white/90"
+    >
+      <button
+        type="button"
+        class="flex items-center gap-1.5 text-xs text-white/75 bg-black/30 backdrop-blur-md px-2.5 py-1 rounded-full cursor-pointer"
+        aria-label="直播入口"
+      >
+        <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse" /> 直播
       </button>
-      <div class="video-app__tabs">
+      <div class="flex items-center gap-4 text-sm font-medium">
         <button
           type="button"
-          class="video-tab"
-          :class="{ 'is-active': activeTab === 'follow' }"
+          class="text-white/60 cursor-pointer pb-0.5 transition-all"
+          :class="{ '!text-white !font-bold border-b-2 border-white': activeTab === 'follow' }"
           @click="activeTab = 'follow'"
         >
           关注
         </button>
         <button
           type="button"
-          class="video-tab"
-          :class="{ 'is-active': activeTab === 'friends' }"
+          class="text-white/60 cursor-pointer pb-0.5 transition-all"
+          :class="{ '!text-white !font-bold border-b-2 border-white': activeTab === 'friends' }"
           @click="activeTab = 'friends'"
         >
           朋友
         </button>
         <button
           type="button"
-          class="video-tab"
-          :class="{ 'is-active': activeTab === 'recommend' }"
+          class="text-white/60 cursor-pointer pb-0.5 transition-all"
+          :class="{ '!text-white !font-bold border-b-2 border-white': activeTab === 'recommend' }"
           @click="activeTab = 'recommend'"
         >
           推荐
         </button>
       </div>
-      <button type="button" class="video-app__search-btn" aria-label="搜索">🔍</button>
+      <button type="button" class="text-sm text-white/80 cursor-pointer" aria-label="搜索">
+        🔍
+      </button>
     </header>
 
     <!-- 垂直视频轮播轨道 -->
-    <div class="video-feed-container">
-      <div class="video-slider-track" :style="trackStyle">
+    <div class="flex-1 relative overflow-hidden w-full h-full">
+      <div class="w-full h-full will-change-transform" :style="trackStyle">
         <div
           v-for="(v, idx) in videos"
           :key="v.id"
-          class="video-slide"
+          class="w-full h-full relative overflow-hidden flex flex-col justify-between"
           :style="{ background: v.gradient }"
-          :class="{ 'is-active': idx === currentIndex }"
           @click="handleStageClick"
         >
           <!-- 视频动态氛围背景 -->
-          <div class="stage-backdrop" :class="`stage-backdrop--${v.videoTheme}`">
-            <div class="stage-particles" aria-hidden="true" />
-            <div class="stage-graphic">
-              <span class="stage-emoji">{{ v.avatar }}</span>
-            </div>
+          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span class="text-9xl opacity-80 drop-shadow-2xl">{{ v.avatar }}</span>
           </div>
 
           <!-- 暂停播放状态图标 (仅当前激活视频) -->
-          <Transition name="fade-scale">
+          <Transition
+            enter-active-class="transition duration-150 ease-out"
+            enter-from-class="opacity-0 scale-75"
+            leave-active-class="transition duration-100 ease-in"
+            leave-to-class="opacity-0 scale-75"
+          >
             <div
               v-if="idx === currentIndex && !isPlaying"
-              class="stage-play-badge"
+              class="absolute inset-0 grid place-items-center z-10 pointer-events-none"
               aria-hidden="true"
             >
-              <span class="play-triangle">▶</span>
+              <span
+                class="w-16 h-16 rounded-full bg-black/40 backdrop-blur-md text-white text-3xl grid place-items-center pl-1"
+                >▶</span
+              >
             </div>
           </Transition>
 
           <!-- 右侧互动侧边操作栏 -->
-          <aside class="video-app__actions" aria-label="视频互动操作">
+          <aside
+            class="actions-bar absolute right-2.5 bottom-24 z-20 flex flex-col items-center gap-4 text-white"
+            aria-label="视频互动操作"
+          >
             <!-- 作者头像与关注 -->
-            <div class="action-item action-avatar">
-              <span class="avatar-face">{{ v.avatar }}</span>
+            <div
+              class="relative w-11 h-11 rounded-full border border-white/50 grid place-items-center text-2xl bg-white/10 mb-1"
+            >
+              <span>{{ v.avatar }}</span>
               <button
                 v-if="!v.followed"
                 type="button"
-                class="avatar-follow-btn"
+                class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-4.5 h-4.5 rounded-full bg-rose-500 text-white font-bold text-xs grid place-items-center cursor-pointer shadow-xs leading-none"
                 aria-label="关注作者"
                 @click.stop="v.followed = true"
               >
@@ -504,13 +521,14 @@ const sampleComments = [
             <!-- 点赞 -->
             <button
               type="button"
-              class="action-item"
-              :class="{ 'is-liked': v.liked }"
+              class="flex flex-col items-center gap-1 cursor-pointer"
               aria-label="点赞"
               @click.stop="handleLike(v)"
             >
-              <span class="action-icon action-icon--heart">{{ v.liked ? '❤️' : '🤍' }}</span>
-              <span class="action-count">{{
+              <span class="text-2xl drop-shadow-md transition-transform active:scale-125">{{
+                v.liked ? '❤️' : '🤍'
+              }}</span>
+              <span class="text-[10.5px] font-semibold text-white/90 drop-shadow-sm">{{
                 v.liked
                   ? v.likes > 10000
                     ? (v.likes / 10000).toFixed(1) + '万'
@@ -522,49 +540,77 @@ const sampleComments = [
             <!-- 评论 -->
             <button
               type="button"
-              class="action-item"
+              class="flex flex-col items-center gap-1 cursor-pointer"
               aria-label="评论"
               @click.stop="showComments = true"
             >
-              <span class="action-icon">💬</span>
-              <span class="action-count">{{ v.comments }}</span>
+              <span class="text-2xl drop-shadow-md">💬</span>
+              <span class="text-[10.5px] font-semibold text-white/90 drop-shadow-sm">{{
+                v.comments
+              }}</span>
             </button>
 
             <!-- 收藏 -->
             <button
               type="button"
-              class="action-item"
-              :class="{ 'is-collected': v.collected }"
+              class="flex flex-col items-center gap-1 cursor-pointer"
               aria-label="收藏"
               @click.stop="handleCollect(v)"
             >
-              <span class="action-icon">{{ v.collected ? '⭐️' : '☆' }}</span>
-              <span class="action-count">{{ v.collects }}</span>
+              <span class="text-2xl drop-shadow-md transition-transform active:scale-125">{{
+                v.collected ? '⭐️' : '☆'
+              }}</span>
+              <span class="text-[10.5px] font-semibold text-white/90 drop-shadow-sm">{{
+                v.collects
+              }}</span>
             </button>
 
             <!-- 分享 -->
-            <button type="button" class="action-item" aria-label="分享" @click.stop>
-              <span class="action-icon">↗</span>
-              <span class="action-count">{{ v.shares }}</span>
+            <button
+              type="button"
+              class="flex flex-col items-center gap-1 cursor-pointer"
+              aria-label="分享"
+              @click.stop
+            >
+              <span class="text-2xl drop-shadow-md">↗</span>
+              <span class="text-[10.5px] font-semibold text-white/90 drop-shadow-sm">{{
+                v.shares
+              }}</span>
             </button>
 
             <!-- 旋转黑胶唱片 -->
-            <div class="action-disc" :class="{ 'is-spinning': idx === currentIndex && isPlaying }">
-              <span class="disc-inner">🎵</span>
+            <div
+              class="w-10 h-10 rounded-full bg-stone-900 border-4 border-stone-800 grid place-items-center text-xs shadow-lg mt-1"
+              :class="{ 'animate-[spin_10s_linear_infinite]': idx === currentIndex && isPlaying }"
+            >
+              <span>🎵</span>
             </div>
           </aside>
 
           <!-- 底部视频信息与音乐条 -->
-          <div class="video-slide__bottom">
-            <div class="video-meta">
-              <strong class="meta-author">@{{ v.author }}</strong>
-              <p class="meta-desc">{{ v.desc }}</p>
-              <div class="meta-tags">
-                <span v-for="tag in v.tags" :key="tag" class="meta-tag">{{ tag }}</span>
+          <div class="absolute bottom-12 inset-x-0 z-20 px-4 pb-2 text-white">
+            <div class="flex flex-col gap-1 max-w-[78%]">
+              <strong class="text-sm font-bold [text-shadow:0_1px_4px_rgba(0,0,0,0.8)]"
+                >@{{ v.author }}</strong
+              >
+              <p
+                class="text-xs text-white/90 line-clamp-2 leading-relaxed [text-shadow:0_1px_4px_rgba(0,0,0,0.8)] m-0"
+              >
+                {{ v.desc }}
+              </p>
+              <div class="flex flex-wrap gap-1 mt-0.5">
+                <span
+                  v-for="tag in v.tags"
+                  :key="tag"
+                  class="text-[11px] font-medium text-white/80 [text-shadow:0_1px_3px_rgba(0,0,0,0.8)]"
+                  >{{ tag }}</span
+                >
               </div>
-              <div class="meta-music">
-                <span class="music-icon">🎵</span>
-                <span class="music-ticker">{{ v.music }}</span>
+              <div
+                class="flex items-center gap-1.5 mt-1 text-[11px] text-white/75 overflow-hidden [text-shadow:0_1px_3px_rgba(0,0,0,0.8)]"
+              >
+                <span>🎵</span>
+                <span class="truncate">{{ v.music }}</span>
               </div>
             </div>
           </div>
@@ -576,730 +622,117 @@ const sampleComments = [
     <div
       v-for="heart in floatingHearts"
       :key="heart.id"
-      class="floating-heart"
+      class="absolute -translate-x-1/2 -translate-y-1/2 text-4xl pointer-events-none animate-ping z-40"
       :style="{ left: `${heart.x}px`, top: `${heart.y}px` }"
     >
       ❤️
     </div>
 
-    <!-- 上下滑动提示浮标 (初次进入或轻提示) -->
-    <Transition name="fade">
-      <div v-if="showSwipeGuide" class="swipe-guide" @click="showSwipeGuide = false">
-        <span class="swipe-guide__icon">⇅</span>
-        <span class="swipe-guide__text">上下滑动切换视频</span>
+    <!-- 上下滑动提示浮标 -->
+    <Transition
+      enter-active-class="transition-opacity duration-200 ease-out"
+      enter-from-class="opacity-0"
+      leave-active-class="transition-opacity duration-200 ease-in"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="showSwipeGuide"
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full text-xs text-white z-40 flex items-center gap-1.5 pointer-events-none"
+        @click="showSwipeGuide = false"
+      >
+        <span>⇅</span>
+        <span>上下滑动切换视频</span>
       </div>
     </Transition>
 
     <!-- 固定在屏幕底部的控制区与进度条 -->
-    <div class="video-app__fixed-footer">
-      <div class="video-progress-bar">
-        <div class="progress-fill" :style="{ width: `${progress}%` }" />
+    <div
+      class="absolute bottom-0 inset-x-0 z-30 flex flex-col bg-gradient-to-t from-black/80 to-transparent pb-1 pt-4"
+    >
+      <div class="h-[2px] bg-white/20 w-full">
+        <div
+          class="h-full bg-white transition-all duration-100"
+          :style="{ width: `${progress}%` }"
+        />
       </div>
 
       <!-- 快速切换上一条 / 下一条按钮 -->
-      <div class="video-switch-controls">
-        <button type="button" class="switch-btn" aria-label="上一条视频" @click.stop="prevVideo">
+      <div class="flex justify-between items-center px-4 py-1.5 text-xs text-white/60">
+        <button
+          type="button"
+          class="px-2.5 py-1 rounded-full bg-white/10 text-white/80 hover:bg-white/20 active:scale-95 cursor-pointer text-[11px]"
+          aria-label="上一条视频"
+          @click.stop="prevVideo"
+        >
           ∧ 上一条
         </button>
-        <span class="switch-count">{{ currentIndex + 1 }} / {{ videos.length }}</span>
-        <button type="button" class="switch-btn" aria-label="下一条视频" @click.stop="nextVideo">
+        <span class="text-[11px] font-mono">{{ currentIndex + 1 }} / {{ videos.length }}</span>
+        <button
+          type="button"
+          class="px-2.5 py-1 rounded-full bg-white/10 text-white/80 hover:bg-white/20 active:scale-95 cursor-pointer text-[11px]"
+          aria-label="下一条视频"
+          @click.stop="nextVideo"
+        >
           ∨ 下一条
         </button>
       </div>
     </div>
 
     <!-- 评论半屏抽屉弹窗 -->
-    <Transition name="drawer">
+    <Transition
+      enter-active-class="transition duration-250 ease-out"
+      enter-from-class="translate-y-full opacity-0"
+      leave-active-class="transition duration-200 ease-in"
+      leave-to-class="translate-y-full opacity-0"
+    >
       <div
         v-if="showComments"
-        class="comments-drawer"
+        class="comments-drawer absolute inset-x-0 bottom-0 h-[65%] rounded-t-3xl bg-slate-900/95 backdrop-blur-xl text-white z-50 flex flex-col p-4 shadow-2xl"
         role="dialog"
         aria-modal="true"
         aria-label="视频评论"
       >
-        <div class="drawer-header">
-          <span class="drawer-title">全部评论 ({{ currentVideo.comments }})</span>
+        <div class="flex justify-between items-center pb-3 border-b border-white/10">
+          <span class="text-sm font-semibold">全部评论 ({{ currentVideo.comments }})</span>
           <button
             type="button"
-            class="drawer-close"
+            class="w-7 h-7 rounded-full bg-white/10 grid place-items-center text-xs text-gray-300 cursor-pointer"
             aria-label="关闭评论"
             @click="showComments = false"
           >
             ✕
           </button>
         </div>
-        <div class="drawer-list">
-          <div v-for="c in sampleComments" :key="c.id" class="comment-card">
-            <span class="comment-avatar">👤</span>
-            <div class="comment-body">
-              <div class="comment-user-row">
-                <span class="comment-user">{{ c.user }}</span>
-                <span class="comment-time">{{ c.time }}</span>
+        <div class="flex-1 my-2 overflow-y-auto flex flex-col gap-3 phone-scroll">
+          <div v-for="c in sampleComments" :key="c.id" class="flex gap-2.5 items-start">
+            <span class="text-xl">👤</span>
+            <div class="flex-1 flex flex-col">
+              <div class="flex justify-between text-xs text-gray-400">
+                <span>{{ c.user }}</span>
+                <span>{{ c.time }}</span>
               </div>
-              <p class="comment-text">{{ c.text }}</p>
-              <div class="comment-actions">
+              <p class="text-xs text-white/90 my-1 leading-relaxed">{{ c.text }}</p>
+              <div class="flex items-center gap-3 text-[10px] text-gray-400">
                 <span>❤️ {{ c.likes }}</span>
-                <span class="comment-reply">回复</span>
+                <span class="cursor-pointer hover:text-white">回复</span>
               </div>
             </div>
           </div>
         </div>
-        <div class="drawer-input-row">
-          <input type="text" class="drawer-input" placeholder="发条友善的评论吧…" />
-          <button type="button" class="drawer-send-btn">发送</button>
+        <div class="pt-2 border-t border-white/10 flex gap-2">
+          <input
+            type="text"
+            class="flex-1 h-9 px-3 rounded-full bg-white/10 text-xs text-white placeholder-gray-400 border border-white/10 outline-none"
+            placeholder="发条友善的评论吧…"
+          />
+          <button
+            type="button"
+            class="px-4 h-9 rounded-full bg-rose-600 text-white text-xs font-semibold cursor-pointer active:bg-rose-700"
+          >
+            发送
+          </button>
         </div>
       </div>
     </Transition>
   </div>
 </template>
-
-<style scoped>
-.video-app {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  color: #ffffff;
-  overflow: hidden;
-  user-select: none;
-  touch-action: pan-x;
-  background: #000000;
-}
-
-/* 顶部导航 */
-.video-app__nav {
-  position: absolute;
-  top: 8px;
-  left: 0;
-  right: 0;
-  z-index: 30;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
-  pointer-events: auto;
-}
-
-.video-app__live-btn,
-.video-app__search-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.85);
-  font-weight: 500;
-  cursor: pointer;
-  background: none;
-  border: none;
-}
-
-.live-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #ff2b55;
-  box-shadow: 0 0 6px #ff2b55;
-}
-
-.video-app__tabs {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.video-tab {
-  position: relative;
-  font-size: 14.5px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.65);
-  cursor: pointer;
-  background: none;
-  border: none;
-  transition: all 0.15s ease;
-}
-
-.video-tab.is-active {
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 15.5px;
-}
-
-.video-tab.is-active::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 18px;
-  height: 2.5px;
-  border-radius: 999px;
-  background: #ffffff;
-}
-
-/* 轮播流容器与滑轨 */
-.video-feed-container {
-  flex: 1;
-  position: relative;
-  height: 100%;
-  overflow: hidden;
-}
-
-.video-slider-track {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  will-change: transform;
-}
-
-/* 单个视频卡片 Slide */
-.video-slide {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  flex: 0 0 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  overflow: hidden;
-  cursor: grab;
-}
-
-.video-slide:active {
-  cursor: grabbing;
-}
-
-/* 舞台背景与氛围 */
-.stage-backdrop {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-size: cover;
-  background-position: center;
-  pointer-events: none;
-}
-
-.stage-particles {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  background-size: 24px 24px;
-  opacity: 0.6;
-}
-
-.stage-graphic {
-  display: grid;
-  place-items: center;
-  width: 140px;
-  height: 140px;
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.07);
-  box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
-  backdrop-filter: blur(8px);
-}
-
-.stage-emoji {
-  font-size: 64px;
-  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
-  animation: float-pulse 3s ease-in-out infinite;
-}
-
-@keyframes float-pulse {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    transform: translateY(-8px) scale(1.05);
-  }
-}
-
-.stage-play-badge {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: grid;
-  place-items: center;
-  width: 68px;
-  height: 68px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
-  z-index: 10;
-  pointer-events: none;
-}
-
-.play-triangle {
-  font-size: 26px;
-  margin-left: 5px;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-/* 右侧操作栏 */
-.video-app__actions {
-  position: absolute;
-  right: 12px;
-  bottom: 85px;
-  z-index: 20;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-  pointer-events: auto;
-}
-
-.action-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  cursor: pointer;
-  background: none;
-  border: none;
-  color: #ffffff;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
-}
-
-.action-avatar {
-  position: relative;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  display: grid;
-  place-items: center;
-  font-size: 22px;
-  box-shadow: 0 0 0 1.5px #ffffff;
-  margin-bottom: 4px;
-}
-
-.avatar-follow-btn {
-  position: absolute;
-  bottom: -6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #ff2b55;
-  color: #ffffff;
-  font-size: 13px;
-  line-height: 16px;
-  font-weight: 700;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  border: 1.5px solid #ffffff;
-}
-
-.action-icon {
-  font-size: 27px;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
-  transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.action-item:active .action-icon {
-  transform: scale(0.85);
-}
-
-.action-item.is-liked .action-icon--heart {
-  transform: scale(1.1);
-  filter: drop-shadow(0 2px 8px rgba(255, 43, 85, 0.8));
-}
-
-.action-count {
-  font-size: 11px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.action-disc {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-  border: 4px solid #374151;
-  display: grid;
-  place-items: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
-  margin-top: 4px;
-}
-
-.action-disc.is-spinning {
-  animation: rotate-disc 6s linear infinite;
-}
-
-.disc-inner {
-  font-size: 14px;
-}
-
-@keyframes rotate-disc {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* 底部视频信息 */
-.video-slide__bottom {
-  position: relative;
-  z-index: 15;
-  padding: 0 76px 78px 16px;
-  background: linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.85) 0%,
-    rgba(0, 0, 0, 0.4) 60%,
-    transparent 100%
-  );
-  pointer-events: none;
-}
-
-.video-meta {
-  pointer-events: auto;
-}
-
-.meta-author {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-
-.meta-desc {
-  margin: 5px 0 6px;
-  font-size: 12.5px;
-  line-height: 1.45;
-  color: rgba(255, 255, 255, 0.92);
-}
-
-.meta-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 7px;
-}
-
-.meta-tag {
-  font-size: 11.5px;
-  color: #ffd54a;
-  font-weight: 500;
-}
-
-.meta-music {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11.5px;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.music-ticker {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 200px;
-}
-
-/* 固定底部控制栏与进度条 */
-.video-app__fixed-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 25;
-  padding: 0 16px 10px;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
-  pointer-events: auto;
-}
-
-.video-progress-bar {
-  height: 2.5px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.2);
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.85);
-  transition: width 0.1s linear;
-}
-
-.video-switch-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  margin-top: 8px;
-}
-
-.switch-btn {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.65);
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  cursor: pointer;
-  border: none;
-  transition: all 0.15s ease;
-}
-
-.switch-btn:active {
-  background: rgba(255, 255, 255, 0.3);
-  color: #ffffff;
-}
-
-.switch-count {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
-  font-variant-numeric: tabular-nums;
-}
-
-/* 滑动引导浮标 */
-.swipe-guide {
-  position: absolute;
-  top: 48%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 28;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 18px;
-  background: rgba(0, 0, 0, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-  backdrop-filter: blur(12px);
-  pointer-events: none;
-  animation: pulse-guide 2.5s ease-in-out infinite;
-}
-
-.swipe-guide__icon {
-  font-size: 18px;
-  animation: bounce-y 1.4s ease-in-out infinite;
-}
-
-.swipe-guide__text {
-  font-size: 11.5px;
-  color: rgba(255, 255, 255, 0.85);
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-@keyframes bounce-y {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-@keyframes pulse-guide {
-  0%,
-  100% {
-    opacity: 0.9;
-  }
-  50% {
-    opacity: 0.6;
-  }
-}
-
-/* 双击漂浮爱心 */
-.floating-heart {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  font-size: 64px;
-  z-index: 40;
-  pointer-events: none;
-  animation: float-heart 0.75s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  filter: drop-shadow(0 4px 14px rgba(255, 43, 85, 0.7));
-}
-
-@keyframes float-heart {
-  0% {
-    transform: translate(-50%, -50%) scale(0.3) rotate(-15deg);
-    opacity: 0;
-  }
-  40% {
-    transform: translate(-50%, -50%) scale(1.3) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-50%, -100px) scale(1) rotate(15deg);
-    opacity: 0;
-  }
-}
-
-/* 评论半屏抽屉 */
-.comments-drawer {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 70%;
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  background: #181d26;
-  border-radius: 18px 18px 0 0;
-  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.7);
-  padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
-}
-
-.drawer-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-
-.drawer-title {
-  font-size: 13.5px;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.drawer-close {
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 12px;
-  cursor: pointer;
-  border: none;
-}
-
-.drawer-list {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.comment-card {
-  display: flex;
-  gap: 10px;
-}
-
-.comment-avatar {
-  font-size: 22px;
-  flex: none;
-}
-
-.comment-body {
-  flex: 1;
-}
-
-.comment-user-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-}
-
-.comment-user {
-  color: rgba(255, 255, 255, 0.55);
-  font-weight: 600;
-}
-
-.comment-time {
-  color: rgba(255, 255, 255, 0.35);
-}
-
-.comment-text {
-  margin: 3px 0 4px;
-  font-size: 12px;
-  line-height: 1.45;
-  color: #f1f5f9;
-}
-
-.comment-actions {
-  display: flex;
-  gap: 14px;
-  font-size: 10.5px;
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.comment-reply {
-  color: #60a5fa;
-  cursor: pointer;
-}
-
-.drawer-input-row {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.drawer-input {
-  flex: 1;
-  height: 36px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #ffffff;
-  font-size: 12px;
-}
-
-.drawer-input::placeholder {
-  color: rgba(255, 255, 255, 0.35);
-}
-
-.drawer-send-btn {
-  padding: 0 14px;
-  border-radius: 999px;
-  background: #ff2b55;
-  color: #ffffff;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-}
-
-/* 过渡动画 */
-.drawer-enter-active,
-.drawer-leave-active {
-  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.drawer-enter-from,
-.drawer-leave-to {
-  transform: translateY(100%);
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.fade-scale-enter-active,
-.fade-scale-leave-active {
-  transition: all 0.2s ease;
-}
-
-.fade-scale-enter-from,
-.fade-scale-leave-to {
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.7);
-}
-</style>

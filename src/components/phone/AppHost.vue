@@ -41,17 +41,16 @@ const isBleedApp = computed(() =>
 </script>
 
 <template>
-  <div class="app-host relative flex flex-col h-full" :class="`app-host--${app.id}`">
+  <div class="relative flex flex-col h-full">
     <header
-      class="app-host__bar flex items-center justify-between flex-none gap-2 px-3.5 pt-0.5 pb-2 z-30"
+      class="flex items-center justify-between flex-none gap-2 px-3.5 pt-0.5 pb-2 z-30"
       :class="{
-        'app-host__bar--overlay !absolute top-0 inset-x-0 bg-transparent pointer-events-none':
-          app.id === 'video',
+        '!absolute top-0 inset-x-0 bg-transparent pointer-events-none': app.id === 'video',
       }"
     >
       <button
         type="button"
-        class="app-host__back inline-flex items-center gap-[3px] min-h-[40px] px-1.5 text-[13px] font-medium text-[rgba(242,244,248,0.85)] cursor-pointer"
+        class="inline-flex items-center gap-[3px] min-h-[40px] px-1.5 text-[13px] font-medium text-[rgba(242,244,248,0.85)] cursor-pointer"
         :class="{
           'pointer-events-auto bg-black/45 rounded-full backdrop-blur-md px-2.5 min-h-[32px] mt-1':
             app.id === 'video',
@@ -60,25 +59,22 @@ const isBleedApp = computed(() =>
       >
         <span aria-hidden="true">‹</span> 主屏
       </button>
-      <span class="app-host__title text-[14px] font-semibold text-white">{{
+      <span class="text-[14px] font-semibold text-white">{{
         app.id === 'video' ? '' : app.name
       }}</span>
-      <span class="app-host__spacer w-[52px]" aria-hidden="true" />
+      <span class="w-[52px]" aria-hidden="true" />
     </header>
 
     <div
-      class="app-host__body flex-1 min-h-0 px-[18px] pb-[80px]"
+      class="flex-1 min-h-0 px-[18px] pb-[80px]"
       :class="{
-        'app-host__body--immersive !p-0 flex flex-col overflow-hidden': isImmersiveApp,
-        'app-host__body--bleed !p-0 flex flex-col': isBleedApp,
+        '!p-0 flex flex-col overflow-hidden': isImmersiveApp,
+        '!p-0 flex flex-col': isBleedApp,
         'phone-scroll': !isImmersiveApp && !isBleedApp,
       }"
     >
       <component :is="view" v-if="view" />
-      <p
-        v-else
-        class="app-host__missing mt-10 text-center text-[13px] text-[rgba(242,244,248,0.5)]"
-      >
+      <p v-else class="mt-10 text-center text-[13px] text-[rgba(242,244,248,0.5)]">
         这个应用还没做。
       </p>
     </div>

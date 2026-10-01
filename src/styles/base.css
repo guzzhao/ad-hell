@@ -1,8 +1,3 @@
-/**
- * 全局基础样式：重置、设计变量、页面底噪。
- * 手机视口与样机相关样式在 phone.css。
- */
-
 @import 'tailwindcss';
 
 @theme {
@@ -20,21 +15,15 @@
 }
 
 :root {
-  /* 页面（手机之外）的底色 */
   --page-bg: #0b0d11;
   --page-bg-2: #151a24;
-
   --ink: #e8eaef;
   --ink-dim: #98a0b0;
   --ink-faint: #5d6675;
-
   --accent: #ff4d3d;
 
-  /* 手机逻辑尺寸：必须与 src/constants.ts 的 PHONE_W / PHONE_H 保持一致 */
   --phone-w-px: 390px;
   --phone-h-px: 844px;
-
-  /* 桌面样机缩放系数，由 useShellScale 写入 */
   --shell-scale: 1;
 
   --font-sans:
@@ -62,7 +51,6 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  /* 沉浸式演示页：禁止页面本身滚动与橡皮筋，滚动手势留给真相长页 */
   overflow: hidden;
   overscroll-behavior: none;
 }
@@ -77,15 +65,274 @@ button {
   border: none;
   background: none;
   cursor: pointer;
-  /* 弹窗上的关闭键故意做得很小，这里不设最小尺寸 —— 这正是要表现的陷阱 */
   -webkit-tap-highlight-color: transparent;
 }
 
-/**
- * 尊重系统的"减少动态效果"。
- * 这里统一压掉 CSS 过渡与动画；GSAP 驱动的位移另由组件按 store 的
- * reducedMotion 标志跳过（CSS 管不到 JS 内联样式）。
- */
+/* 手机壳与视口基础设施 */
+.device-shell {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 50% 0%, var(--page-bg-2) 0%, var(--page-bg) 60%), var(--page-bg);
+}
+
+.device-shell__stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.device-frame {
+  position: relative;
+  width: var(--phone-w-px);
+  height: var(--phone-h-px);
+  transform: scale(var(--shell-scale));
+  transform-origin: center center;
+}
+
+.device-frame::before {
+  content: '';
+  position: absolute;
+  inset: -14px;
+  border-radius: 62px;
+  background: linear-gradient(160deg, #3a4150 0%, #171b23 42%, #2a303c 100%);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 40px 90px -20px rgba(0, 0, 0, 0.85),
+    0 0 120px -30px rgba(120, 160, 255, 0.18);
+  z-index: 0;
+}
+
+.device-frame__notch {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 108px;
+  height: 26px;
+  border-radius: 999px;
+  background: #05070a;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.device-frame__motion {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 46px;
+  overflow: hidden;
+  will-change: transform, filter;
+}
+
+@media (max-width: 767px) {
+  .device-frame {
+    width: 100%;
+    height: 100%;
+    transform: none;
+  }
+  .device-frame::before,
+  .device-frame__notch {
+    display: none;
+  }
+  .device-frame__motion {
+    border-radius: 0;
+  }
+}
+
+.phone-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 90% 60% at 85% 15%, rgba(99, 102, 241, 0.45) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 50% at 15% 75%, rgba(236, 72, 153, 0.35) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 60% at 65% 85%, rgba(56, 189, 248, 0.3) 0%, transparent 70%),
+    linear-gradient(175deg, #0d1222 0%, #151d33 45%, #080c16 100%);
+  color: #f2f4f8;
+  isolation: isolate;
+}
+
+.phone-screen__body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.phone-scroll {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 广告高光扫光与通用徽标 */
+.creative-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.creative-sheen::after {
+  content: '';
+  position: absolute;
+  top: -60%;
+  bottom: -60%;
+  left: 0;
+  width: 42%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.16) 45%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0.16) 55%,
+    transparent 100%
+  );
+  transform: translateX(-160%) rotate(8deg);
+  animation: creative-sheen-sweep 5200ms ease-in-out infinite;
+}
+
+.creative-badge {
+  display: inline-block;
+  flex: none;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--ad-accent);
+  color: #14161a;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* 常用动画关键帧统一管理 */
+@keyframes creative-sheen-sweep {
+  0%,
+  14% {
+    transform: translateX(-160%) rotate(8deg);
+  }
+  64%,
+  100% {
+    transform: translateX(360%) rotate(8deg);
+  }
+}
+
+@keyframes phone-shake-tilt {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-18deg);
+  }
+  40% {
+    transform: rotate(18deg);
+  }
+  60% {
+    transform: rotate(-12deg);
+  }
+  80% {
+    transform: rotate(12deg);
+  }
+}
+
+@keyframes call-pulse {
+  0% {
+    transform: scale(0.88);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+@keyframes wave-bounce {
+  0%,
+  100% {
+    transform: scaleY(0.4);
+  }
+  50% {
+    transform: scaleY(1.1);
+  }
+}
+
+@keyframes accept-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(22, 163, 74, 0);
+  }
+}
+
+@keyframes laser-scan {
+  0% {
+    top: 0;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+.ad-enter-active {
+  animation: ad-pop-in 240ms cubic-bezier(0.2, 1.35, 0.4, 1) both;
+}
+
+.ad-leave-active {
+  animation: ad-pop-out 150ms ease-in both;
+}
+
+@keyframes ad-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes ad-pop-out {
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+.takeover-enter-active {
+  animation: takeover-in 200ms ease-out both;
+}
+
+.takeover-leave-active {
+  animation: takeover-out 220ms ease-in both;
+}
+
+@keyframes takeover-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes takeover-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* 动效偏好回退 */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -94,5 +341,9 @@ button {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+  }
+  .creative-sheen::after {
+    animation: none;
+    opacity: 0;
   }
 }
