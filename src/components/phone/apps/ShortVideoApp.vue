@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
+const emit = defineEmits<{ back: [] }>()
+
 interface VideoItem {
   id: number
   author: string
@@ -279,7 +281,17 @@ function onPointerUp(e: PointerEvent): void {
 
   const elapsed = Date.now() - startTime
   const dy = dragOffsetY.value
+  const dx = e.clientX - startX
   const absDy = Math.abs(dy)
+  const absDx = Math.abs(dx)
+
+  // 手机左边缘向右滑动返回手势
+  if (hasMoved && startX < 50 && dx > 50 && absDx > absDy * 1.4) {
+    emit('back')
+    dragOffsetY.value = 0
+    return
+  }
+
   const isFlick = elapsed < 320 && absDy > 35
   const isDragFar = absDy > 70
 
@@ -423,14 +435,16 @@ const sampleComments = [
   >
     <!-- 顶部状态与分类导航 (固定在视口最上方) -->
     <header
-      class="nav-header absolute top-0 inset-x-0 z-30 flex items-center justify-between px-4 pt-10 pb-2 text-white/90"
+      class="nav-header absolute top-0 inset-x-0 z-30 flex items-center justify-between px-3.5 pt-2 pb-2 text-white/90"
     >
       <button
         type="button"
-        class="flex items-center gap-1.5 text-xs text-white/75 bg-black/30 backdrop-blur-md px-2.5 py-1 rounded-full cursor-pointer"
-        aria-label="直播入口"
+        class="inline-flex items-center gap-1 min-h-[32px] px-2.5 text-[12px] font-medium text-white/90 bg-black/45 rounded-full backdrop-blur-md cursor-pointer hover:bg-black/65 active:scale-95 transition-all"
+        aria-label="返回主屏"
+        @click="emit('back')"
       >
-        <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse" /> 直播
+        <span aria-hidden="true" class="text-sm font-bold leading-none">‹</span>
+        <span>主屏</span>
       </button>
       <div class="flex items-center gap-4 text-sm font-medium">
         <button

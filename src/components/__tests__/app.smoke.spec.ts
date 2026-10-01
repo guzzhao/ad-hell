@@ -97,6 +97,32 @@ describe('App 冒烟测试', () => {
     wrapper.unmount()
   })
 
+  it('打开短视频应用后能够返回主屏', async () => {
+    const wrapper = mount(App)
+    const storm = useStormStore()
+    await nextTick()
+
+    // 找到短视频图标并点击
+    const videoBtn = wrapper.findAll('button').find((b) => b.text().includes('短视频'))
+    expect(videoBtn?.exists()).toBe(true)
+    await videoBtn!.trigger('click')
+    await nextTick()
+
+    // 关闭可能弹出的开屏广告
+    storm.closeAllAds()
+    await nextTick()
+
+    const backBtn = wrapper.findAll('button').find((b) => b.text().includes('主屏'))
+    expect(backBtn?.exists()).toBe(true)
+    await backBtn!.trigger('click')
+    await nextTick()
+
+    expect(wrapper.text()).toContain('短视频')
+    expect(wrapper.findComponent({ name: 'HomeGrid' }).exists()).toBe(true)
+
+    wrapper.unmount()
+  })
+
   it('逃生通道始终在位：常驻「结束体验」按钮', async () => {
     const wrapper = mount(App)
     // phase 在 onMounted 里才被置为 storm，DOM 更新要等一个 tick

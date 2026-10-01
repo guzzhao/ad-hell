@@ -43,25 +43,17 @@ const isBleedApp = computed(() =>
 <template>
   <div class="relative flex flex-col h-full">
     <header
+      v-if="app.id !== 'video'"
       class="flex items-center justify-between flex-none gap-2 px-3.5 pt-0.5 pb-2 z-30"
-      :class="{
-        '!absolute top-0 inset-x-0 bg-transparent pointer-events-none': app.id === 'video',
-      }"
     >
       <button
         type="button"
         class="inline-flex items-center gap-[3px] min-h-[40px] px-1.5 text-[13px] font-medium text-[rgba(242,244,248,0.85)] cursor-pointer"
-        :class="{
-          'pointer-events-auto bg-black/45 rounded-full backdrop-blur-md px-2.5 min-h-[32px] mt-1':
-            app.id === 'video',
-        }"
         @click="emit('back')"
       >
         <span aria-hidden="true">‹</span> 主屏
       </button>
-      <span class="text-[14px] font-semibold text-white">{{
-        app.id === 'video' ? '' : app.name
-      }}</span>
+      <span class="text-[14px] font-semibold text-white">{{ app.name }}</span>
       <span class="w-[52px]" aria-hidden="true" />
     </header>
 
@@ -73,7 +65,7 @@ const isBleedApp = computed(() =>
         'phone-scroll': !isImmersiveApp && !isBleedApp,
       }"
     >
-      <component :is="view" v-if="view" />
+      <component :is="view" v-if="view" @back="emit('back')" />
       <p v-else class="mt-10 text-center text-[13px] text-[rgba(242,244,248,0.5)]">
         这个应用还没做。
       </p>
