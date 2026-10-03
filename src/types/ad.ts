@@ -22,7 +22,14 @@ export type CloseVariant =
   | 'none'
 
 /** 广告素材的版式。 */
-export type AdLayout = 'banner' | 'interstitial' | 'splash' | 'floating' | 'fakeCall' | 'callPage'
+export type AdLayout =
+  | 'banner'
+  | 'interstitial'
+  | 'splash'
+  | 'floating'
+  | 'fakeCall'
+  | 'callPage'
+  | 'quickApp'
 
 /**
  * 广告的呈现面：它由哪一层渲染。

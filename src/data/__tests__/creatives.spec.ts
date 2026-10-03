@@ -123,12 +123,11 @@ describe('反转对照的两个分区', () => {
     )
   })
 
-  it('B 类（现实中广告泛滥）至少 2 个，且每个都带点题说明', () => {
+  it('B 类（现实中广告泛滥）至少 2 个，且每个都带有商业广告攻陷说明', () => {
     const commercial = appsByCategory('commercial')
     expect(commercial.length).toBeGreaterThanOrEqual(2)
     for (const app of commercial) {
       expect(app.note).toBeTruthy()
-      expect(app.note).toContain('一个广告都没有')
     }
   })
 

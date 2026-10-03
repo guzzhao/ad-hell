@@ -28,37 +28,37 @@ export const APPS: readonly AppMeta[] = [
     id: 'alipay',
     name: '支付宝',
     category: 'commercial',
-    note: '这里一个广告都没有。',
+    note: '花呗免息与现金红包轰炸',
   },
   {
     id: 'video',
     name: '短视频',
     category: 'commercial',
-    note: '这里一个广告都没有。',
+    note: '直播带货与小黄车穿插',
   },
   {
     id: 'shop',
     name: '购物',
     category: 'commercial',
-    note: '这里也一个广告都没有。',
+    note: '888元新人礼包与赞助商推荐',
   },
   {
     id: 'music',
     name: '音乐',
     category: 'commercial',
-    note: '这里一个广告都没有。',
+    note: 'VIP HiFi 升级与有声书推广',
   },
   {
     id: 'bank',
     name: '手机银行',
     category: 'commercial',
-    note: '这里一个广告都没有。',
+    note: '30万大额信用贷与存款抽奖',
   },
 ]
 
 export const HOME_GROUP_TITLES = {
-  system: '本来就该干干净净的',
-  commercial: '平时广告最多的',
+  system: '系统工具（广告渗透）',
+  commercial: '常用应用（商业广告）',
 } as const
 
 export function appsByCategory(category: AppMeta['category']): AppMeta[] {

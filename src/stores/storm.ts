@@ -1,6 +1,8 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { AdInstance, AdTrigger, CloseOutcome, StormPhase } from '@/types/ad'
+import type { AdCreative, AdInstance, AdTrigger, CloseOutcome, StormPhase } from '@/types/ad'
+import type { LandingTarget } from '@/data/landing'
+import { resolveLandingTarget } from '@/data/landing'
 import { CREATIVES, findCreative } from '@/data/creatives'
 import { BEATS } from '@/data/beats'
 import { misclickPenalty, resolveClose } from '@/engine/close'
@@ -46,6 +48,8 @@ export const useStormStore = defineStore('storm', () => {
   const misclickCount = ref(0)
   const reducedMotion = ref(false)
   const landingOpen = ref(false)
+  const currentLanding = ref<LandingTarget>(resolveLandingTarget('loan-fast'))
+  const activeAppId = ref<string | null>(null)
   /** 静音偏好。与"减少动态效果"无关——动效偏好不蕴含声音偏好。 */
   const muted = ref(false)
   /**
@@ -60,9 +64,9 @@ export const useStormStore = defineStore('storm', () => {
   const explorationMode = ref<'manual' | 'auto'>('manual')
   /**
    * 全局广告展示开关：
-   * 当前阶段打磨手机系统与原生应用界面，完全关闭广告展示；广告组件均保留供后续开启。
+   * 开启后展示各 App 内的原生场景化广告与交互触发广告。
    */
-  const adsEnabled = ref(false)
+  const adsEnabled = ref(true)
 
   // ── 非响应式的内部记账 ───────────────────────────────────
   let rng: () => number = mulberry32(DEFAULT_SEED)
@@ -113,13 +117,14 @@ export const useStormStore = defineStore('storm', () => {
     spawnedCount.value = 0
     misclickCount.value = 0
     landingOpen.value = false
+    activeAppId.value = null
     audioBlocked.value = false
   }
 
   function start(
     seed: number = DEFAULT_SEED,
     mode: 'manual' | 'auto' = 'auto',
-    enableAds: boolean = mode === 'auto',
+    enableAds: boolean = true,
   ): void {
     reset(seed)
     explorationMode.value = mode
@@ -222,9 +227,12 @@ export const useStormStore = defineStore('storm', () => {
     }
 
     switch (appId) {
-      case 'shop':
-        spawnTargeted('splash-mall')
+      case 'shop': {
+        const shopAds = ['splash-mall', 'shop-speed', 'shop-bargain']
+        const pick = shopAds[Math.floor(rng() * shopAds.length)] ?? 'splash-mall'
+        spawnTargeted(pick)
         break
+      }
       case 'video':
         spawnTargeted('splash-video')
         break
@@ -243,9 +251,12 @@ export const useStormStore = defineStore('storm', () => {
       case 'settings':
         spawnTargeted('fake-system')
         break
-      case 'messages':
-        spawnTargeted('shop-99')
+      case 'messages': {
+        const msgAds = ['shop-99', 'shop-factory', 'shop-luxury']
+        const pick = msgAds[Math.floor(rng() * msgAds.length)] ?? 'shop-99'
+        spawnTargeted(pick)
         break
+      }
     }
   }
 
@@ -362,6 +373,7 @@ export const useStormStore = defineStore('storm', () => {
       closedCount.value += 1
     } else if (outcome.kind === 'misclick') {
       misclickCount.value += 1
+      currentLanding.value = resolveLandingTarget(ad.creativeId)
       landingOpen.value = true
       applyPenalty(outcome.extraAds)
     }
@@ -369,11 +381,45 @@ export const useStormStore = defineStore('storm', () => {
   }
 
   /**
-   * 点击弹窗**主体**（不是关闭键）。
-   * 真实广告里这同样是"误触跳转"，因此与假关闭键等价。
+   * 打开指定应用。
    */
-  function tapAdBody(): void {
+  function openApp(appId: string): void {
+    activeAppId.value = appId
+    if (adsEnabled.value) {
+      triggerAppAd(appId)
+    }
+  }
+
+  /**
+   * 关闭当前打开的应用，返回主屏。
+   */
+  function closeApp(): void {
+    activeAppId.value = null
+    if (explorationMode.value === 'manual') {
+      ads.value = []
+    }
+  }
+
+  /**
+   * 打开落地页，并精准定位目标广告品类。
+   */
+  function openLanding(landingTarget?: string | AdCreative | LandingTarget): void {
+    currentLanding.value = resolveLandingTarget(
+      landingTarget ?? ads.value[ads.value.length - 1]?.creativeId,
+    )
+    landingOpen.value = true
+  }
+
+  /**
+   * 点击弹窗**主体**或应用内广告（不是关闭键）。
+   * 真实广告里这同样是"误触跳转"，因此与假关闭键等价。
+   * 支持传入具体 landingTarget / creativeId / creative，让跳转目标严格符合广告品类。
+   */
+  function tapAdBody(landingTarget?: string | AdCreative | LandingTarget): void {
     misclickCount.value += 1
+    currentLanding.value = resolveLandingTarget(
+      landingTarget ?? ads.value[ads.value.length - 1]?.creativeId,
+    )
     landingOpen.value = true
     applyPenalty(misclickPenalty(rng()))
   }
@@ -417,6 +463,7 @@ export const useStormStore = defineStore('storm', () => {
 
     // 与点假关闭键、点广告主体同罪：屏幕上多出 2~4 个弹窗
     misclickCount.value += 1
+    currentLanding.value = resolveLandingTarget(ad.creativeId)
     landingOpen.value = true
     applyPenalty(misclickPenalty(rng()))
   }
@@ -448,6 +495,8 @@ export const useStormStore = defineStore('storm', () => {
     misclickCount,
     reducedMotion,
     landingOpen,
+    currentLanding,
+    activeAppId,
     muted,
     audioBlocked,
     explorationMode,
@@ -464,6 +513,9 @@ export const useStormStore = defineStore('storm', () => {
     // 动作
     start,
     restart,
+    openApp,
+    closeApp,
+    openLanding,
     setExplorationMode,
     setAdsEnabled,
     spawnTargeted,
