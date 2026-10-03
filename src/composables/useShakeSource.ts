@@ -78,7 +78,17 @@ export function useShakeSource(): ShakeSource {
     if (!motionActive.value) return
 
     const acceleration = event.accelerationIncludingGravity
-    const magnitude = Math.hypot(acceleration?.x ?? 0, acceleration?.y ?? 0, acceleration?.z ?? 0)
+    if (
+      !acceleration ||
+      (acceleration.x == null && acceleration.y == null && acceleration.z == null)
+    ) {
+      return
+    }
+
+    const magnitude = Math.hypot(acceleration.x ?? 0, acceleration.y ?? 0, acceleration.z ?? 0)
+    // 传感器未输出真实重力读数（如全是 0）时忽略，避免 0 与 9.81 的差值误触发
+    if (magnitude < 1) return
+
     const above = Math.abs(magnitude - GRAVITY) >= MOTION_BEAT_DEVIATION
 
     // 只数"从静止抬起来"的那一次。否则一次甩动里的几十个事件会瞬间把阈值冲爆，

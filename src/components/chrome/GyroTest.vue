@@ -84,8 +84,10 @@ function onDeviceMotion(event: DeviceMotionEvent): void {
   const gx = grav?.x ?? 0
   const gy = grav?.y ?? 0
   const gz = grav?.z ?? 0
-  const magnitude = Math.hypot(gx, gy, gz)
-  const deviation = Math.abs(magnitude - GRAVITY)
+  const hasValidGrav = grav != null && (grav.x != null || grav.y != null || grav.z != null)
+  const magnitude = hasValidGrav ? Math.hypot(gx, gy, gz) : 0
+  // 必须在传感器真正输出有效读数且模长 >= 1 时才计算与标准重力的偏差，避免 0 误判为与重力差 9.81
+  const deviation = hasValidGrav && magnitude >= 1 ? Math.abs(magnitude - GRAVITY) : 0
 
   motion.value = {
     accX: Number((acc?.x ?? 0).toFixed(2)),
@@ -101,8 +103,8 @@ function onDeviceMotion(event: DeviceMotionEvent): void {
     deviation: Number(deviation.toFixed(2)),
   }
 
-  // 模拟摇晃节拍判定
-  const above = deviation >= MOTION_BEAT_DEVIATION
+  // 模拟摇晃节拍判定（需达到阈值且当前在有效输出中）
+  const above = hasValidGrav && magnitude >= 1 && deviation >= MOTION_BEAT_DEVIATION
   if (above && !aboveMotionBar) {
     shakeDetectCount.value++
     const now = new Date()
@@ -115,6 +117,21 @@ function onDeviceMotion(event: DeviceMotionEvent): void {
   }
   aboveMotionBar = above
 }
+
+const motionStatus = computed(() => {
+  if (motionEventCount.value === 0)
+    return { text: '等待数据...', color: 'text-white/40 bg-white/10' }
+  if (motion.value.magnitude < 1)
+    return { text: '未检测到有效重力', color: 'text-amber-400 bg-amber-500/10' }
+  if (motion.value.deviation >= MOTION_BEAT_DEVIATION)
+    return {
+      text: '⚡ 剧烈甩动中！(已触发)',
+      color: 'text-rose-400 bg-rose-500/20 font-bold animate-pulse',
+    }
+  if (motion.value.deviation >= 1.5)
+    return { text: '✋ 轻微拿动中', color: 'text-amber-300 bg-amber-500/15' }
+  return { text: '🟢 平稳静止 (重力 ≈ 1G)', color: 'text-emerald-400 bg-emerald-500/15' }
+})
 
 useEventListener(window, 'deviceorientation', onDeviceOrientation)
 useEventListener(window, 'devicemotion', onDeviceMotion)
@@ -188,7 +205,7 @@ onMounted(() => {
         :class="motionEventCount > 0 ? 'bg-emerald-400' : 'bg-amber-400'"
       />
       <span>陀螺仪测试</span>
-      <span class="opacity-75">({{ orientationEventCount + motionEventCount }}次)</span>
+      <span class="opacity-80">({{ motionStatus.text }})</span>
     </button>
   </div>
 
@@ -341,10 +358,20 @@ onMounted(() => {
         </div>
 
         <!-- DeviceMotion 详情 -->
-        <div class="p-2.5 rounded-lg bg-white/5 space-y-1 font-mono text-[11px]">
+        <div class="p-2.5 rounded-lg bg-white/5 space-y-1.5 font-mono text-[11px]">
           <div class="flex justify-between items-center text-xs font-bold text-white/80 font-sans">
-            <span>加速度与晃动 (DeviceMotion)</span>
-            <span class="text-emerald-400">{{ motionEventCount }} 次事件</span>
+            <div class="flex items-center gap-1.5">
+              <span>加速度 (DeviceMotion)</span>
+              <span class="px-1.5 py-0.5 rounded text-[10px]" :class="motionStatus.color">
+                {{ motionStatus.text }}
+              </span>
+            </div>
+            <span
+              class="text-white/40 text-[10px]"
+              title="传感器硬件以约 60Hz 频率持续采样推送，静止时也会持续递增"
+            >
+              采样: {{ motionEventCount }} 帧
+            </span>
           </div>
           <div class="grid grid-cols-2 gap-2 pt-1">
             <div class="p-1.5 rounded bg-black/30 space-y-0.5">
@@ -352,17 +379,22 @@ onMounted(() => {
               <div>X: {{ motion.gravX }}</div>
               <div>Y: {{ motion.gravY }}</div>
               <div>Z: {{ motion.gravZ }}</div>
-              <div class="text-emerald-300 font-bold">模长: {{ motion.magnitude }}</div>
+              <div class="text-emerald-300 font-bold">合力模长: {{ motion.magnitude }}</div>
             </div>
             <div class="p-1.5 rounded bg-black/30 space-y-0.5">
               <div class="text-white/40 text-[10px]">线性加速度 (m/s²)</div>
               <div>X: {{ motion.accX }}</div>
               <div>Y: {{ motion.accY }}</div>
               <div>Z: {{ motion.accZ }}</div>
-              <div class="text-amber-300 font-bold">偏离: {{ motion.deviation }}</div>
+              <div class="text-amber-300 font-bold">偏离重力: {{ motion.deviation }}</div>
             </div>
           </div>
-          <div v-if="lastShakeTime" class="pt-1 text-[10px] text-amber-300 font-sans">
+          <div class="text-[10px] text-white/40 font-sans leading-tight">
+            💡 采样帧数代表底层硬件时钟刷新（约 60Hz
+            持续采样，静止也会递增，属正常物理流）。当偏离重力 ≥ 4.0 甩动时，上方「摇晃命中」才会
+            +1。
+          </div>
+          <div v-if="lastShakeTime" class="pt-1 text-[10px] text-amber-300 font-sans font-bold">
             ⚡ 上次检测到晃动触发: {{ lastShakeTime }}
           </div>
         </div>
