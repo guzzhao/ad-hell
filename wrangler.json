@@ -1,0 +1,8 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ad-hell",
+  "compatibility_date": "2025-02-14",
+  "assets": {
+    "directory": "./dist"
+  }
+}

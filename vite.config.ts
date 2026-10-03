@@ -4,6 +4,7 @@ import { configDefaults, defineConfig, lazyPlugins } from 'vite-plus'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
+import { cloudflare } from '@cloudflare/vite-plugin'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -33,6 +34,7 @@ export default defineConfig({
       '.codex',
       '.dsh',
       '.vscode',
+      '.wrangler',
     ],
   },
   lint: {
@@ -58,7 +60,12 @@ export default defineConfig({
       'vite-plus/prefer-vite-plus-imports': 'error',
     },
   },
-  plugins: lazyPlugins(() => [tailwindcss(), vue(), vueDevTools()]),
+  plugins: lazyPlugins(() => [
+    ...(process.env.VITEST ? [] : [cloudflare()]),
+    tailwindcss(),
+    vue(),
+    vueDevTools(),
+  ]),
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
