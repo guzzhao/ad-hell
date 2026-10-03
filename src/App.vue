@@ -10,6 +10,7 @@ import DeviceShell from '@/components/shell/DeviceShell.vue'
 import EscapeHatch from '@/components/chrome/EscapeHatch.vue'
 import AudioControls from '@/components/chrome/AudioControls.vue'
 import ShakeHint from '@/components/chrome/ShakeHint.vue'
+import GyroTest from '@/components/chrome/GyroTest.vue'
 import TruthPanel from '@/components/truth/TruthPanel.vue'
 
 const storm = useStormStore()
@@ -52,5 +53,6 @@ useEventListener(window, 'keydown', (event) => {
       @request="requestMotionPermission()"
       @simulate="simulate()"
     />
+    <GyroTest />
   </div>
 </template>
