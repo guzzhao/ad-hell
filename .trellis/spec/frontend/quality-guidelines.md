@@ -9,35 +9,33 @@
 命令（注意 `test:unit` 与 `test:unit:run` 的区别）：
 
 ```bash
-npm run lint            # oxlint . --fix
-npm run format:check    # oxfmt --check src/
+npm run check           # vp check（统一检查格式、lint 与类型）
+npm run lint            # vp lint . --fix
+npm run format:check    # vp fmt --check src/
 npm run type-check      # vue-tsc --build
-npm run test:unit:run   # vitest run（跑一遍就退出）
-npm run build           # run-p type-check + vite build
+npm run test:unit:run   # vp test run（跑一遍就退出）
+npm run build           # run-p type-check + vp build
 ```
 
 > **Warning**：`npm run test:unit` 是 **watch 模式**，在脚本、CI 或 agent 里会永久挂住。
 > 需要"跑一遍就退出"时一律用 `test:unit:run`。
 
-### 工具链现状：只有 oxc
+### 工具链现状：Vite+ (统一集成 oxc 与 vitest)
 
-本项目**不依赖 eslint，也不依赖 prettier**。lint 与格式化都由 oxc 工具链承担：
+本项目采用 **Vite+ (`vite-plus`)** 统一工具链，无需分散维护各种配置文件：
 
-| 职责 | 工具 | 配置 |
+| 职责 | 工具 | 配置集中位置 |
 |------|------|------|
-| Lint | `oxlint` | `.oxlintrc.json` |
-| 格式化 | `oxfmt` | `.oxfmtrc.json` |
+| Dev / Build | `vite` / `rolldown` | `vite.config.ts` |
+| Lint | `oxlint` (via `vp lint`) | `vite.config.ts` (`lint` 节点) |
+| 格式化 | `oxfmt` (via `vp fmt`) | `vite.config.ts` (`fmt` 节点) |
+| 单元测试 | `vitest` (via `vp test`) | `vite.config.ts` (`test` 节点) |
+| 提交钩子 | `vp staged` | `vite.config.ts` (`staged` 节点) + `.vite-hooks/` |
 
-- `.oxlintrc.json` 启用了 6 个插件（`eslint` / `typescript` / `unicorn` / `oxc` / `vue` / `vitest`），
-  类别开了 `correctness` + `suspicious`，共 177 条规则。
-  **不要退回只开 `correctness`** —— `suspicious` 只多 33 条规则却抓到过真问题（`unicorn/no-array-sort`）。
-- `pedantic` **不要开**：会多出 109 条规则，其中 `max-lines-per-function`、`no-conditional-in-test`
-  这类风格观点会跟现有代码结构打架，噪音大于价值。
-- `.oxfmtrc.json` 是从旧的 Prettier 配置迁移来的（`--migrate=prettier`），保留了
-  `semi: false` / `singleQuote: true` / `printWidth: 100` 三项。
-- **格式化器的行为与 Prettier 不完全一致**：oxfmt 没有 Prettier 的数组 "fill" 行为，
-  装不下的数组会排成一行一项（见 `src/data/__tests__/creatives.spec.ts` 的 `REAL_BRANDS`）。
-  这是已知代价，不要去跟格式化器较劲，也不要用技巧绕开它。
+- Lint 配置在 `vite.config.ts` 中开启了类型感知（`typeAware` / `typeCheck`）与 `vite-plus/prefer-vite-plus-imports` 规则。
+- 格式化配置在 `vite.config.ts` 的 `fmt` 节点中保留了 `semi: false` / `singleQuote: true` / `printWidth: 100`。
+- 测试 API 统一从 `vite-plus/test` 导入（如 `describe`, `it`, `expect`, `vi`）。
+- 提交时通过 `.vite-hooks` 自动执行 `vp staged`（即 `vp check --fix`）。
 
 ---
 

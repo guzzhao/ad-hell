@@ -1259,28 +1259,28 @@ export function resolveLandingTarget(
   if (typeof target === 'object') {
     // 已经是 LandingTarget 结构
     if ('heroCard' in target && 'features' in target) {
-      return target as LandingTarget
+      return target
     }
     // 是 AdCreative 结构
     if ('id' in target && typeof target.id === 'string') {
       const mappedKey = ALIAS_MAP[target.id] ?? ALIAS_MAP[target.brand]
       if (mappedKey && LANDING_TARGETS[mappedKey]) {
-        return LANDING_TARGETS[mappedKey]!
+        return LANDING_TARGETS[mappedKey]
       }
       // 根据品类动态生成
-      return generateDynamicLanding(target as AdCreative)
+      return generateDynamicLanding(target)
     }
   }
 
   if (typeof target === 'string') {
     const key = ALIAS_MAP[target] ?? target
     if (LANDING_TARGETS[key]) {
-      return LANDING_TARGETS[key]!
+      return LANDING_TARGETS[key]
     }
     // 字符串匹配关键词
     for (const [k, v] of Object.entries(ALIAS_MAP)) {
       if (target.includes(k) && LANDING_TARGETS[v]) {
-        return LANDING_TARGETS[v]!
+        return LANDING_TARGETS[v]
       }
     }
   }

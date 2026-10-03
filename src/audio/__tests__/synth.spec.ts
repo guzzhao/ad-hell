@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vite-plus/test'
 import { RING_MS, buildPlan, noiseSamples, type SynthPlan, type VoiceSpec } from '../synth'
 import { STORM } from '@/engine/storm'
 

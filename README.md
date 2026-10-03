@@ -11,17 +11,18 @@ npm install
 npm run dev        # http://localhost:5173
 ```
 
-| 命令 | 作用 |
-| --- | --- |
-| `npm run dev` | 启动开发服务器 |
-| `npm run build` | 类型检查 + 生产构建，产物在 `dist/` |
-| `npm run preview` | 预览构建产物 |
-| `npm run test:unit` | 单元测试（watch 模式） |
+| 命令                    | 作用                                      |
+| ----------------------- | ----------------------------------------- |
+| `npm run dev`           | 启动开发服务器                            |
+| `npm run build`         | 类型检查 + 生产构建，产物在 `dist/`       |
+| `npm run preview`       | 预览构建产物                              |
+| `npm run test:unit`     | 单元测试（watch 模式）                    |
 | `npm run test:unit:run` | 单元测试跑一遍就退出（CI / 自动化用这个） |
-| `npm run type-check` | `vue-tsc` 类型检查 |
-| `npm run lint` | `oxlint` 检查并自动修复（177 条规则） |
-| `npm run format` | `oxfmt` 格式化 `src/` |
-| `npm run format:check` | 只检查格式，不改文件 |
+| `npm run type-check`    | `vue-tsc` 类型检查                        |
+| `npm run check`         | `vp check` 统一代码格式与静态分析检查     |
+| `npm run lint`          | `oxlint` (via `vp`) 检查并自动修复        |
+| `npm run format`        | `oxfmt` (via `vp`) 格式化 `src/`          |
+| `npm run format:check`  | 只检查格式，不改文件                      |
 
 要求 Node `^22.18.0 || >=24.12.0`（见 `package.json` 的 `engines`）。
 
@@ -40,13 +41,13 @@ npm run dev        # http://localhost:5173
 
 弹窗的关闭键按报道里点名的几种花招实现（见 `src/components/ads/CloseButton.vue`）：
 
-| 变体 | 表现 |
-| --- | --- |
-| `honest` | 正常关闭键，看得见也点得到 |
-| `tiny` | 浅灰色小字，命中区只有 14px |
-| `corner` | 塞在左上角，命中区 16px、低对比 |
+| 变体        | 表现                                         |
+| ----------- | -------------------------------------------- |
+| `honest`    | 正常关闭键，看得见也点得到                   |
+| `tiny`      | 浅灰色小字，命中区只有 14px                  |
+| `corner`    | 塞在左上角，命中区 16px、低对比              |
 | `deceptive` | 外观与正常关闭键**完全一致**，但点了是"跳转" |
-| `none` | 根本没有关闭键，只能等它被后来的弹窗盖住 |
+| `none`      | 根本没有关闭键，只能等它被后来的弹窗盖住     |
 
 点假关闭键会进入一个**页内**假落地页（不会跳转到任何真实网站），返回后屏幕上会多出 2~4 个新弹窗。
 
@@ -143,12 +144,12 @@ src/
 
 ### 想加一种广告？四条扩展缝
 
-| 缝 | 要动哪里 | 漏了会怎样 |
-| --- | --- | --- |
-| **形态** `AdLayout` | 新增 `creatives/AdXxx.vue`，在 `ads/layouts.ts` 注册一行 | `type-check` 直接报错 |
-| **呈现面** `AdSurface` | 新增层组件，在 `ads/surfaces.ts` 注册一行 | `type-check` 直接报错 |
-| **媒体** `mediaId` | 在 `data/media.ts` 加一条 | `registry.spec.ts` 失败 |
-| **触发** `AdTrigger` | 补上编译器指出的所有位置 | `type-check` 报错，但**这是多点改动**，不是单点注册 |
+| 缝                     | 要动哪里                                                 | 漏了会怎样                                          |
+| ---------------------- | -------------------------------------------------------- | --------------------------------------------------- |
+| **形态** `AdLayout`    | 新增 `creatives/AdXxx.vue`，在 `ads/layouts.ts` 注册一行 | `type-check` 直接报错                               |
+| **呈现面** `AdSurface` | 新增层组件，在 `ads/surfaces.ts` 注册一行                | `type-check` 直接报错                               |
+| **媒体** `mediaId`     | 在 `data/media.ts` 加一条                                | `registry.spec.ts` 失败                             |
+| **触发** `AdTrigger`   | 补上编译器指出的所有位置                                 | `type-check` 报错，但**这是多点改动**，不是单点注册 |
 
 前三条是真正的单点注册；触发缝因为要访问各触发方式自己的字段，加一种类型会牵动若干处 —— 编译器会把它们全指出来，这比静默出错好得多，但不该说成"加一行"。
 

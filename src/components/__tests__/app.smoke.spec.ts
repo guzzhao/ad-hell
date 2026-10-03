@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
@@ -27,7 +27,7 @@ function matchMediaStub(query: string): MediaQueryList {
     addListener: () => {},
     removeListener: () => {},
     dispatchEvent: () => false,
-  } as unknown as MediaQueryList
+  }
 }
 
 const matchMediaMock = vi.fn<(query: string) => MediaQueryList>(matchMediaStub)

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vite-plus/test'
 import { MISCLICK_EXTRA_ADS_MAX, MISCLICK_EXTRA_ADS_MIN, isClosable, resolveClose } from '../close'
 import type { CloseOutcome, CloseVariant } from '@/types/ad'
 

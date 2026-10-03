@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vite-plus/test'
 import { CREATIVES, findCreative } from '../creatives'
 import { APPS, appsByCategory } from '../apps'
 import { FULL_SHAKE_ENERGY } from '@/engine/shake'

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vite-plus/test'
 import { CREATIVES } from '@/data/creatives'
 import { findMedia } from '@/data/media'
 import { SURFACES, SURFACE_ORDER } from '@/components/ads/surfaces'

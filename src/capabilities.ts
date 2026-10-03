@@ -46,22 +46,35 @@ interface MotionPermissionApi {
   requestPermission?: () => Promise<'granted' | 'denied'>
 }
 
+function getMotionPermissionApi(): MotionPermissionApi | undefined {
+  const dme: unknown = globalThis.DeviceMotionEvent
+  if (
+    (typeof dme === 'function' || typeof dme === 'object') &&
+    dme !== null &&
+    'requestPermission' in dme
+  ) {
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+    return dme as MotionPermissionApi
+  }
+  return undefined
+}
+
 /** 从真实浏览器读一份 env。这是本模块唯一碰全局对象的地方。 */
 export function readCapabilityEnv(): CapabilityEnv {
   const hasDeviceMotion = typeof globalThis.DeviceMotionEvent === 'function'
-  const api = globalThis.DeviceMotionEvent as unknown as MotionPermissionApi | undefined
+  const api = getMotionPermissionApi()
 
   return {
     hasDeviceMotion,
     needsMotionPermission: hasDeviceMotion && typeof api?.requestPermission === 'function',
     hasAudioContext: typeof globalThis.AudioContext === 'function',
-    isSecureContext: globalThis.isSecureContext === true,
+    isSecureContext: globalThis.isSecureContext,
   }
 }
 
 /** 在用户手势里请求传感器授权。环境不支持或用户拒绝都返回 false，绝不抛错。 */
 export async function requestMotionPermission(): Promise<boolean> {
-  const api = globalThis.DeviceMotionEvent as unknown as MotionPermissionApi | undefined
+  const api = getMotionPermissionApi()
   const request = api?.requestPermission
   if (typeof request !== 'function' || !api) return false
 

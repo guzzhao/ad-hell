@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vite-plus/test'
 import { LANDING_TARGETS, resolveLandingTarget } from '../landing'
 import { CREATIVES } from '../creatives'
 
