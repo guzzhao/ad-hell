@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useStormStore } from '@/stores/storm'
+
+const storm = useStormStore()
+const showCouponModal = ref(true)
 
 interface Product {
   id: number
@@ -13,12 +17,135 @@ interface Product {
   rating: string
   thumb: string
   gradient: string
+  isAd?: boolean
+  adCta?: string
 }
 
 const categories = ['精选推荐', '数码潮电', '品质居家', '户外运动', '美食生鲜']
 const activeCategory = ref('精选推荐')
 
+const promoBanners = [
+  {
+    platform: '京选速达',
+    tag: '广告 · 百亿补贴狂欢',
+    title: '京选数码大促：正品直降 1000 元',
+    sub: '次日必达 · 假一赔十 · 享24期免息 ›',
+    icon: '⚡',
+    gradient: 'from-red-600 via-rose-600 to-amber-600',
+  },
+  {
+    platform: '拼一拼优选',
+    tag: '广告 · 9.9 包邮专场',
+    title: '秋季拼一拼：食品生鲜 9.9 元抢购',
+    sub: '顺丰直达 · 坏果包赔 · 领券立减 ›',
+    icon: '🥜',
+    gradient: 'from-orange-500 via-amber-500 to-red-500',
+  },
+  {
+    platform: '淘得乐工厂',
+    tag: '广告 · 工厂源头直发',
+    title: '淘得乐产业带：全场 1 元起包邮',
+    sub: '无中间商赚差价 · 7天无理由退换 ›',
+    icon: '🏭',
+    gradient: 'from-orange-600 via-rose-500 to-purple-600',
+  },
+  {
+    platform: '唯享特卖会',
+    tag: '广告 · 名牌断码 1 折',
+    title: '唯享大牌清仓：轻奢服饰 1 折起',
+    sub: '专柜直发 · 支持验货 · 今日截单 ›',
+    icon: '🏷️',
+    gradient: 'from-pink-600 via-fuchsia-600 to-purple-700',
+  },
+]
+const activeBannerIdx = ref(0)
+let bannerTimer: number | null = null
+onMounted(() => {
+  bannerTimer = window.setInterval(() => {
+    activeBannerIdx.value = (activeBannerIdx.value + 1) % promoBanners.length
+  }, 4000)
+})
+onUnmounted(() => {
+  if (bannerTimer) clearInterval(bannerTimer)
+})
+const currentBanner = computed(() => promoBanners[activeBannerIdx.value] ?? promoBanners[0]!)
+
 const products: Product[] = [
+  {
+    id: 101,
+    name: '【拼一拼优选】9.9 包邮巨无霸坚果大礼包',
+    subtitle: '整整10大包 · 顺丰直达 · 今日前100名免单',
+    price: 9.9,
+    origPrice: 99,
+    category: '美食生鲜',
+    sales: '已抢 12.8万+ 件',
+    tag: '广告 · 拼一拼',
+    rating: '5.0分 (4.8万条好评)',
+    thumb: '🥜',
+    gradient: 'linear-gradient(145deg, #78350f 0%, #451a03 100%)',
+    isAd: true,
+    adCta: '9.9元立即拼',
+  },
+  {
+    id: 102,
+    name: '【京选速达】百亿补贴 旗舰级主动降噪耳机',
+    subtitle: '正品现货 · 次日必达 · 假一赔十 · 24期免息',
+    price: 199,
+    origPrice: 699,
+    category: '数码潮电',
+    sales: '已抢 8.6万+ 件',
+    tag: '广告 · 京选自营',
+    rating: '4.9分 (3.2万条好评)',
+    thumb: '🎧',
+    gradient: 'linear-gradient(145deg, #7f1d1d 0%, #450a0a 100%)',
+    isAd: true,
+    adCta: '立省500抢',
+  },
+  {
+    id: 103,
+    name: '【淘得乐工厂】源头直供 19.9 元纯棉加厚卫衣',
+    subtitle: '产地直发 · 无中间商赚差价 · 破损全包赔',
+    price: 19.9,
+    origPrice: 129,
+    category: '品质居家',
+    sales: '已售 32.1万+ 件',
+    tag: '广告 · 淘得乐直销',
+    rating: '4.8分 (1.8万条好评)',
+    thumb: '👕',
+    gradient: 'linear-gradient(145deg, #7c2d12 0%, #431407 100%)',
+    isAd: true,
+    adCta: '工厂价秒杀',
+  },
+  {
+    id: 104,
+    name: '【聚省省拼购】0 元免费领 智能多功能电饭煲',
+    subtitle: '已砍99.9% · 仅差0.01颗金币 · 邀好友立即提货',
+    price: 0,
+    origPrice: 299,
+    category: '品质居家',
+    sales: '已免费提走 5.4万+ 台',
+    tag: '广告 · 砍价免费拿',
+    rating: '4.9分 (9200条好评)',
+    thumb: '🍚',
+    gradient: 'linear-gradient(145deg, #701a75 0%, #4a044e 100%)',
+    isAd: true,
+    adCta: '0元立即提货',
+  },
+  {
+    id: 105,
+    name: '【唯享名牌特卖】法国高定轻奢羊毛大衣',
+    subtitle: '专柜断码清仓 1折起 · 100%正品专柜验货',
+    price: 188,
+    origPrice: 1880,
+    category: '户外运动',
+    sales: '仅剩最后 17 件',
+    tag: '广告 · 唯享大牌特卖',
+    rating: '5.0分 (6400条好评)',
+    thumb: '🧥',
+    gradient: 'linear-gradient(145deg, #831843 0%, #500724 100%)',
+    isAd: true,
+    adCta: '1折进场抢',
+  },
   {
     id: 1,
     name: '无线主动降噪耳机 Pro',
@@ -200,21 +327,34 @@ function buySelectedProduct(): void {
     </header>
 
     <div class="flex-1 px-3 py-3 phone-scroll flex flex-col gap-3 pb-20">
-      <!-- 官方运营活动大横幅 -->
+      <!-- 多电商平台联合大促横幅 (轮播) -->
       <section
-        class="rounded-2xl p-3.5 bg-gradient-to-r from-orange-500 via-rose-500 to-red-500 text-white flex justify-between items-center shadow-sm"
-        aria-label="品质焕新季"
+        class="rounded-2xl p-3.5 text-white flex justify-between items-center shadow-sm cursor-pointer hover:brightness-105 active:scale-[0.99] transition-all bg-gradient-to-r"
+        :class="currentBanner.gradient"
+        aria-label="电商大促专区"
+        @click="storm.tapAdBody(currentBanner.platform)"
       >
-        <div>
-          <span
-            class="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-black/20 text-orange-100 mb-1 inline-block"
-            >品牌特惠 · 限时专享</span
-          >
-          <h2 class="text-base font-bold m-0 mb-0.5">秋季品质焕新季</h2>
-          <p class="text-[11px] text-white/80 m-0">官方自营保障 · 每满200减30 · 极速次日达</p>
+        <div class="min-w-0 pr-2">
+          <div class="flex items-center gap-1.5 mb-1">
+            <span
+              class="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-black/25 text-white inline-block shrink-0"
+              >{{ currentBanner.tag }}</span
+            >
+            <span class="text-[10px] opacity-75 truncate">电商联名特惠</span>
+          </div>
+          <h2 class="text-base font-bold m-0 mb-0.5 truncate">{{ currentBanner.title }}</h2>
+          <p class="text-[11px] text-white/85 m-0 truncate">{{ currentBanner.sub }}</p>
         </div>
-        <div aria-hidden="true">
-          <span class="text-4xl">🎁</span>
+        <div aria-hidden="true" class="shrink-0 flex flex-col items-center">
+          <span class="text-3xl">{{ currentBanner.icon }}</span>
+          <div class="flex gap-1 mt-1.5">
+            <span
+              v-for="(_, i) in promoBanners"
+              :key="i"
+              class="w-1.5 h-1.5 rounded-full transition-all"
+              :class="i === activeBannerIdx ? 'bg-white scale-125' : 'bg-white/40'"
+            />
+          </div>
         </div>
       </section>
 
@@ -504,6 +644,84 @@ function buySelectedProduct(): void {
         aria-live="polite"
       >
         <span>✓ {{ toastMsg }}</span>
+      </div>
+    </Transition>
+
+    <!-- 进店首屏弹出：新人专享 888 元拼团大礼包 (带微小假关闭键) -->
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 scale-90"
+      leave-active-class="transition duration-150 ease-in"
+      leave-to-class="opacity-0 scale-95"
+    >
+      <div
+        v-if="storm.adsEnabled && showCouponModal"
+        class="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-5 select-none"
+        @click.self="showCouponModal = false"
+      >
+        <div
+          class="relative w-full max-w-[280px] rounded-3xl bg-gradient-to-b from-red-600 via-rose-600 to-amber-600 p-5 text-white text-center shadow-2xl border border-yellow-300/40"
+        >
+          <!-- 极小隐蔽关闭键 -->
+          <button
+            type="button"
+            class="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/30 text-[10px] text-white/50 hover:text-white grid place-items-center cursor-pointer"
+            aria-label="关闭"
+            @click="showCouponModal = false"
+          >
+            ✕
+          </button>
+
+          <span class="text-4xl block my-1">🧧</span>
+          <span
+            class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-yellow-300 text-red-900 uppercase"
+          >
+            限时 10 分钟失效
+          </span>
+          <h3 class="text-base font-extrabold text-yellow-100 mt-2">恭喜获得多电商 888 元神券</h3>
+          <p class="text-[11px] text-yellow-200/90 mt-0.5">
+            京选速达 · 淘得乐 · 拼一拼 · 唯享特卖通用
+          </p>
+
+          <div class="my-3 space-y-1.5 text-left">
+            <div
+              class="py-1.5 px-2.5 rounded-xl bg-black/25 border border-yellow-300/25 flex items-center justify-between text-xs"
+            >
+              <div class="flex items-center gap-1.5">
+                <span class="text-sm">⚡</span>
+                <span class="text-yellow-200 font-medium">【京选速达】数码直减 200 元</span>
+              </div>
+              <span class="text-yellow-300 font-extrabold">待激活</span>
+            </div>
+            <div
+              class="py-1.5 px-2.5 rounded-xl bg-black/25 border border-yellow-300/25 flex items-center justify-between text-xs"
+            >
+              <div class="flex items-center gap-1.5">
+                <span class="text-sm">🥜</span>
+                <span class="text-yellow-200 font-medium">【拼一拼】9.9 元食品无门槛</span>
+              </div>
+              <span class="text-yellow-300 font-extrabold">待激活</span>
+            </div>
+            <div
+              class="py-1.5 px-2.5 rounded-xl bg-black/25 border border-yellow-300/25 flex items-center justify-between text-xs"
+            >
+              <div class="flex items-center gap-1.5">
+                <span class="text-sm">🏷️</span>
+                <span class="text-yellow-200 font-medium">【唯享特卖】大牌专柜 100 元券</span>
+              </div>
+              <span class="text-yellow-300 font-extrabold">待激活</span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="w-full py-2.5 rounded-full bg-gradient-to-r from-yellow-300 via-amber-300 to-yellow-400 text-red-950 font-black text-sm shadow-lg hover:brightness-105 active:scale-95 transition-all cursor-pointer"
+            @click="storm.tapAdBody('shop-luxury')"
+          >
+            一键领取全部礼券 ›
+          </button>
+          <span class="block mt-2 text-[9px] text-white/50">广告 · 点击领取将唤起合作活动</span>
+        </div>
       </div>
     </Transition>
   </div>

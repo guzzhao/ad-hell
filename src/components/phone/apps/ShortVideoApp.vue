@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useStormStore } from '@/stores/storm'
 
 const emit = defineEmits<{ back: [] }>()
+const storm = useStormStore()
 
 interface VideoItem {
   id: number
@@ -21,6 +23,10 @@ interface VideoItem {
   collected: boolean
   gradient: string
   videoTheme: string
+  isAd?: boolean
+  adCta?: string
+  adProduct?: string
+  adPrice?: string
 }
 
 interface FloatingHeart {
@@ -48,6 +54,52 @@ const videos = ref<VideoItem[]>([
     collected: false,
     gradient: 'linear-gradient(175deg, #1e1b18 0%, #2e241c 45%, #14100c 100%)',
     videoTheme: 'woodwork',
+  },
+  {
+    id: 101,
+    author: '拼一拼源头严选',
+    handle: '@pyp_official',
+    avatar: '🛒',
+    desc: '【直播特惠】工厂清仓最后1000份！精品夏威夷果坚果礼包，不要99，只要9.9包邮到家！抢完即止！',
+    tags: ['#广告', '#9.9包邮', '#清仓甩卖', '#源头直供'],
+    music: '拼一拼神曲 - 疯狂抢购现场原声',
+    likes: 421000,
+    likesFormatted: '42.1万',
+    comments: 8940,
+    collects: 32000,
+    shares: 19800,
+    followed: false,
+    liked: false,
+    collected: false,
+    gradient: 'linear-gradient(175deg, #450a0a 0%, #7f1d1d 45%, #180505 100%)',
+    videoTheme: 'shop',
+    isAd: true,
+    adCta: '立即抢购',
+    adProduct: '9.9包邮精品坚果大礼包',
+    adPrice: '¥9.9',
+  },
+  {
+    id: 102,
+    author: '京选数码官方直播',
+    handle: '@jingxuan_official',
+    avatar: '📦',
+    desc: '【百亿补贴官方直播】数码狂欢夜！主动降噪无线耳机直降500，正品自营次日必达，假一赔十！',
+    tags: ['#广告', '#百亿补贴', '#官方自营', '#次日必达'],
+    music: '京选大促进行曲 - 嗨购专场原声',
+    likes: 318000,
+    likesFormatted: '31.8万',
+    comments: 6720,
+    collects: 24100,
+    shares: 14500,
+    followed: false,
+    liked: false,
+    collected: false,
+    gradient: 'linear-gradient(175deg, #7f1d1d 0%, #991b1b 45%, #450a0a 100%)',
+    videoTheme: 'shop',
+    isAd: true,
+    adCta: '去京选抢购',
+    adProduct: '百亿补贴 旗舰级主动降噪耳机',
+    adPrice: '¥199',
   },
   {
     id: 2,
@@ -603,6 +655,33 @@ const sampleComments = [
 
           <!-- 底部视频信息与音乐条 -->
           <div class="absolute bottom-12 inset-x-0 z-20 px-4 pb-2 text-white">
+            <!-- 视频带货小黄车浮层 -->
+            <div
+              v-if="v.isAd && storm.adsEnabled"
+              class="flex items-center gap-2 p-2 rounded-xl bg-black/75 backdrop-blur-md border border-amber-400/50 cursor-pointer shadow-xl mb-2 max-w-[85%] hover:bg-black/85 transition-all"
+              @click.stop="storm.tapAdBody(v.author)"
+            >
+              <div
+                class="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 grid place-items-center text-lg shrink-0 shadow-sm"
+              >
+                🛒
+              </div>
+              <div class="flex flex-col min-w-0 flex-1">
+                <span class="text-xs font-bold text-yellow-300 truncate">{{ v.adProduct }}</span>
+                <div class="flex items-baseline gap-1.5 mt-0.5">
+                  <span class="text-xs font-black text-red-400">{{ v.adPrice }}</span>
+                  <span class="text-[9px] text-white/50 line-through">¥99.0</span>
+                  <span class="text-[9px] text-amber-300 font-semibold">热卖第1名</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                class="px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-400 to-yellow-300 text-black font-extrabold text-[10.5px] shrink-0 active:scale-95 shadow-xs cursor-pointer"
+              >
+                {{ v.adCta }} ›
+              </button>
+            </div>
+
             <div class="flex flex-col gap-1 max-w-[78%]">
               <strong class="text-sm font-bold [text-shadow:0_1px_4px_rgba(0,0,0,0.8)]"
                 >@{{ v.author }}</strong

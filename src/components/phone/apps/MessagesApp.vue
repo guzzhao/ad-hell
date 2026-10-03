@@ -5,11 +5,31 @@ const storm = useStormStore()
 
 const threads = [
   {
-    from: '中国联通',
-    preview: '【余额提醒】您的可用话费余额为 86.50 元，本月流量剩余 24.8 GB。',
+    from: '10698888 · 速银花',
+    preview:
+      '【授信通知】恭喜！您的 200,000 元备用金已审批完成，点击领取立即提现，日息低至 0.02%！',
     time: '刚刚',
     unread: true,
+    flagged: true,
+    isAd: true,
+    adTarget: 'loan-fast',
+  },
+  {
+    from: '10689999 · 京选速达',
+    preview: '【百亿补贴】您关注的旗舰数码降至 199 元！专柜正品次日送达，退订回T',
+    time: '3分钟前',
+    unread: true,
+    flagged: true,
+    isAd: true,
+    adTarget: 'shop-speed',
+  },
+  {
+    from: '中国联通',
+    preview: '【余额提醒】您的可用话费余额为 86.50 元，本月流量剩余 24.8 GB。',
+    time: '10分钟前',
+    unread: true,
     flagged: false,
+    isAd: false,
   },
   {
     from: '菜鸟驿站',
@@ -17,6 +37,7 @@ const threads = [
     time: '11:20',
     unread: true,
     flagged: false,
+    isAd: false,
   },
   {
     from: '女儿',
@@ -24,6 +45,7 @@ const threads = [
     time: '09:45',
     unread: false,
     flagged: false,
+    isAd: false,
   },
   {
     from: '招商银行',
@@ -31,13 +53,7 @@ const threads = [
     time: '昨天',
     unread: false,
     flagged: false,
-  },
-  {
-    from: '接警中心',
-    preview: '【现场取证】请点击链接验证并上传相关说明材料。',
-    time: '前天',
-    unread: false,
-    flagged: true,
+    isAd: false,
   },
 ]
 </script>
@@ -55,47 +71,58 @@ const threads = [
       <li
         v-for="thread in threads"
         :key="thread.from"
-        class="flex gap-3 px-0.5 py-[13px] border-b border-white/[0.07]"
+        class="flex gap-3 px-0.5 py-[13px] border-b border-white/[0.07] cursor-pointer"
         :class="{
-          '-mx-2.5 px-2.5 rounded-[13px] bg-[rgba(226,59,46,0.1)] !border-b-transparent':
+          '-mx-2.5 px-2.5 rounded-[13px] bg-[rgba(226,59,46,0.12)] border border-[rgba(226,59,46,0.3)] shadow-xs':
             storm.adsEnabled && thread.flagged,
         }"
+        @click="thread.isAd ? storm.tapAdBody(thread.adTarget) : null"
       >
         <div class="relative flex-none">
           <span
-            class="grid place-items-center w-10 h-10 rounded-full bg-gradient-to-br from-[#3b82f6] to-[#1d4ed8] text-white text-[14.5px] font-semibold"
+            class="grid place-items-center w-10 h-10 rounded-full text-white text-[14.5px] font-semibold"
+            :class="
+              thread.isAd
+                ? 'bg-gradient-to-br from-red-600 to-amber-600'
+                : 'bg-gradient-to-br from-[#3b82f6] to-[#1d4ed8]'
+            "
             aria-hidden="true"
-            >{{ thread.from.slice(0, 1) }}</span
+            >{{ thread.isAd ? '💰' : thread.from.slice(0, 1) }}</span
           >
           <span
             v-if="thread.unread"
-            class="absolute -top-px -right-px w-[9px] h-[9px] rounded-full bg-[#3b82f6] border-2 border-black"
+            class="absolute -top-px -right-px w-[9px] h-[9px] rounded-full bg-red-500 border-2 border-black"
             aria-hidden="true"
           />
         </div>
         <div class="min-w-0 flex-1">
           <div class="flex items-baseline justify-between gap-2">
-            <strong class="text-[13px] font-semibold text-white">{{ thread.from }}</strong>
-            <small class="text-[10.5px] text-[rgba(242,244,248,0.42)]">{{ thread.time }}</small>
+            <div class="flex items-center gap-1.5 truncate">
+              <strong class="text-[13px] font-semibold text-white truncate">{{
+                thread.from
+              }}</strong>
+              <span
+                v-if="thread.isAd"
+                class="px-1 py-px rounded bg-red-500/30 text-red-300 text-[9px] font-bold border border-red-400/40 shrink-0"
+                >营销推广</span
+              >
+            </div>
+            <small class="text-[10.5px] text-[rgba(242,244,248,0.42)] shrink-0">{{
+              thread.time
+            }}</small>
           </div>
           <p class="mt-[3px] text-[12px] leading-[1.55] text-[rgba(242,244,248,0.68)]">
             {{ thread.preview }}
           </p>
-          <p
+          <div
             v-if="storm.adsEnabled && thread.flagged"
-            class="mt-1.5 text-[11px] leading-[1.6] text-[#ff9c8f]"
+            class="mt-1.5 flex items-center justify-between text-[11px] leading-[1.6] text-amber-300"
           >
-            点开这个链接，先弹出来的是浏览器的开屏广告。
-          </p>
+            <span>👉 点击进入提现认证（将唤起网页）</span>
+            <span class="text-[10px] text-white/40">回复 TD 退订</span>
+          </div>
         </div>
       </li>
     </ul>
-
-    <p
-      v-if="storm.adsEnabled"
-      class="mt-4 text-[11.5px] leading-[1.7] text-[rgba(242,244,248,0.5)]"
-    >
-      信息广告位（已保留，待启用）
-    </p>
   </div>
 </template>

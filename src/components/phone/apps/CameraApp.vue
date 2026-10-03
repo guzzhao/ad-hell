@@ -32,6 +32,7 @@ let focusTimer: number | null = null
 const captureCount = ref(0)
 const lastPhoto = ref<string | null>(null)
 const showGalleryModal = ref(false)
+const showShutterAd = ref(false)
 
 function handleViewfinderClick(e: MouseEvent): void {
   const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
@@ -58,6 +59,7 @@ function handleShutter(): void {
       if (recordTimer) clearInterval(recordTimer)
       lastPhoto.value = '🎬'
       captureCount.value += 1
+      showShutterAd.value = true
     }
     return
   }
@@ -66,6 +68,7 @@ function handleShutter(): void {
   shutterFlashing.value = true
   captureCount.value += 1
   lastPhoto.value = currentMode.value === '夜景' ? '🌃' : currentMode.value === '人像' ? '✨' : '📸'
+  showShutterAd.value = true
 
   setTimeout(() => {
     shutterFlashing.value = false
@@ -238,11 +241,49 @@ onUnmounted(() => {
         </button>
       </div>
 
+      <!-- 快门拍照后触发冲印浮层广告 -->
+      <Transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="opacity-0 translate-y-3"
+        leave-active-class="transition duration-150 ease-in"
+        leave-to-class="opacity-0 translate-y-2"
+      >
+        <div
+          v-if="storm.adsEnabled && showShutterAd"
+          class="absolute bottom-16 left-3 right-3 z-30 flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-amber-500/95 to-orange-600/95 text-white shadow-xl backdrop-blur-md cursor-pointer border border-yellow-300/30"
+          @click="storm.tapAdBody('camera-print')"
+        >
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="text-xl shrink-0">🖼️</span>
+            <div class="flex flex-col min-w-0">
+              <span class="text-xs font-bold truncate">拍摄成功！免费领取 30 张高清冲印</span>
+              <span class="text-[10px] text-yellow-100 opacity-90 truncate"
+                >今日限时顺丰包邮 · 新人专享</span
+              >
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0 ml-2">
+            <span
+              class="px-2.5 py-1 rounded-full bg-white text-orange-700 text-xs font-extrabold shadow-sm"
+              >立即领</span
+            >
+            <button
+              type="button"
+              class="w-5 h-5 rounded-full bg-black/30 text-[10px] text-white/80 grid place-items-center"
+              aria-label="关闭广告"
+              @click.stop="showShutterAd = false"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      </Transition>
+
       <!-- 广告保留挂载点（由 adsEnabled 状态控制） -->
       <InAppAdSlot
         v-if="storm.adsEnabled"
         creative-id="fake-system"
-        caption="相机广告位（已保留，待启用）"
+        caption="相机取景界面广告（现实中常伪装为镜头滤镜推荐）"
       />
     </div>
 

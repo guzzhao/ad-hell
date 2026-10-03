@@ -29,6 +29,17 @@ const { muted, audioBlocked } = storeToRefs(storm)
         muted ? '🔇' : '🔊'
       }}</span>
       <span class="audio-controls__label">{{ muted ? '已静音' : '声音开' }}</span>
+      <span v-if="!muted" class="flex items-end gap-[2px] h-3 ml-0.5" aria-hidden="true">
+        <span
+          class="w-[2px] h-2 bg-emerald-400 rounded-full animate-[wave-bounce_0.8s_ease-in-out_infinite]"
+        />
+        <span
+          class="w-[2px] h-3 bg-emerald-400 rounded-full animate-[wave-bounce_0.6s_ease-in-out_infinite_0.15s]"
+        />
+        <span
+          class="w-[2px] h-1.5 bg-emerald-400 rounded-full animate-[wave-bounce_0.9s_ease-in-out_infinite_0.3s]"
+        />
+      </span>
     </button>
 
     <!--

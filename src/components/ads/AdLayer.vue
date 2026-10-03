@@ -11,8 +11,8 @@ function onClose(id: number): void {
   storm.attemptClose(id, true)
 }
 
-function onTap(): void {
-  storm.tapAdBody()
+function onTap(creativeId?: string): void {
+  storm.tapAdBody(creativeId)
 }
 </script>
 

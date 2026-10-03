@@ -19,12 +19,16 @@ const storm = useStormStore()
   >
     <button
       type="button"
-      class="escape__btn inline-flex items-center gap-1.5 min-h-[34px] px-3 rounded-full bg-[#0f141e]/45 border border-white/12 text-[#eef1f6]/80 text-[11.5px] font-medium backdrop-blur-md shadow-[0_4px_16px_-4px_rgba(0,0,0,0.5)] transition-all duration-200 ease-out hover:bg-[#19202e]/85 hover:text-white active:scale-95 cursor-pointer"
+      class="escape__btn inline-flex items-center gap-2 min-h-[36px] px-3.5 rounded-full bg-[#0f141e]/75 border border-white/15 text-[#eef1f6] text-[12px] font-medium backdrop-blur-md shadow-[0_6px_20px_-4px_rgba(0,0,0,0.6)] transition-all duration-200 ease-out hover:bg-[#1a2232] hover:border-white/30 hover:shadow-[0_0_16px_rgba(255,255,255,0.12)] active:scale-95 cursor-pointer"
       @click="storm.enterTruth()"
     >
-      <span class="escape__label">结束体验</span>
+      <span
+        class="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.8)] shrink-0"
+        aria-hidden="true"
+      />
+      <span class="escape__label font-medium">结束体验</span>
       <kbd
-        class="escape__kbd px-[5px] py-px rounded bg-white/10 font-mono text-[9px] tracking-wider opacity-70"
+        class="escape__kbd px-[6px] py-0.5 rounded bg-white/10 border border-white/10 font-mono text-[9.5px] tracking-wider opacity-75 shadow-inner"
         aria-hidden="true"
       >
         Esc

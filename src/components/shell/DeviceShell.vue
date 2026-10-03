@@ -73,7 +73,17 @@ onBeforeUnmount(() => {
   <div class="device-shell">
     <div ref="stage" class="device-shell__stage">
       <div class="device-frame" :style="{ '--shell-scale': String(scale) }">
-        <div class="device-frame__notch" aria-hidden="true" />
+        <!-- 侧边物理实体按键 -->
+        <div class="device-frame__button device-frame__button--mute" aria-hidden="true" />
+        <div class="device-frame__button device-frame__button--vol-up" aria-hidden="true" />
+        <div class="device-frame__button device-frame__button--vol-down" aria-hidden="true" />
+        <div class="device-frame__button device-frame__button--power" aria-hidden="true" />
+
+        <!-- 灵动岛药丸屏（含真实感光学镜头与传感器） -->
+        <div class="device-frame__notch" aria-hidden="true">
+          <span class="device-frame__sensor" />
+          <span class="device-frame__lens" />
+        </div>
         <div ref="motion" class="device-frame__motion">
           <PhoneScreen />
         </div>

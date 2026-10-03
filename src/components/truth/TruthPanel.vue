@@ -39,24 +39,32 @@ const oversight = [
 
       <!-- 你刚才的经历 -->
       <section
-        class="truth__run grid grid-cols-2 min-[520px]:grid-cols-4 gap-px mt-8 mb-2 rounded-[14px] overflow-hidden bg-white/[0.08]"
+        class="truth__run grid grid-cols-2 min-[520px]:grid-cols-4 gap-px mt-8 mb-2 rounded-[14px] overflow-hidden bg-white/[0.08] shadow-md"
         aria-label="你刚才的经历"
       >
-        <div class="truth__run-item flex flex-col gap-[5px] p-4 sm:p-[18px] bg-[#11151d]">
+        <div
+          class="truth__run-item flex flex-col gap-[5px] p-4 sm:p-[18px] bg-[#11151d] border-t-2 border-emerald-500/60"
+        >
           <span class="text-[11.5px] text-[#5d6675]">坚持了</span>
-          <b class="font-mono text-[19px] font-bold text-white">{{ elapsedSeconds }}s</b>
+          <b class="font-mono text-[20px] font-bold text-white">{{ elapsedSeconds }}s</b>
         </div>
-        <div class="truth__run-item flex flex-col gap-[5px] p-4 sm:p-[18px] bg-[#11151d]">
+        <div
+          class="truth__run-item flex flex-col gap-[5px] p-4 sm:p-[18px] bg-[#11151d] border-t-2 border-sky-500/60"
+        >
           <span class="text-[11.5px] text-[#5d6675]">关掉了</span>
-          <b class="font-mono text-[19px] font-bold text-white">{{ closedCount }} 个</b>
+          <b class="font-mono text-[20px] font-bold text-white">{{ closedCount }} 个</b>
         </div>
-        <div class="truth__run-item flex flex-col gap-[5px] p-4 sm:p-[18px] bg-[#11151d]">
+        <div
+          class="truth__run-item flex flex-col gap-[5px] p-4 sm:p-[18px] bg-[#11151d] border-t-2 border-rose-500/60"
+        >
           <span class="text-[11.5px] text-[#5d6675]">又来了</span>
-          <b class="font-mono text-[19px] font-bold text-[#ff8f7f] is-bad">{{ spawnedCount }} 个</b>
+          <b class="font-mono text-[20px] font-bold text-[#ff8f7f] is-bad">{{ spawnedCount }} 个</b>
         </div>
-        <div class="truth__run-item flex flex-col gap-[5px] p-4 sm:p-[18px] bg-[#11151d]">
+        <div
+          class="truth__run-item flex flex-col gap-[5px] p-4 sm:p-[18px] bg-[#11151d] border-t-2 border-amber-500/60"
+        >
           <span class="text-[11.5px] text-[#5d6675]">误触</span>
-          <b class="font-mono text-[19px] font-bold text-[#ff8f7f] is-bad"
+          <b class="font-mono text-[20px] font-bold text-[#ff8f7f] is-bad"
             >{{ misclickCount }} 次</b
           >
         </div>
@@ -142,7 +150,7 @@ const oversight = [
         <div class="truth__actions mt-[26px]">
           <button
             type="button"
-            class="truth__again inline-flex items-center justify-center min-h-[52px] px-6 rounded-full bg-white/[0.08] border border-white/15 text-[#e8eaef] text-sm font-semibold cursor-pointer active:bg-white/15 transition-colors"
+            class="truth__again inline-flex items-center justify-center min-h-[52px] px-8 rounded-full bg-gradient-to-r from-white/[0.12] to-white/[0.08] hover:from-white/[0.18] hover:to-white/[0.12] border border-white/20 text-[#e8eaef] text-sm font-semibold cursor-pointer active:scale-95 transition-all shadow-[0_8px_24px_-4px_rgba(0,0,0,0.5)]"
             @click="storm.restart()"
           >
             再被淹一次（换个弹窗序列）

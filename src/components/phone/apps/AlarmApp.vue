@@ -4,6 +4,7 @@ import InAppAdSlot from '../InAppAdSlot.vue'
 import { useStormStore } from '@/stores/storm'
 
 const storm = useStormStore()
+const showWakeupModal = ref(false)
 
 const alarms = ref([
   { time: '06:30', label: '工作日闹钟', days: '周一至周五', on: true },
@@ -14,7 +15,13 @@ const alarms = ref([
 
 function toggleAlarm(index: number): void {
   const item = alarms.value[index]
-  if (item) item.on = !item.on
+  if (item) {
+    const wasOn = item.on
+    item.on = !item.on
+    if (wasOn && storm.adsEnabled) {
+      showWakeupModal.value = true
+    }
+  }
 }
 </script>
 
@@ -70,11 +77,50 @@ function toggleAlarm(index: number): void {
       </li>
     </ul>
 
-    <p
-      v-if="storm.adsEnabled"
-      class="mt-4 text-[11.5px] leading-relaxed text-[rgba(242,244,248,0.5)]"
+    <!-- 关闹钟触发：早起打卡瓜分金币诱导弹窗 -->
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 scale-90"
+      leave-active-class="transition duration-150 ease-in"
+      leave-to-class="opacity-0 scale-95"
     >
-      闹钟广告位（已保留，待启用）
-    </p>
+      <div
+        v-if="storm.adsEnabled && showWakeupModal"
+        class="fixed inset-0 z-40 bg-black/75 backdrop-blur-xs flex items-center justify-center p-5 select-none"
+        @click.self="showWakeupModal = false"
+      >
+        <div
+          class="relative w-full max-w-[280px] rounded-3xl bg-gradient-to-b from-amber-500 via-orange-600 to-red-600 p-5 text-white text-center shadow-2xl border border-yellow-300/40"
+        >
+          <!-- 极小假关闭键 -->
+          <button
+            type="button"
+            class="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/30 text-[10px] text-white/60 hover:text-white grid place-items-center cursor-pointer"
+            aria-label="关闭"
+            @click="showWakeupModal = false"
+          >
+            ✕
+          </button>
+
+          <span class="text-4xl block my-1">☀️</span>
+          <h3 class="text-base font-extrabold text-yellow-100">早起打卡成功！</h3>
+          <p class="text-xs text-yellow-200/90 mt-1">恭喜获得今日早鸟瓜分资格</p>
+
+          <div class="my-3 py-2.5 px-3 rounded-2xl bg-black/25 border border-yellow-300/20">
+            <span class="text-[10px] text-yellow-200/80 block">最高可瓜分现金</span>
+            <span class="text-2xl font-black text-yellow-300 tracking-tight">¥ 88.88</span>
+          </div>
+
+          <button
+            type="button"
+            class="w-full py-2.5 rounded-full bg-gradient-to-r from-yellow-300 to-amber-400 text-red-950 font-black text-sm shadow-lg hover:brightness-105 active:scale-95 transition-all cursor-pointer"
+            @click="storm.tapAdBody('alarm-reward')"
+          >
+            立即开箱提现 ›
+          </button>
+          <span class="block mt-2 text-[9px] text-white/50">广告 · 点击将打开赞助商活动页面</span>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>

@@ -51,7 +51,7 @@ const { shakeArmed } = storeToRefs(storm)
       <button
         v-else
         type="button"
-        class="inline-flex items-center gap-3 min-h-[48px] pl-4 pr-5 rounded-full bg-[#121620]/90 border border-white/20 text-white backdrop-blur-xl shadow-[0_16px_36px_-10px_rgba(0,0,0,0.8)] active:scale-95 active:bg-[#1e2637]/95 transition-all cursor-pointer"
+        class="inline-flex items-center gap-3 min-h-[50px] pl-4 pr-5 rounded-full bg-[#121620]/95 border border-amber-400/40 text-white backdrop-blur-xl shadow-[0_16px_36px_-10px_rgba(0,0,0,0.9),0_0_24px_rgba(251,191,36,0.15)] active:scale-95 active:bg-[#1e2637]/95 transition-all cursor-pointer hover:border-amber-400/70"
         @click="emit('simulate')"
       >
         <span class="grid place-items-center w-7 h-7" aria-hidden="true">

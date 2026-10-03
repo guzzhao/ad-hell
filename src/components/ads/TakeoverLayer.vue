@@ -67,10 +67,14 @@ function onClose(id: number): void {
         :key="view.id"
         class="absolute inset-0 pointer-events-auto cursor-pointer"
         :style="view.style"
-        @click="storm.tapAdBody()"
+        @click="storm.tapAdBody(view.creative.id)"
       >
-        <component :is="view.layout" :creative="view.creative" />
-        <CloseButton :variant="view.creative.closeVariant" @hit="onClose(view.id)" />
+        <component :is="view.layout" :creative="view.creative" @close="onClose(view.id)" />
+        <CloseButton
+          v-if="view.creative.layout !== 'quickApp'"
+          :variant="view.creative.closeVariant"
+          @hit="onClose(view.id)"
+        />
       </div>
     </TransitionGroup>
   </div>

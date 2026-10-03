@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useStormStore } from '@/stores/storm'
+
+const storm = useStormStore()
+const showAlipayReward = ref(true)
 
 const showPayCode = ref(false)
 const showScanner = ref(false)
@@ -239,6 +243,38 @@ const transactions: Transaction[] = [
         </div>
       </div>
 
+      <!-- 花呗分期免息 / 天天领现金 Banner -->
+      <section
+        v-if="storm.adsEnabled"
+        class="bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-600 rounded-2xl p-3 text-white flex items-center justify-between shadow-md cursor-pointer hover:brightness-105 active:scale-[0.99] transition-all border border-blue-400/30"
+        @click="storm.tapAdBody('alipay-huabei')"
+      >
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div
+            class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm grid place-items-center text-xl shrink-0"
+          >
+            💰
+          </div>
+          <div class="flex flex-col min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-bold truncate">花呗分期 · 专享 12 期免息</span>
+              <span
+                class="text-[9px] bg-amber-400 text-blue-950 font-black px-1.5 py-px rounded-full shrink-0"
+                >新人专属</span
+              >
+            </div>
+            <span class="text-[10px] text-blue-100 opacity-90 truncate mt-0.5"
+              >最高可借 200,000 元 · 实时放款到账</span
+            >
+          </div>
+        </div>
+        <span
+          class="px-2.5 py-1 rounded-full bg-yellow-300 text-blue-950 font-bold text-xs shrink-0 ml-2 shadow-xs"
+        >
+          领额度 ›
+        </span>
+      </section>
+
       <!-- 蚂蚁森林绿色卡片 -->
       <section
         class="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-2xl px-3.5 py-3 text-white flex items-center justify-between shadow-[0_4px_12px_rgba(5,150,105,0.2)]"
@@ -405,5 +441,33 @@ const transactions: Transaction[] = [
         {{ toastText }}
       </div>
     </Transition>
+
+    <!-- 右下角悬浮：天天领现金红包挂件 -->
+    <div
+      v-if="storm.adsEnabled && showAlipayReward"
+      class="absolute right-3 bottom-14 z-30 flex flex-col items-center cursor-pointer group select-none"
+      @click="storm.tapAdBody('home-redpacket')"
+    >
+      <div
+        class="relative flex flex-col items-center px-2 py-1.5 rounded-2xl bg-gradient-to-b from-red-600 via-rose-600 to-amber-500 shadow-xl border border-yellow-200/50"
+        :class="{ 'animate-bounce': !storm.reducedMotion }"
+      >
+        <button
+          type="button"
+          class="absolute -top-1.5 -left-1.5 w-4 h-4 rounded-full bg-black/70 text-[9px] text-white/90 grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity"
+          aria-label="关闭挂件"
+          @click.stop="showAlipayReward = false"
+        >
+          ✕
+        </button>
+        <span class="text-2xl leading-none">🧧</span>
+        <span class="text-[9px] font-black text-yellow-200 leading-tight mt-0.5">天天领</span>
+        <span
+          class="text-[8px] bg-yellow-300 text-red-900 font-black px-1 py-px rounded-full scale-90 mt-0.5"
+        >
+          现金
+        </span>
+      </div>
+    </div>
   </div>
 </template>

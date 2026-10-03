@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useStormStore } from '@/stores/storm'
+
+const storm = useStormStore()
 
 interface PhotoItem {
   id: number
@@ -208,6 +211,19 @@ function prevPhoto(): void {
       </button>
     </header>
 
+    <!-- 云存储容量告警广告条 -->
+    <div
+      v-if="storm.adsEnabled"
+      class="flex items-center justify-between mx-4 mt-2 px-3 py-2 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-200 text-xs cursor-pointer hover:bg-amber-500/25 transition-all"
+      @click="storm.tapAdBody('gallery-cloud')"
+    >
+      <div class="flex items-center gap-2 truncate">
+        <span>☁️</span>
+        <span class="truncate">云空间已用 98.4%，照片将停止同步</span>
+      </div>
+      <span class="shrink-0 text-[11px] font-bold text-amber-300 underline ml-2">1元扩容2TB ›</span>
+    </div>
+
     <!-- 照片分类过滤胶囊 -->
     <div
       v-if="activeTab === 'photos'"
@@ -258,33 +274,59 @@ function prevPhoto(): void {
     <!-- 照片视图 -->
     <main v-if="activeTab === 'photos'" class="flex-1 px-4 py-3 phone-scroll">
       <div class="grid grid-cols-2 gap-3">
-        <article
-          v-for="photo in filteredPhotos"
-          :key="photo.id"
-          class="relative aspect-[3/4] rounded-2xl overflow-hidden p-3 flex flex-col justify-between cursor-pointer group shadow-lg"
-          :style="{ background: photo.gradient }"
-          @click="selectedPhoto = photo"
-        >
+        <template v-for="(photo, pIndex) in filteredPhotos" :key="photo.id">
+          <!-- 伪装相册流的原生广告卡片 -->
           <div
-            class="flex-1 grid place-items-center text-5xl select-none group-hover:scale-105 transition-transform"
+            v-if="storm.adsEnabled && pIndex === 2"
+            class="relative aspect-[3/4] rounded-2xl overflow-hidden p-3 flex flex-col justify-between cursor-pointer group shadow-lg bg-gradient-to-br from-rose-950 via-purple-950 to-neutral-900 border border-rose-500/40"
+            @click="storm.tapAdBody('dating-nearby')"
           >
-            <span>{{ photo.emoji }}</span>
+            <div class="flex items-center justify-between z-10">
+              <span
+                class="px-1.5 py-0.5 rounded bg-black/60 text-[9px] text-amber-300 font-bold border border-amber-400/40"
+                >推广</span
+              >
+              <span class="text-[10px] text-rose-300/80">附近3人</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center justify-center select-none text-center">
+              <span class="text-4xl mb-1 group-hover:scale-110 transition-transform">💌</span>
+              <span class="text-xs font-bold text-white">近邻缘 · 同城交友</span>
+              <span class="text-[10px] text-rose-200/80 mt-0.5">有好友想查看你的相册</span>
+            </div>
+            <div class="flex items-center justify-between z-10 pt-1 border-t border-white/10">
+              <span class="text-[10px] text-white/60">广告</span>
+              <span class="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-bold"
+                >查看 ›</span
+              >
+            </div>
           </div>
 
-          <div class="flex flex-col z-10 [text-shadow:0_1px_3px_rgba(0,0,0,0.8)]">
-            <span class="text-xs font-semibold text-white truncate">{{ photo.title }}</span>
-            <span class="text-[10px] text-white/70">{{ photo.date }} {{ photo.time }}</span>
-          </div>
-
-          <button
-            type="button"
-            class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm grid place-items-center text-xs cursor-pointer z-10 active:scale-90 transition-transform"
-            aria-label="收藏照片"
-            @click="toggleLike(photo, $event)"
+          <article
+            class="relative aspect-[3/4] rounded-2xl overflow-hidden p-3 flex flex-col justify-between cursor-pointer group shadow-lg"
+            :style="{ background: photo.gradient }"
+            @click="selectedPhoto = photo"
           >
-            {{ photo.liked ? '❤️' : '🤍' }}
-          </button>
-        </article>
+            <div
+              class="flex-1 grid place-items-center text-5xl select-none group-hover:scale-105 transition-transform"
+            >
+              <span>{{ photo.emoji }}</span>
+            </div>
+
+            <div class="flex flex-col z-10 [text-shadow:0_1px_3px_rgba(0,0,0,0.8)]">
+              <span class="text-xs font-semibold text-white truncate">{{ photo.title }}</span>
+              <span class="text-[10px] text-white/70">{{ photo.date }} {{ photo.time }}</span>
+            </div>
+
+            <button
+              type="button"
+              class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm grid place-items-center text-xs cursor-pointer z-10 active:scale-90 transition-transform"
+              aria-label="收藏照片"
+              @click="toggleLike(photo, $event)"
+            >
+              {{ photo.liked ? '❤️' : '🤍' }}
+            </button>
+          </article>
+        </template>
       </div>
     </main>
 

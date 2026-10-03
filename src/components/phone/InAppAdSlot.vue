@@ -15,12 +15,13 @@ const creative = computed(() => findCreative(props.creativeId))
 <template>
   <figure v-if="storm.adsEnabled && creative" class="my-4">
     <div
-      class="flex items-center gap-2.5 px-3 py-[11px] rounded-[13px] shadow-[0_8px_22px_-12px_rgba(0,0,0,0.7)] bg-[var(--ad-bg)] text-[var(--ad-fg)]"
+      class="flex items-center gap-2.5 px-3 py-[11px] rounded-[13px] shadow-[0_8px_22px_-12px_rgba(0,0,0,0.7)] bg-[var(--ad-bg)] text-[var(--ad-fg)] cursor-pointer hover:brightness-105 active:scale-[0.98] transition-all"
       :style="{
         '--ad-bg': creative.palette.bg,
         '--ad-fg': creative.palette.fg,
         '--ad-accent': creative.palette.accent,
       }"
+      @click="storm.tapAdBody(creative)"
     >
       <span
         class="shrink-0 self-start px-[5px] py-px border border-current rounded text-[9px] opacity-75"

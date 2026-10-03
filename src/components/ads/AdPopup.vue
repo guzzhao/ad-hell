@@ -6,7 +6,7 @@ import CloseButton from './CloseButton.vue'
 import { LAYOUTS } from './layouts'
 
 const props = defineProps<{ ad: AdInstance }>()
-const emit = defineEmits<{ close: [id: number]; tap: [] }>()
+const emit = defineEmits<{ close: [id: number]; tap: [creativeId: string] }>()
 
 const creative = computed(() => findCreative(props.ad.creativeId))
 
@@ -51,7 +51,7 @@ const boxStyle = computed<CSSProperties>(() => {
     v-if="creative && layout"
     class="absolute pointer-events-auto cursor-pointer"
     :style="boxStyle"
-    @click="emit('tap')"
+    @click="emit('tap', ad.creativeId)"
   >
     <component :is="layout" :creative="creative" />
     <CloseButton :variant="creative.closeVariant" @hit="emit('close', ad.id)" />

@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useStormStore } from '@/stores/storm'
+
+const storm = useStormStore()
 
 const isBalanceHidden = ref(false)
 const balanceTotal = ref(158260.5)
@@ -256,6 +259,40 @@ function handleTransferSubmit(): void {
         </div>
       </div>
 
+      <!-- 尊享闪电贷营销大卡片 -->
+      <section
+        v-if="storm.adsEnabled"
+        class="rounded-2xl p-3.5 bg-gradient-to-r from-red-800 via-rose-900 to-amber-950 text-white shadow-md border border-amber-500/30 flex items-center justify-between cursor-pointer hover:brightness-105 active:scale-[0.99] transition-all"
+        @click="storm.tapAdBody('bank-lightning')"
+      >
+        <div class="flex items-center gap-3 min-w-0">
+          <div
+            class="w-11 h-11 rounded-2xl bg-amber-400/20 border border-amber-300/30 grid place-items-center text-2xl shrink-0"
+          >
+            ⚡
+          </div>
+          <div class="flex flex-col min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-bold text-amber-200 truncate"
+                >尊享闪电贷 · 最高额度 300,000 元</span
+              >
+              <span
+                class="text-[9px] bg-red-600 text-white font-black px-1.5 py-px rounded-full shrink-0"
+                >特批</span
+              >
+            </div>
+            <span class="text-[10px] text-amber-100/80 truncate mt-0.5"
+              >年化利率 3.2% 起 · 凭信用 1 分钟到账</span
+            >
+          </div>
+        </div>
+        <span
+          class="px-3 py-1.5 rounded-full bg-gradient-to-r from-yellow-300 to-amber-400 text-red-950 font-black text-xs shrink-0 ml-2 shadow-xs"
+        >
+          立即测额 ›
+        </span>
+      </section>
+
       <!-- 精选稳健理财专区 -->
       <section class="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-100">
         <div class="flex justify-between items-center mb-2.5">
@@ -294,6 +331,30 @@ function handleTransferSubmit(): void {
             </button>
           </div>
         </div>
+      </section>
+
+      <!-- 存款送油营销卡片 -->
+      <section
+        v-if="storm.adsEnabled"
+        class="rounded-2xl p-3 bg-gradient-to-r from-amber-500/15 to-orange-500/10 border border-amber-400/25 flex items-center justify-between text-gray-800 cursor-pointer hover:bg-amber-500/20 active:scale-[0.99] transition-all"
+        @click="storm.tapAdBody('dialer-finance')"
+      >
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="text-2xl shrink-0">🎁</span>
+          <div class="flex flex-col min-w-0">
+            <span class="text-xs font-bold text-amber-900 truncate"
+              >定期存款达标有礼 · 抽 5L 压榨花生油</span
+            >
+            <span class="text-[10.5px] text-amber-800/80 truncate mt-0.5"
+              >起存金额 1 万元 · 100% 中奖</span
+            >
+          </div>
+        </div>
+        <span
+          class="px-2.5 py-1 rounded-full bg-amber-500 text-white font-bold text-[11px] shrink-0 ml-2 shadow-xs"
+        >
+          去抽奖 ›
+        </span>
       </section>
 
       <!-- 最近收支动账记录 -->

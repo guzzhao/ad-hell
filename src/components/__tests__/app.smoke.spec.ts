@@ -270,4 +270,31 @@ describe('音频控件', () => {
 
     wrapper.unmount()
   })
+
+  it('支持双桌面与左右滑动分页切换', async () => {
+    const wrapper = mount(App)
+    await nextTick()
+
+    const homeGrid = wrapper.findComponent({ name: 'HomeGrid' })
+    expect(homeGrid.exists()).toBe(true)
+
+    // 第一屏应用与第二屏预装推广应用均已就绪
+    expect(homeGrid.text()).toContain('相机')
+    expect(homeGrid.text()).toContain('极速清理')
+    expect(homeGrid.text()).toContain('龙渊传奇')
+
+    // 存在两页分页指示按钮
+    const dots = homeGrid.findAll('[aria-label="分页指示器"] button')
+    expect(dots.length).toBe(2)
+
+    // 点击第二页切换
+    await dots[1]!.trigger('click')
+    await nextTick()
+
+    // 再次点击第一页切换回主屏
+    await dots[0]!.trigger('click')
+    await nextTick()
+
+    wrapper.unmount()
+  })
 })

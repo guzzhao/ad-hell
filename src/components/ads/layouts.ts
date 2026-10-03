@@ -6,6 +6,7 @@ import AdInterstitial from './creatives/AdInterstitial.vue'
 import AdSplash from './creatives/AdSplash.vue'
 import AdFakeCall from './creatives/AdFakeCall.vue'
 import AdCallPage from './creatives/AdCallPage.vue'
+import AdQuickApp from './creatives/AdQuickApp.vue'
 
 /**
  * 版式 → 渲染组件的注册表。
@@ -24,4 +25,5 @@ export const LAYOUTS: Record<AdLayout, Component> = {
   splash: AdSplash,
   fakeCall: AdFakeCall,
   callPage: AdCallPage,
+  quickApp: AdQuickApp,
 }

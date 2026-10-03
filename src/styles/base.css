@@ -96,13 +96,52 @@ button {
   content: '';
   position: absolute;
   inset: -14px;
-  border-radius: 62px;
-  background: linear-gradient(160deg, #3a4150 0%, #171b23 42%, #2a303c 100%);
+  border-radius: 60px;
+  background: linear-gradient(165deg, #444b5a 0%, #1e222a 35%, #12151b 70%, #2f3542 100%);
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
-    0 40px 90px -20px rgba(0, 0, 0, 0.85),
-    0 0 120px -30px rgba(120, 160, 255, 0.18);
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+    0 0 0 2px rgba(0, 0, 0, 0.8),
+    0 35px 85px -15px rgba(0, 0, 0, 0.9),
+    0 0 120px -25px rgba(99, 102, 241, 0.16);
   z-index: 0;
+}
+
+/* 硬件实体侧边按键 */
+.device-frame__button {
+  position: absolute;
+  background: linear-gradient(to right, #2b313d, #424959);
+  border-radius: 3px;
+  z-index: 0;
+  box-shadow: -1px 0 3px rgba(0, 0, 0, 0.5);
+}
+
+.device-frame__button--mute {
+  left: -17px;
+  top: 106px;
+  width: 4px;
+  height: 28px;
+}
+
+.device-frame__button--vol-up {
+  left: -17px;
+  top: 154px;
+  width: 4px;
+  height: 52px;
+}
+
+.device-frame__button--vol-down {
+  left: -17px;
+  top: 218px;
+  width: 4px;
+  height: 52px;
+}
+
+.device-frame__button--power {
+  right: -17px;
+  top: 168px;
+  width: 4px;
+  height: 68px;
+  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.5);
 }
 
 .device-frame__notch {
@@ -113,9 +152,44 @@ button {
   width: 108px;
   height: 26px;
   border-radius: 999px;
-  background: #05070a;
+  background: #030406;
   z-index: 60;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 11px;
+  gap: 7px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+}
+
+.device-frame__lens {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #182848 0%, #060910 70%);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 0 2px rgba(56, 189, 248, 0.5);
+  position: relative;
+}
+
+.device-frame__lens::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 2.5px;
+  height: 2.5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.device-frame__sensor {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #0d121c;
 }
 
 .device-frame__motion {
@@ -134,7 +208,8 @@ button {
     transform: none;
   }
   .device-frame::before,
-  .device-frame__notch {
+  .device-frame__notch,
+  .device-frame__button {
     display: none;
   }
   .device-frame__motion {

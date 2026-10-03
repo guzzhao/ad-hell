@@ -33,6 +33,30 @@ const systemRows = [
       <span>🔍 搜索设置选项…</span>
     </div>
 
+    <!-- 顶部高危虚假系统清理/安全警示卡片 -->
+    <div
+      v-if="storm.adsEnabled"
+      class="flex items-center justify-between gap-3 px-3.5 py-3 rounded-[14px] bg-gradient-to-r from-red-500/20 to-orange-500/15 border border-red-500/35 mb-3.5 cursor-pointer hover:bg-red-500/25 active:scale-[0.98] transition-all"
+      @click="storm.spawnTargeted('quick-clean')"
+    >
+      <div class="flex items-center gap-2.5 min-w-0">
+        <span class="text-2xl shrink-0 animate-pulse">⚠️</span>
+        <div class="flex flex-col min-w-0">
+          <strong class="text-[13px] font-bold text-red-200 truncate"
+            >系统高危：积压 3.8GB 缓存与垃圾</strong
+          >
+          <small class="text-[10.5px] text-red-300/80 truncate"
+            >手机已严重卡顿，建议立即进行深度清理</small
+          >
+        </div>
+      </div>
+      <span
+        class="shrink-0 px-2.5 py-1 rounded-full bg-red-500 text-white text-[11px] font-bold shadow-xs"
+      >
+        一键清理 ›
+      </span>
+    </div>
+
     <!-- 用户卡片 -->
     <div
       class="flex items-center gap-3 px-3.5 py-3 rounded-[14px] bg-white/[0.07] mb-3.5 cursor-pointer"
@@ -69,13 +93,27 @@ const systemRows = [
         v-for="row in generalRows"
         :key="row.label"
         class="flex items-center justify-between gap-3 px-3.5 py-[13px] cursor-pointer active:bg-white/[0.04]"
+        @click="
+          row.label === '电池' && storm.adsEnabled
+            ? storm.spawnTargeted('quick-battery')
+            : undefined
+        "
       >
         <div class="flex items-center gap-2.5">
           <span class="text-[15px] w-5 grid place-items-center">{{ row.icon }}</span>
           <span class="text-[13px] font-medium">{{ row.label }}</span>
         </div>
         <div class="flex items-center gap-1.5">
-          <span class="text-[12px] text-[rgba(242,244,248,0.5)]">{{ row.value }}</span>
+          <span
+            class="text-[12px]"
+            :class="
+              row.label === '电池' && storm.adsEnabled
+                ? 'text-rose-400 font-bold'
+                : 'text-[rgba(242,244,248,0.5)]'
+            "
+          >
+            {{ row.label === '电池' && storm.adsEnabled ? '44.5℃ · 高温预警 🔥' : row.value }}
+          </span>
           <span class="text-[14px] text-[rgba(242,244,248,0.35)]">›</span>
         </div>
       </div>

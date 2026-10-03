@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useStormStore } from '@/stores/storm'
+
+const storm = useStormStore()
 
 interface Song {
   id: number
@@ -269,7 +272,54 @@ function toggleSongLike(song: Song, e?: MouseEvent): void {
           </div>
         </div>
       </section>
+
+      <!-- 赞助商推广卡片：有声书 -->
+      <section
+        v-if="storm.adsEnabled"
+        class="rounded-2xl p-3 bg-gradient-to-r from-amber-950/70 via-stone-900 to-amber-900/60 border border-amber-500/30 flex items-center justify-between shadow-md cursor-pointer hover:brightness-105 active:scale-[0.99] transition-all"
+        @click="storm.tapAdBody('course-free')"
+      >
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div
+            class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 grid place-items-center text-xl shrink-0"
+          >
+            🎙️
+          </div>
+          <div class="flex flex-col min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-bold text-amber-200 truncate"
+                >【有声剧】《盗墓惊魂》全本免费听</span
+              >
+              <span
+                class="text-[9px] bg-amber-400 text-stone-950 font-bold px-1.5 py-px rounded-full shrink-0"
+                >推广</span
+              >
+            </div>
+            <span class="text-[10px] text-stone-300 opacity-90 truncate mt-0.5"
+              >3D沉浸环绕声 · 今日限时免VIP试听</span
+            >
+          </div>
+        </div>
+        <span
+          class="px-2.5 py-1 rounded-full bg-amber-400 text-stone-950 font-bold text-xs shrink-0 ml-2 shadow-xs"
+        >
+          免费听 ›
+        </span>
+      </section>
     </main>
+
+    <!-- 底部播放条上方常驻：VIP Hi-Fi 试听推广条 -->
+    <div
+      v-if="storm.adsEnabled"
+      class="absolute bottom-14 inset-x-0 h-7 bg-gradient-to-r from-amber-600/95 to-yellow-500/95 text-black px-3.5 flex items-center justify-between text-[11px] font-bold z-30 cursor-pointer shadow-md hover:brightness-105 transition-all"
+      @click="storm.tapAdBody('music-vip')"
+    >
+      <div class="flex items-center gap-1.5 truncate">
+        <span>👑</span>
+        <span class="truncate">开通黑胶 VIP · 首月仅 0.01 元享 Hi-Fi 无损音质与免广告</span>
+      </div>
+      <span class="underline shrink-0 text-[10.5px]">立即开通 ›</span>
+    </div>
 
     <!-- 底部常驻迷你播放条 (Mini Player) -->
     <div
