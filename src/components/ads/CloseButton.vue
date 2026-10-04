@@ -23,7 +23,7 @@ const variantClasses: Record<CloseVariant, string> = {
   honest: 'top-1.5 right-1.5 w-7 h-7 text-xs text-white bg-black/40',
   deceptive: 'top-1.5 right-1.5 w-7 h-7 text-xs text-white bg-black/40',
   tiny: 'top-1.5 right-1.5 w-5 h-5 text-[10px] text-white/70 bg-black/25',
-  corner: 'top-1.5 right-1.5 w-[22px] h-[22px] text-[11px] text-black/60 bg-black/10',
+  corner: 'top-1.5 left-1.5 w-[22px] h-[22px] text-[11px] text-black/60 bg-black/10',
   none: '',
 }
 </script>

@@ -151,7 +151,7 @@ const oversight = [
           <button
             type="button"
             class="truth__again inline-flex items-center justify-center min-h-[52px] px-8 rounded-full bg-gradient-to-r from-white/[0.12] to-white/[0.08] hover:from-white/[0.18] hover:to-white/[0.12] border border-white/20 text-[#e8eaef] text-sm font-semibold cursor-pointer active:scale-95 transition-all shadow-[0_8px_24px_-4px_rgba(0,0,0,0.5)]"
-            @click="storm.restart()"
+            @click="storm.restart('auto')"
           >
             再被淹一次（换个弹窗序列）
           </button>

@@ -132,9 +132,9 @@ export const useStormStore = defineStore('storm', () => {
     phase.value = 'storm'
   }
 
-  /** 「重新体验」：换一个种子，让第二遍不至于完全一样。 */
-  function restart(): void {
-    start(Date.now() >>> 0, explorationMode.value, adsEnabled.value)
+  /** 「重新体验」：换一个种子，让第二遍不至于完全一样。支持可选显式指定探索模式。 */
+  function restart(mode?: 'manual' | 'auto'): void {
+    start(Date.now() >>> 0, mode ?? explorationMode.value, adsEnabled.value)
   }
 
   function setAdsEnabled(enabled: boolean): void {

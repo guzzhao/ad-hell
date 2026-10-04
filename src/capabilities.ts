@@ -68,7 +68,8 @@ export function readCapabilityEnv(): CapabilityEnv {
     hasDeviceMotion,
     needsMotionPermission: hasDeviceMotion && typeof api?.requestPermission === 'function',
     hasAudioContext: typeof globalThis.AudioContext === 'function',
-    isSecureContext: globalThis.isSecureContext,
+    isSecureContext:
+      typeof globalThis.isSecureContext === 'boolean' ? globalThis.isSecureContext : false,
   }
 }
 

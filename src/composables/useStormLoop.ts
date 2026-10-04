@@ -30,8 +30,8 @@ export function useStormLoop(): void {
     ({ delta }) => {
       storm.advance(Math.min(MAX_FRAME_MS, Math.max(0, delta)))
 
-      // 崩塌 / 真相阶段不需要再逐帧推进了
-      if (storm.phase !== 'storm') pause()
+      // 只有进入真相环节（truth）后才暂停；collapsed 阶段需要继续推进以完成崩塌演出并自动切换
+      if (storm.phase === 'truth') pause()
     },
     // 先别跑，等 onMounted 里把状态机也一起起好
     { immediate: false },
